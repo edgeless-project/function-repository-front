@@ -1,3 +1,9 @@
+import Layout from "@/components/layout/Layout";
+
 export default function WorkflowList() {
-  return <h2>TODO: List of workflows</h2>
+  return (
+    <Layout title="Workflows">
+      <h2>TODO: List of workflows</h2>
+    </Layout>
+  );
 }

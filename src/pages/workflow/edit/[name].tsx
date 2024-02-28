@@ -1,4 +1,4 @@
-import Layout from "@/components/layout/Layout";
+import { useRouter } from 'next/router';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -9,9 +9,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function WorkflowCreate() {
+import Layout from "@/components/layout/Layout";
+
+export default function WorkflowEdit() {
+  const router = useRouter();
+  const name = router.query.name;
+
   return (
-    <Layout title="Create workflow">
+    <Layout title={`Edit workflow: ${name}`}>
       <Tabs defaultValue="json-editor" className="w-full">
         <TabsList>
           <TabsTrigger value="json-editor">JSON Editor</TabsTrigger>
