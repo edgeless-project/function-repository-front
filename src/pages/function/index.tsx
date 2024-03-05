@@ -41,7 +41,6 @@ export default function FunctionList() {
     fetchFunctions(offset)
       .then(functions => {
         setFunctions(functions.items);
-        console.log(functions);
         setTotal(functions.total);
         setFunctionsLoading(false);
       })
