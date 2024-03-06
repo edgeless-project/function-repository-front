@@ -19,6 +19,14 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import { fetchFunctions } from "@/services/functionServices";
@@ -63,61 +71,71 @@ export default function FunctionList() {
 
   return (
     <Layout title="Functions">
-      {functionsLoading && <div className="flex items-center justify-center py-20">
-        <Spinner />
-      </div>}
-      {!functionsLoading && <div>
-        {total} functions found
-      </div>}
-      {!functionsLoading && <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">Id</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Latest version</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead>Updated At</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {functions.map(fun => (
-            <TableRow key={fun.id}>
-              <TableCell className="font-medium">{fun.id}</TableCell>
-              <TableCell>{fun.function_type}</TableCell>
-              <TableCell>{fun.version}</TableCell>
-              <TableCell>{fun.createdAt}</TableCell>
-              <TableCell>{fun.updatedAt}</TableCell>
-              <TableCell className="text-right">
-                <Button asChild className="ml-2">
-                  <Link href={`/function/view/${fun.id}`}>View</Link>
-                </Button>
-                <Button asChild className="ml-2">
-                  <Link href={`/function/edit/${fun.id}`}>Edit</Link>
-                </Button>
-                <Button asChild className="ml-2">
-                  <Link href={`/function/delete/${fun.id}`}>Delete</Link>
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>}
-
-      {!functionsLoading && <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" onClick={selectPrevPage} />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#" onClick={selectSamePage}>{page}</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" onClick={selectNextPage} />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>}
-
+      <Card>
+        <CardHeader>
+          <CardTitle>List of functions</CardTitle>
+          {!functionsLoading && <CardDescription>{total} functions found</CardDescription>}
+          <div className="flex justify-end">
+          <Button asChild className="ml-2">
+            <Link href={'/function/create'}>Create new function</Link>
+          </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {functionsLoading && <div className="flex items-center justify-center py-20">
+            <Spinner />
+          </div>}
+          {!functionsLoading && <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">Id</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Latest version</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead>Updated At</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {functions.map(fun => (
+                <TableRow key={fun.id}>
+                  <TableCell className="font-medium">{fun.id}</TableCell>
+                  <TableCell>{fun.function_type}</TableCell>
+                  <TableCell>{fun.version}</TableCell>
+                  <TableCell>{fun.createdAt}</TableCell>
+                  <TableCell>{fun.updatedAt}</TableCell>
+                  <TableCell className="text-right">
+                    <Button asChild className="ml-2">
+                      <Link href={`/function/view/${fun.id}`}>View</Link>
+                    </Button>
+                    <Button asChild className="ml-2">
+                      <Link href={`/function/edit/${fun.id}`}>Edit</Link>
+                    </Button>
+                    <Button asChild className="ml-2">
+                      <Link href={`/function/delete/${fun.id}`}>Delete</Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>}
+        </CardContent>
+        <CardFooter>
+          {!functionsLoading && <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" onClick={selectPrevPage} />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#" onClick={selectSamePage}>{page}</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext href="#" onClick={selectNextPage} />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>}
+        </CardFooter>
+      </Card>
     </Layout>
   );
 }
