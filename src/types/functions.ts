@@ -12,3 +12,15 @@ export interface ApiResponseGetFunctions {
   limit: number;
   offset: number;
 };
+
+export interface ApiResponseUploadFunctionCode {
+  id: string;
+};
+
+export interface ApiRequestCreateFunction {
+  id: string, 
+  code_file_id: string,
+  function_type: string,
+  version: string,
+  outputs: string[]
+};
