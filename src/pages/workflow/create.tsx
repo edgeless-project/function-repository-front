@@ -1,3 +1,5 @@
+import dynamic from 'next/dynamic';
+
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -8,8 +10,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
+
 
 export default function WorkflowCreate() {
+
+  const testData = {
+    functions: [],
+    resources: [],
+    annotations: {}
+  };
+
+  const handleJSONChange = (jsonData: object) => {
+    console.log(jsonData);
+  };
+
+  const handleJSONError = (hasError: boolean) => {
+    console.log('Error: ', hasError);
+  };
+
   return (
     <Layout title="Create workflow">
       <Tabs defaultValue="json-editor" className="w-full">
@@ -21,7 +40,7 @@ export default function WorkflowCreate() {
           <Card>
             <CardHeader></CardHeader>
             <CardContent>
-              <p>TODO: JSON Editor</p>
+              <JSONEditorComponent value={testData} onChange={handleJSONChange} onError={handleJSONError} />
             </CardContent>
           </Card>
         </TabsContent>
