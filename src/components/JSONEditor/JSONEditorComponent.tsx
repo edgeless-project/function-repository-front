@@ -36,7 +36,7 @@ const JsonEditorComponent: React.FC<JsonEditorComponentProps> = ({ value, onChan
 
       return () => editor.destroy();
     }
-  }, [isMounted, value, onChange]);
+  }, [isMounted]);
 
   return isMounted ? (<div>
     <style jsx global>{`
