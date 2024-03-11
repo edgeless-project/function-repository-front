@@ -4,11 +4,12 @@ import 'jsoneditor/dist/jsoneditor.css';
 
 interface JsonEditorComponentProps {
   value: object;
-  onChange: (value: object) => void;
-  onError: (hasError: boolean) => void;
+  onChange?: (value: object) => void;
+  onError?: (hasError: boolean) => void;
+  readOnly?: boolean;
 }
 
-const JsonEditorComponent: React.FC<JsonEditorComponentProps> = ({ value, onChange, onError }) => {
+const JsonEditorComponent: React.FC<JsonEditorComponentProps> = ({ value, onChange, onError, readOnly=false }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
 
@@ -20,19 +21,24 @@ const JsonEditorComponent: React.FC<JsonEditorComponentProps> = ({ value, onChan
     if (isMounted && editorRef.current) {
       const options: JSONEditorOptions = {
         modes: ['code', 'tree', 'view', 'form', 'text'],
+        mode: readOnly ? 'view' : 'code',
         mainMenuBar: false,
         onChange: () => {
           try {
-            onChange(editor.get());
-            onError(false);
+            if (onChange) onChange(editor.get());
+            if (onError) onError(false);
           } catch (error) {
-            onError(true);
+            if (onError) onError(true);
           }
         }
       };
 
       const editor = new JSONEditor(editorRef.current, options);
       editor.set(value);
+
+      if (readOnly) {
+        editor.expandAll();
+      }
 
       return () => editor.destroy();
     }
@@ -44,7 +50,7 @@ const JsonEditorComponent: React.FC<JsonEditorComponentProps> = ({ value, onChan
         border-color: rgb(229 231 235) !important;
       }
     `}</style>
-    <div ref={editorRef} style={{ height: '400px' }} />
+    <div ref={editorRef} style={{ height: '500px' }} />
   </div>) : null;
 };
 
