@@ -1,3 +1,16 @@
+export interface WorkflowMinified {
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export interface ApiResponseGetWorkflows {
+  items: WorkflowMinified[];
+  total: number;
+  limit: number;
+  offset: number;
+};
+
 export interface FunctionWorkflow {
   name: string;
   class_specification: any; // TODO
