@@ -25,7 +25,7 @@ export interface ResourceWorkflow {
   configurations: any;
 };
 
-export interface ApiResponseCreateWorkflow {
+export interface ApiResponseWorkflow {
   createdAt: string;
   updatedAt: string;
   name: string;
