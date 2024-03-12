@@ -6,11 +6,20 @@ export interface FunctionMinified {
   updatedAt?: string;
 };
 
+export interface FunctionComplete extends FunctionMinified {
+  code_file_id: string;
+  outputs: string[];
+};
+
 export interface ApiResponseGetFunctions {
   items: FunctionMinified[];
   total: number;
   limit: number;
   offset: number;
+};
+
+export interface ApiResponseGetFunctionVersions {
+  versions: string[];
 };
 
 export interface ApiResponseUploadFunctionCode {
