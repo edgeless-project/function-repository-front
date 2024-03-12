@@ -64,7 +64,7 @@ export default function WorkflowEdit() {
     setIsSaving(true);
     setModalOpen(true);
 
-    // Create the workflow in the API
+    // Update the workflow in the API
     try {
       const workflowData: ApiRequestUpdateWorkflow = {
         ...workflowJSON as ApiRequestUpdateWorkflow
