@@ -43,3 +43,7 @@ export interface ApiRequestUpdateWorkflow {
 export interface ApiRequestCreateWorkflow extends ApiRequestUpdateWorkflow {
   name: string;
 };
+
+export interface ApiResponseDeleteWorkflow {
+  deletedCount: number;
+};

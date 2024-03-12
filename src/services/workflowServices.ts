@@ -1,4 +1,4 @@
-import { ApiRequestCreateWorkflow, ApiResponseWorkflow, ApiResponseGetWorkflows, ApiRequestUpdateWorkflow } from "@/types/workflows";
+import { ApiRequestCreateWorkflow, ApiResponseWorkflow, ApiResponseGetWorkflows, ApiRequestUpdateWorkflow, ApiResponseDeleteWorkflow } from "@/types/workflows";
 import { buildFetchHeaders } from "@/utils/fetch";
 
 const serverRestApi = process.env.NEXT_PUBLIC_SERVER_REST_API;
@@ -56,6 +56,23 @@ export const updateWorkflow = async (name: string, workflowData: ApiRequestUpdat
   const data = await fetch(url, { 
     method: 'PUT',
     body: JSON.stringify(workflowData),
+    headers 
+  });
+
+  if(!data.ok) {
+    const json = await data.json();
+    throw new Error(json.message);
+  }
+
+  const json = await data.json();
+  return json;
+};
+
+export const deleteWorkflow = async (name: string): Promise<ApiResponseDeleteWorkflow> => {
+  const headers = buildFetchHeaders('');
+  const url = `${serverRestApi}/workflow/${name}`;
+  const data = await fetch(url, { 
+    method: 'DELETE',
     headers 
   });
 
