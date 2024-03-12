@@ -34,9 +34,12 @@ export interface ApiResponseWorkflow {
   annotations: any; // TODO
 };
 
-export interface ApiRequestCreateWorkflow {
-  name: string;
+export interface ApiRequestUpdateWorkflow {
   functions: FunctionWorkflow[];
   resources: ResourceWorkflow[];
   annotations: any; // TODO
+};
+
+export interface ApiRequestCreateWorkflow extends ApiRequestUpdateWorkflow {
+  name: string;
 };

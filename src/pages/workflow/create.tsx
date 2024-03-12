@@ -166,7 +166,7 @@ export default function WorkflowCreate() {
 
       <DialogSave
         isOpen={modalOpen}
-        title="Saving function"
+        title="Saving workflow"
         description={saveMessage}
         isLoading={isSaving}
         onClose={closeModal}

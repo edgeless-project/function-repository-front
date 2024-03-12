@@ -25,7 +25,7 @@ export default function WorkflowView() {
 
   useEffect(() => {
     setLoading(true);
-    getWorkflow(name as string)
+    getWorkflow(name as string, false)
       .then(workflow => {
         setWorkflow(workflow);
         // We do not want to show name, createdAt and updatedAt in the workflow definition
