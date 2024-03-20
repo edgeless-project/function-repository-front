@@ -18,7 +18,6 @@ import DialogSave from "@/components/utils/DialogSave";
 
 //Form Schema verification
 const formSchema = z.object({
-    version: z.string().min(1, 'The version must contain at least 1 character'),//TODO: delete attr
     functionType: z.enum(['RUST_WASM']),
     file: z.instanceof(File).optional(),
     outputs: z.string()
@@ -59,7 +58,7 @@ export default function FunctionEdit() {
   const [saveMessage, setSaveMessage] = useState('');
   const [resultOk, setResultOk] = useState(false);
 
-  //Controls for an id to be passed and loading deactivated
+  //Controls for an id to be loaded from API and loading
   useEffect(() => {
     setLoading(true);
     getFunctionVersionsComplete(id as string)
@@ -74,7 +73,6 @@ export default function FunctionEdit() {
   const form = useForm<z.infer< typeof formSchema>>({
       resolver: zodResolver(formSchema),
       defaultValues: {
-          version: '0.1',
           functionType: 'RUST_WASM',
           file: new File([], ""),
           outputs: '',
@@ -101,7 +99,7 @@ export default function FunctionEdit() {
       // Create the function with an API call
       try {
           const outputs = splitOutputs(data.outputs);
-          await updateFunction(id, codeId, data.functionType, data.version.trim(), outputs);
+          await updateFunction(id, codeId, data.functionType, functions[functions.length-1].version, outputs);
 
           setSaveMessage('The function has been updated successfully');
           setResultOk(true);
@@ -125,40 +123,29 @@ export default function FunctionEdit() {
         <Spinner />
         </div>}
         {!loading && functions.length>0 &&<div>
-         <Card>
-            <CardHeader>
-                <CardTitle>General information</CardTitle>
-            </CardHeader>
-            <CardContent className="max-w-5xl">
-              <div className="flex my-3">
-                <div className="w-48 font-bold">Id:</div>
-                <div className="w-96">{functions[0].id}</div>
-              </div>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle>Function class specification</CardTitle>
-            </CardHeader>
-            <Form {...form}>
+            <Card>
+               <CardHeader>
+                   <CardTitle>General information</CardTitle>
+               </CardHeader>
+               <CardContent className="max-w-5xl">
+                   <div className="flex my-3">
+                       <div className="w-48 font-bold">Id:</div>
+                       <div className="w-96">{functions[0].id}</div>
+                   </div>
+                   <div className="flex my-3">
+                       <div className="w-48 font-bold">Version:</div>
+                       <div className="w-96">{functions[functions.length-1].version}</div>
+                   </div>
+               </CardContent>
+            </Card>
+            <br/>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Function class specification</CardTitle>
+                </CardHeader>
+                <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)}>
                     <CardContent className="max-w-5xl">
-                        <FormField
-                            control={form.control}
-                            name="version"
-                            render={({field}) => {
-                                return (
-                                    <FormItem className="mt-5">
-                                        <FormLabel>Version</FormLabel>
-                                        <FormControl>
-                                            <Input type="text" placeholder="version" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                );
-                            }}
-                        />
                         <FormField
                             control={form.control}
                             name="functionType"
@@ -223,18 +210,18 @@ export default function FunctionEdit() {
                             variant="outline"
                             onClick={() => { router.back() }}
                         >Cancel</Button>
-                        <Button type="submit">Save</Button>
+                        <Button type="submit">Update</Button>
                     </CardFooter>
                 </form>
             </Form>
             <DialogSave
                 isOpen={modalOpen}
-                title="Saving function"
+                title="Updating function"
                 description={saveMessage}
                 isLoading={isSaving}
                 onClose={closeModal}
             />
-        </Card>
+            </Card>
         </div>}
     </Layout>
   );
