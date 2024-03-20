@@ -1,9 +1,9 @@
 import {
-  ApiRequestCreateFunction, 
-  ApiResponseGetFunctionVersions, 
-  ApiResponseGetFunctions, 
-  ApiResponseUploadFunctionCode, 
-  FunctionComplete
+  ApiRequestCreateFunction,
+  ApiResponseGetFunctionVersions,
+  ApiResponseGetFunctions,
+  ApiResponseUploadFunctionCode,
+  FunctionComplete, ApiRequestUpdateFunction
 } from "@/types/functions";
 import { buildFetchHeaders, buildFileFetchHeaders } from "@/utils/fetch";
 
@@ -90,6 +90,38 @@ export const createFunction = async (
     method: 'POST',
     body: JSON.stringify(payload),
     headers 
+  });
+
+  if(!data.ok) {
+    const json = await data.json();
+    throw new Error(json.message);
+  }
+
+  const json = await data.json();
+  return json;
+};
+
+export const updateFunction = async (
+    id: string,
+    code_file_id: string,
+    function_type: string,
+    version: string,
+    outputs: string[]
+): Promise<ApiResponseUploadFunctionCode> => {
+
+  const headers = buildFetchHeaders('')
+  const params = new URLSearchParams({ version: version});
+  const url = `${serverRestApi}/function/${id}?${params.toString()}`;
+  const payload: ApiRequestUpdateFunction = {
+    code_file_id,
+    function_type,
+    outputs
+  };
+
+  const data = await fetch(url, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+    headers
   });
 
   if(!data.ok) {

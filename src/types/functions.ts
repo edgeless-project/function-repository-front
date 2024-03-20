@@ -33,3 +33,9 @@ export interface ApiRequestCreateFunction {
   version: string,
   outputs: string[]
 };
+
+export interface ApiRequestUpdateFunction {
+  code_file_id: string,
+  function_type: string,
+  outputs: string[]
+};
