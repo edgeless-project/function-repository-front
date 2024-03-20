@@ -118,6 +118,7 @@ export default function FunctionEdit() {
     };
 
   return (
+      
     <Layout title={`Edit function: ${id}`}>
         {loading && <div className="flex items-center justify-center py-20">
         <Spinner />
