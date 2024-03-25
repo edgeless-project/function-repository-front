@@ -1,0 +1,24 @@
+From 36a583ea641b0f71074150781faf8080ed7e91b7 Mon Sep 17 00:00:00 2001
+From: maespi <marcausejo@hotmail.com>
+Date: Wed, 20 Mar 2024 13:43:54 +0100
+Subject: [PATCH] Commend Ammend
+
+---
+ src/pages/function/edit/[id].tsx | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/pages/function/edit/[id].tsx b/src/pages/function/edit/[id].tsx
+index 1c4e297..87562a8 100644
+--- a/src/pages/function/edit/[id].tsx
++++ b/src/pages/function/edit/[id].tsx
+@@ -118,6 +118,7 @@ export default function FunctionEdit() {
+     };
+ 
+   return (
++      
+     <Layout title={`Edit function: ${id}`}>
+         {loading && <div className="flex items-center justify-center py-20">
+         <Spinner />
+-- 
+2.44.0.windows.1
+

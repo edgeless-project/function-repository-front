@@ -6,6 +6,10 @@ export interface FunctionMinified {
   updatedAt?: string;
 };
 
+export enum FunctionTypes {
+  RUST_WASM = 'RUST_WASM'
+};
+
 export interface FunctionComplete extends FunctionMinified {
   code_file_id: string;
   outputs: string[];

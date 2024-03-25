@@ -2,8 +2,12 @@ import { useRouter } from 'next/router';
 
 import Layout from "@/components/layout/Layout";
 import {useEffect, useState} from "react";
-import {createFunction, getFunctionVersionsComplete, updateFunction, uploadCodeFile} from "@/services/functionServices";
-import {FunctionComplete} from "@/types/functions";
+import {
+    getFunction,
+    updateFunction,
+    uploadCodeFile
+} from "@/services/functionServices";
+import {FunctionComplete, FunctionTypes} from "@/types/functions";
 import Spinner from "@/components/utils/Spinner";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {z} from "zod";
@@ -16,9 +20,12 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Button} from "@/components/ui/button";
 import DialogSave from "@/components/utils/DialogSave";
 
+const TypesEnum = z.nativeEnum(FunctionTypes);
+type TypesEnum = z.infer<typeof TypesEnum>;
+
 //Form Schema verification
 const formSchema = z.object({
-    functionType: z.enum(['RUST_WASM']),
+    functionType: TypesEnum,
     file: z.instanceof(File).optional(),
     outputs: z.string()
 })
@@ -51,33 +58,36 @@ export default function FunctionEdit() {
   const router = useRouter();
   const id = router.query.id as string;
 
-  const [functions, setFunctions] = useState<FunctionComplete[]>([]);
+  const [fun, setFunctions] = useState<FunctionComplete>({} as unknown as FunctionComplete);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [resultOk, setResultOk] = useState(false);
 
+  //Form Data
+  const form = useForm<z.infer< typeof formSchema>>({
+  resolver: zodResolver(formSchema),
+  defaultValues: {
+      functionType: FunctionTypes[fun.function_type as keyof typeof FunctionTypes],
+      file: new File([], ""),
+      outputs: fun.outputs? fun.outputs.join(', ') : "",
+    }
+  });
+
   //Controls for an id to be loaded from API and loading
   useEffect(() => {
     setLoading(true);
-    getFunctionVersionsComplete(id as string)
-        .then(functions => {
-          setFunctions(functions);
-          setLoading(false);
+    getFunction(id as string)
+        .then(fun => {
+            //Set form default values from Docker response and save to global var
+            form.setValue('functionType',FunctionTypes[fun.function_type as keyof typeof FunctionTypes]);
+            form.setValue('outputs',fun.outputs? fun.outputs.join(', ') : "");
+            setFunctions(fun);
+            setLoading(false);
         })
         .catch(error => console.error(error)); //TODO: Error threw
   }, []);
-
-  //Form Data
-  const form = useForm<z.infer< typeof formSchema>>({
-      resolver: zodResolver(formSchema),
-      defaultValues: {
-          functionType: 'RUST_WASM',
-          file: new File([], ""),
-          outputs: '',
-      }
-  });
 
   const handleSubmit = async (data: z.infer< typeof formSchema>) => {
       setSaveMessage('');
@@ -99,7 +109,7 @@ export default function FunctionEdit() {
       // Create the function with an API call
       try {
           const outputs = splitOutputs(data.outputs);
-          await updateFunction(id, codeId, data.functionType, functions[functions.length-1].version, outputs);
+          await updateFunction(id, codeId, data.functionType, fun.version, outputs);
 
           setSaveMessage('The function has been updated successfully');
           setResultOk(true);
@@ -110,20 +120,20 @@ export default function FunctionEdit() {
       setIsSaving(false);
   };
 
-    const closeModal = () => {
-        if (resultOk) {
-            router.back();
-        }
-        setModalOpen(false);
+  const closeModal = () => {
+      if (resultOk) {
+          router.back();
+      }
+      setModalOpen(false);
     };
-
+  
   return (
-      
+
     <Layout title={`Edit function: ${id}`}>
         {loading && <div className="flex items-center justify-center py-20">
         <Spinner />
         </div>}
-        {!loading && functions.length>0 &&<div>
+        {!loading && fun.id &&<div>
             <Card>
                <CardHeader>
                    <CardTitle>General information</CardTitle>
@@ -131,11 +141,11 @@ export default function FunctionEdit() {
                <CardContent className="max-w-5xl">
                    <div className="flex my-3">
                        <div className="w-48 font-bold">Id:</div>
-                       <div className="w-96">{functions[0].id}</div>
+                       <div className="w-96">{fun.id}</div>
                    </div>
                    <div className="flex my-3">
                        <div className="w-48 font-bold">Version:</div>
-                       <div className="w-96">{functions[functions.length-1].version}</div>
+                       <div className="w-96">{fun.version}</div>
                    </div>
                </CardContent>
             </Card>
@@ -197,7 +207,7 @@ export default function FunctionEdit() {
                                     <FormItem className="mt-5">
                                         <FormLabel>Outputs</FormLabel>
                                         <FormControl>
-                                            <Input type="text" placeholder="Outputs" {...field} />
+                                            <Input type="text" placeholder="Outputs" {...field}/>
                                         </FormControl>
                                         <FormDescription>Here you can define the outputs, separated by commas.</FormDescription>
                                         <FormMessage />
