@@ -31,6 +31,7 @@ export default function FunctionDelete() {
         .catch(error => console.error(error)); //TODO: Error threw
   }, []);
 
+  
   const deleteVer = async (id: string, version: string = '') =>{
     setDelMessage('');
     try {
