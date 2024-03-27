@@ -2,8 +2,8 @@ import { useRouter } from 'next/router';
 
 import Layout from "@/components/layout/Layout";
 import {useEffect, useState} from "react";
-import {ApiResponseGetFunctionVersions} from "@/types/functions";
-import {getFunctionVersions} from "@/services/functionServices";
+import {ApiResponseGetFunctionVersions, FunctionComplete} from "@/types/functions";
+import {deleteFunction, getFunctionVersions, getFunctionVersionsComplete} from "@/services/functionServices";
 import Spinner from "@/components/utils/Spinner";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
@@ -13,33 +13,46 @@ export default function FunctionDelete() {
   const router = useRouter();
   const id = router.query.id as string;
 
-  const [response, setResponse] = useState<ApiResponseGetFunctionVersions>({} as unknown as ApiResponseGetFunctionVersions);
+  const [functions, setFunctions] = useState<FunctionComplete[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState('');
+  const [delMsg, setDelMessage] = useState('');
   const [resultOk, setResultOk] = useState(false);
 
   //Controls for an id to be loaded from API and loading
   useEffect(() => {
     setLoading(true);
-      getFunctionVersions(id as string)
-        .then(ver => {
-          console.log(ver);
-          setResponse(ver);
+    getFunctionVersionsComplete(id as string)
+        .then(fun => {
+          setFunctions(fun);
           setLoading(false);
         })
         .catch(error => console.error(error)); //TODO: Error threw
   }, []);
 
+  const deleteVer = async (id: string, version: string = '') =>{
+    setDelMessage('');
+    try {
+      const resp = await deleteFunction(id,version);
+      console.log(resp.deletedCount);
+      setResultOk(true);
+      //setDelMessage(`Elements deleted ${resp}`);
 
+    }catch (e: any) {
+      const text = `ERROR: ${e.message as string}`;
+      setDelMessage(text);
+      return;
+    }
+    router.back();
+  }
 
   return (
     <Layout title={`View function: ${id}`}>
       {loading && <div className="flex items-center justify-center py-20">
         <Spinner />
       </div>}
-      {!loading && response.versions.length>0 && <Card>
+      {!loading && functions.length>0 && <Card>
         <CardHeader>
           <CardTitle>General information</CardTitle>
         </CardHeader>
@@ -48,12 +61,16 @@ export default function FunctionDelete() {
             <div className="w-48 font-bold">Id:</div>
             <div className="w-96">{id}</div>
             <div className="flex justify-end">
-              <Button className="ml-6">Delete Function</Button>
+              <Button
+                  className="ml-6"
+                  variant="destructive"
+                  onClick={() => {deleteVer(id)}}
+              >Delete Function</Button>
             </div>
           </div>
         </CardContent>
       </Card>}
-      {!loading && response.versions.length>0 && <Card className="mt-4">
+      {!loading && functions.length>0 && <Card className="mt-4">
         <CardHeader>
           <CardTitle>Versions</CardTitle>
         </CardHeader>
@@ -62,14 +79,26 @@ export default function FunctionDelete() {
             <TableHeader>
               <TableRow>
                 <TableHead>Version</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Outputs</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead>Updated At</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {response.versions.map(v => (
-                  <TableRow key={v}>
-                    <TableCell>{v}</TableCell>
+              {functions.map(v => (
+                  <TableRow key={v.version}>
+                    <TableCell>{v.version}</TableCell>
+                    <TableCell>{v.function_type}</TableCell>
+                    <TableCell>{v.outputs.join(', ')}</TableCell>
+                    <TableCell>{v.createdAt}</TableCell>
+                    <TableCell>{v.updatedAt}</TableCell>
                     <TableCell className="text-right">
-                      <Button className="ml-2">Delete</Button>
+                      <Button
+                          className="ml-2 red"
+                          variant="destructive"
+                          onClick={() => {deleteVer(id, v.version)}}
+                      >Delete</Button>
                     </TableCell>
                   </TableRow>
               ))}
