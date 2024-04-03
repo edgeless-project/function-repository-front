@@ -1,24 +1,174 @@
-From 36a583ea641b0f71074150781faf8080ed7e91b7 Mon Sep 17 00:00:00 2001
-From: maespi <marcausejo@hotmail.com>
-Date: Wed, 20 Mar 2024 13:43:54 +0100
-Subject: [PATCH] Commend Ammend
+From 427a69a1bf540fa1af3c2d07b0e515d49d3ab9ff Mon Sep 17 00:00:00 2001
+From: "Marc Espinosa i Tejada(W135175)" <marc.espinosa@worldline.com>
+Date: Wed, 3 Apr 2024 13:07:22 +0200
+Subject: [PATCH] Delete function implemented for versions and full function
 
 ---
- src/pages/function/edit/[id].tsx | 1 +
- 1 file changed, 1 insertion(+)
+ src/components/utils/DialogDelete.tsx | 46 +++++++++++++++++++++++++
+ src/pages/function/delete/[id].tsx    | 49 +++++++++++++++++++++------
+ 2 files changed, 85 insertions(+), 10 deletions(-)
+ create mode 100644 src/components/utils/DialogDelete.tsx
 
-diff --git a/src/pages/function/edit/[id].tsx b/src/pages/function/edit/[id].tsx
-index 1c4e297..87562a8 100644
---- a/src/pages/function/edit/[id].tsx
-+++ b/src/pages/function/edit/[id].tsx
-@@ -118,6 +118,7 @@ export default function FunctionEdit() {
-     };
+diff --git a/src/components/utils/DialogDelete.tsx b/src/components/utils/DialogDelete.tsx
+new file mode 100644
+index 0000000..7b2e2cb
+--- /dev/null
++++ b/src/components/utils/DialogDelete.tsx
+@@ -0,0 +1,46 @@
++import { Button } from "@/components/ui/button";
++import {
++  Dialog,
++  DialogContent,
++  DialogDescription,
++  DialogFooter,
++  DialogHeader,
++  DialogTitle,
++} from "@/components/ui/dialog";
++import Spinner from "@/components/utils/Spinner";
++import {router} from "next/client";
++
++interface DialogSaveProps {
++  isOpen: boolean;
++  title: string;
++  description: string;
++  isLoading: boolean;
++  resultOK: boolean;
++  onClose: () => void;
++  onConfirm: () => void;
++}
++
++export default function DialogSave ({isOpen, title, description, isLoading, resultOK, onClose, onConfirm}: DialogSaveProps) {
++
++  return (
++    <Dialog open={isOpen}>
++      <DialogContent className="sm:max-w-[425px]">
++        <DialogHeader>
++          <DialogTitle>{title}</DialogTitle>
++
++          {!isLoading && <DialogDescription>
++            {description}
++          </DialogDescription>}
++          {isLoading && <div className="flex items-center justify-center py-5">
++            <Spinner />
++          </div>}
++          
++        </DialogHeader>
++        {!isLoading && <DialogFooter className="flex justify-end">
++          <Button variant="outline" onClick={onClose}>Close</Button>
++          {!resultOK && <Button variant="destructive" onClick={onConfirm}>Confirm</Button>}
++        </DialogFooter>}
++      </DialogContent>
++    </Dialog>
++  );
++};
+\ No newline at end of file
+diff --git a/src/pages/function/delete/[id].tsx b/src/pages/function/delete/[id].tsx
+index c92f32b..ba623a9 100644
+--- a/src/pages/function/delete/[id].tsx
++++ b/src/pages/function/delete/[id].tsx
+@@ -8,6 +8,7 @@ import Spinner from "@/components/utils/Spinner";
+ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+ import {Button} from "@/components/ui/button";
++import DialogDelete from "@/components/utils/DialogDelete"
+ 
+ export default function FunctionDelete() {
+   const router = useRouter();
+@@ -18,6 +19,7 @@ export default function FunctionDelete() {
+   const [modalOpen, setModalOpen] = useState(false);
+   const [isSaving, setIsSaving] = useState(false);
+   const [delMsg, setDelMessage] = useState('');
++  const [version, setVersion] = useState('');
+   const [resultOk, setResultOk] = useState(false);
+ 
+   //Controls for an id to be loaded from API and loading
+@@ -31,21 +33,38 @@ export default function FunctionDelete() {
+         .catch(error => console.error(error)); //TODO: Error threw
+   }, []);
+ 
+-  
+   const deleteVer = async (id: string, version: string = '') =>{
+-    setDelMessage('');
+     try {
+       const resp = await deleteFunction(id,version);
+-      console.log(resp.deletedCount);
+       setResultOk(true);
+-      //setDelMessage(`Elements deleted ${resp}`);
++      return resp.deletedCount;
+ 
+     }catch (e: any) {
+       const text = `ERROR: ${e.message as string}`;
+       setDelMessage(text);
+-      return;
++      return 0;
+     }
+-    router.back();
++  }
++
++  const handleDeleteModal = (version: string = '') => {
++    setVersion(version);
++    setDelMessage(`Confirm to delete function id ${id}${version?` version ${version}`:''}.`);
++    setModalOpen(true);
++  }
++
++  const handleDialogDelete = (id: string, version: string = '') => {
++    deleteVer(id, version).then( resp => {
++      setModalOpen(false);
++      if(resp > 0){
++        console.log(`Deleted elements ${resp}`);
++        setDelMessage(`Function deleted!`);
++        setResultOk(true);
++      }else{
++        setDelMessage('Function could not be deleted!');
++        setResultOk(true);
++      }
++      setModalOpen(true);
++    });
+   }
  
    return (
-+      
-     <Layout title={`Edit function: ${id}`}>
-         {loading && <div className="flex items-center justify-center py-20">
-         <Spinner />
+@@ -65,7 +84,7 @@ export default function FunctionDelete() {
+               <Button
+                   className="ml-6"
+                   variant="destructive"
+-                  onClick={() => {deleteVer(id)}}
++                  onClick={() => handleDeleteModal('')}
+               >Delete Function</Button>
+             </div>
+           </div>
+@@ -98,7 +117,7 @@ export default function FunctionDelete() {
+                       <Button
+                           className="ml-2 red"
+                           variant="destructive"
+-                          onClick={() => {deleteVer(id, v.version)}}
++                          onClick={() => handleDeleteModal(v.version)}
+                       >Delete</Button>
+                     </TableCell>
+                   </TableRow>
+@@ -106,11 +125,21 @@ export default function FunctionDelete() {
+             </TableBody>
+           </Table>
+         </CardContent>
+-      </Card>}
++        <DialogDelete
++            isOpen={modalOpen}
++            title={"Delete function"}
++            description={delMsg}
++            isLoading={isSaving}
++            resultOK={resultOk}
++            onClose={() => router.back()}
++            onConfirm={() => handleDialogDelete(id, version)}
++        />
++      </Card>
++      }
+       <div className="flex justify-between my-8">
+         <Button
+             variant="outline"
+-            onClick={() => { router.back() }}
++            onClick={() => router.back()}
+         >Go back</Button>
+       </div>
+     </Layout>
 -- 
 2.44.0.windows.1
 
