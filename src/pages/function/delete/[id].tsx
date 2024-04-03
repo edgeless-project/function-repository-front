@@ -8,7 +8,7 @@ import Spinner from "@/components/utils/Spinner";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Button} from "@/components/ui/button";
-import DialogDelete from "@/components/utils/DialogDelete"
+import DialogDelete from '@/components/utils/DialogDelete'
 
 export default function FunctionDelete() {
   const router = useRouter();

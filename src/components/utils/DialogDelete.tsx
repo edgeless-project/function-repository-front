@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Spinner from "@/components/utils/Spinner";
-import {router} from "next/client";
 
 interface DialogSaveProps {
   isOpen: boolean;
