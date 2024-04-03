@@ -43,3 +43,7 @@ export interface ApiRequestUpdateFunction {
   function_type: string,
   outputs: string[]
 };
+
+export interface ApiResponseDeleteFunction {
+  deletedCount: number;
+};

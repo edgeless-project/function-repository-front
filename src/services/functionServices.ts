@@ -3,7 +3,7 @@ import {
   ApiResponseGetFunctionVersions,
   ApiResponseGetFunctions,
   ApiResponseUploadFunctionCode,
-  FunctionComplete, ApiRequestUpdateFunction
+  FunctionComplete, ApiRequestUpdateFunction, ApiResponseDeleteFunction
 } from "@/types/functions";
 import { buildFetchHeaders, buildFileFetchHeaders } from "@/utils/fetch";
 
@@ -132,3 +132,25 @@ export const updateFunction = async (
   const json = await data.json();
   return json;
 };
+
+export const deleteFunction = async (
+    id: string,
+    version: string
+):Promise<ApiResponseDeleteFunction> => {
+  const headers = buildFetchHeaders('')
+  const params = new URLSearchParams({ version: version});
+  const url = `${serverRestApi}/function/${id}${version? `?${params.toString()}`:""}`;
+  console.log(url);
+  const data = await fetch(url, {
+    method: 'DELETE',
+    headers
+  });
+
+  if(!data.ok) {
+    const json = await data.json();
+    throw new Error(json.message);
+  }
+
+  const json = await data.json();
+  return json;
+}
