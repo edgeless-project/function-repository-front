@@ -76,7 +76,7 @@ export default function FunctionList() {
           <CardTitle>List of functions</CardTitle>
           {!functionsLoading && <CardDescription>{total} functions found</CardDescription>}
           <div className="flex justify-end">
-          <Button asChild className="ml-2">
+          <Button asChild className="ml-2 bg-[#6e2d9f]">
             <Link href={'/function/create'}>Create new function</Link>
           </Button>
           </div>
