@@ -6,9 +6,9 @@ interface HeaderProps {
 
 export default function Header({ title }: HeaderProps) {
   return (
-    <Head>
-      <title>{title && `${title} -`} EDGELESS Function Repository</title>
-      <meta name="description" content='Front-end app for the EDGELESS Function Repository' />
-    </Head>
+      <Head>
+          <title>{title && `${title} -`} EDGELESS Function Repository</title>
+          <meta name="description" content='Front-end app for the EDGELESS Function Repository'/>
+      </Head>
   );
 }
