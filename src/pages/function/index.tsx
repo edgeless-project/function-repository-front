@@ -73,7 +73,7 @@ export default function FunctionList() {
     <Layout title="Functions">
       <Card>
         <CardHeader>
-          <CardTitle>List of functions</CardTitle>
+          <CardTitle className="text-edgeless-secondary-color">List of functions</CardTitle>
           {!functionsLoading && <CardDescription>{total} functions found</CardDescription>}
           <div className="flex justify-end">
             <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
