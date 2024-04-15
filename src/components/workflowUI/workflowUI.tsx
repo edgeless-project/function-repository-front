@@ -3,8 +3,6 @@ import ReactFlow, {
     MiniMap,
     Controls,
     Background,
-    useNodesState,
-    useEdgesState,
     addEdge,
     MarkerType,
     Edge,
@@ -14,7 +12,8 @@ import ReactFlow, {
     applyNodeChanges,
     OnEdgesChange,
     applyEdgeChanges,
-    FitViewOptions, Connection
+    FitViewOptions,
+    Connection
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
 
@@ -154,59 +153,22 @@ const fitViewOptions: FitViewOptions = {
     padding: 0.05,
 };
 
-const initialNodes1: Node[] = [
-    {
-        id: '1',
-        type: 'input',
-        data: { label: 'Node 1' },
-        position: { x: 250, y: 5 },
-    },
-    {
-        id: '2',
-        data: { label: 'Node 2' },
-        position: { x: 100, y: 100 },
-    },
-    {
-        id: '3',
-        data: { label: 'Node 3' },
-        position: { x: 400, y: 100 },
-    }
-];
-
-const initialEdges1: Edge[] = [
-    { id: 'e1-2', source: '1', target: '2', animated: true },
-    { id: 'e1-3', source: '1', target: '3', animated: true },
-];
-
-interface JsonFlowComponentProps {
-}
-
 const Flow:React.FC = () => {
-    const [nodes, setNodes] = useState<Node[]>(initialNodes1);
-    const [edges, setEdges] = useState<Edge[]>(initialEdges1);
-    const reactRef = useRef<HTMLDivElement>(null);
+    const [nodes, setNodes] = useState<Node[]>(initialNodes);
+    const [edges, setEdges] = useState<Edge[]>(initialEdges);
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    useEffect(() => {
-        if (isMounted && reactRef.current) {
-            console.log('Its mounted!');
-
-        }
-    }, [isMounted]);
-
     const onClickNode = (event: any, nodeClicked: any) => {
         console.log(nodeClicked);
     }; //Function to execute on node click
-
     const onConnect = useCallback(
         (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
     );
-
     const onNodesChange: OnNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
         [setNodes],
@@ -217,7 +179,7 @@ const Flow:React.FC = () => {
     );
 
     return isMounted ? (
-        <div ref={reactRef} style={{width: '80vw', height: '90vh'}}>
+        <div style={{width: '80vw', height: '90vh'}}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
