@@ -17,7 +17,6 @@ import ReactFlow, {
     FitViewOptions, Connection
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
-import JSONEditor, {JSONEditorOptions} from "jsoneditor";
 
 //Nodes Style modes
 let styleResourceNode = {
@@ -217,7 +216,7 @@ const Flow:React.FC = () => {
         [setEdges],
     );
 
-    return (
+    return isMounted ? (
         <div ref={reactRef} style={{width: '80vw', height: '90vh'}}>
             <ReactFlow
                 nodes={nodes}
@@ -236,7 +235,7 @@ const Flow:React.FC = () => {
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
             </ReactFlow>
         </div>
-    );
+    ) : null;
 }
 
 export default Flow;
