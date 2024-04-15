@@ -7,7 +7,7 @@ export default function FunctionIcon (props: any) {
       width={20}
       height={20}
       fill="none"
-      stroke="#fff"
+      stroke="#6e2d9f"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

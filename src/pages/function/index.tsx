@@ -105,13 +105,13 @@ export default function FunctionList() {
                   <TableCell>{fun.createdAt}</TableCell>
                   <TableCell>{fun.updatedAt}</TableCell>
                   <TableCell className="text-right">
-                    <Button asChild className="ml-2">
+                    <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/function/view/${fun.id}`}>View</Link>
                     </Button>
-                    <Button asChild className="ml-2">
+                    <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/function/edit/${fun.id}`}>Edit</Link>
                     </Button>
-                    <Button asChild className="ml-2">
+                    <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/function/delete/${fun.id}`}>Delete</Link>
                     </Button>
                   </TableCell>
