@@ -7,7 +7,7 @@ export default function Sidebar() {
   return (
     <div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200">
         <Link href="/">
-            <div className="flex justify-items-center h-16 bg-white">
+            <div className="flex justify-items-center h-16 border-b border-gray-200 bg-white">
                 <div className="basis-1/2 flex justify-center items-center">
                     <img className="h-14" src="/assets/images/logo_edgeless_alpha_light.png" alt={"Edgeless logo"}/>
                 </div>
