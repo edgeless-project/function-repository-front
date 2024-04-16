@@ -1,9 +1,14 @@
 import Layout from '../components/layout/Layout';
+import Flow from '../components/workflowUI/workflowUI';
+import {StrictMode} from "react";
 
 export default function Page() {
   return (
-    <Layout title=''>
-      <h2>TODO: Home page</h2>
+    <Layout title='Workflow'>
+        <div id='rootFlow'/>
+        <StrictMode>
+            <Flow />
+        </StrictMode>
     </Layout>
   );
 }
