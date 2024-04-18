@@ -7,7 +7,6 @@ import ReactFlow, {
     MarkerType,
     Edge,
     Node,
-    OnConnect,
     OnNodesChange,
     applyNodeChanges,
     OnEdgesChange,
@@ -16,6 +15,8 @@ import ReactFlow, {
     Connection
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
+import {JsonFlowComponentState} from "@/types/workflows";
+import {read} from "node:fs";
 
 //Nodes Style modes
 let styleResourceNode = {
@@ -78,30 +79,6 @@ interface JsonFlowComponentProps {
     readOnly?: boolean;
 }
 
-interface JsonFlowComponentState {
-    name?: string,
-    functions: {
-        name: string,
-        class_specification_id: string,
-        class_specification_version: string,
-        output_mapping: {
-            "next-step"?: string
-        },
-        annotations: {},
-    }[],
-    resources: {
-        name: string,
-        class_type: string,
-        output_mapping: {
-            new_request?: string
-        },
-        configurations: {
-            host?: string,
-            methods?: string
-        }
-    }[],
-    annotations: {}
-}
 
 const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
     const [nodes, setNodes] = useState<Node[]>([]);
@@ -111,28 +88,6 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
     const [jsonFile, setFile] = useState<JsonFlowComponentState>(dummyFile);
 
     useEffect(() => {
-        if(value){let newEdge: Edge={
-            id: "e_"+r.name+"_"+r.output_mapping["new_request"],
-            source: r.name,
-            target: r.output_mapping["new_request"]? r.output_mapping["new_request"]: "",
-            markerEnd: {
-                type: MarkerType.ArrowClosed,
-                width: 20,
-                height: 20,
-                color: '#ff0000'
-            },
-            style: {
-                strokeWidth: 2,
-                stroke: '#ff0000',
-            }
-        };
-
-            initialEdges.push(newEdge);
-            value.name = "Passage";
-            setFile(value);
-        }
-
-        console.log(value, 'vs', jsonFile);
 
         let initialNodes : Node[] = [], initialEdges: Edge[] = []; //  Nodes To INIT Flow
         let i = 2, e_n = 0,o_n = 0, space = 100; // Nodes idxs IDs and Position
@@ -207,6 +162,9 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
             i++;
         });//Create a node and an edge from each resource entry. Entry points nodes.
 
+        if(readOnly)
+            setIsInteractive(!readOnly);
+        setFile(value);
         setNodes(initialNodes);
         setEdges(initialEdges);
         setIsMounted(true);

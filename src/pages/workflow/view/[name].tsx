@@ -15,31 +15,8 @@ import Spinner from '@/components/utils/Spinner';
 import JSONEditorComponent from '@/components/JSONEditor/JSONEditorComponent';
 import { Button } from '@/components/ui/button';
 import Flow from "@/components/workflowUI/workflowUI";
+import { JsonFlowComponentState } from "@/types/workflows";
 
-interface JsonFlowComponentState {
-    name?: string,
-    functions: {
-        name: string,
-        class_specification_id: string,
-        class_specification_version: string,
-        output_mapping: {
-            "next-step"?: string
-        },
-        annotations: {},
-    }[],
-    resources: {
-        name: string,
-        class_type: string,
-        output_mapping: {
-            new_request?: string
-        },
-        configurations: {
-            host?: string,
-            methods?: string
-        }
-    }[],
-    annotations: {}
-}
 
 export default function WorkflowView() {
   const router = useRouter();

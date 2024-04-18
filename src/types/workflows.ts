@@ -12,17 +12,25 @@ export interface ApiResponseGetWorkflows {
 };
 
 export interface FunctionWorkflow {
-  name: string;
-  class_specification: any; // TODO
-  output_mapping: any; // TODO
-  annotations: any; // TODO
+  name: string,
+  class_specification_id: string,
+  class_specification_version: string,
+  output_mapping: {
+    "next-step"?: string
+  },
+  annotations: {},
 };
 
 export interface ResourceWorkflow {
-  name: string;
-  class_type: string;
-  output_mapping: any;
-  configurations: any;
+  name: string,
+  class_type: string,
+  output_mapping: {
+    new_request?: string
+  },
+  configurations: {
+    host?: string,
+    methods?: string
+  }
 };
 
 export interface ApiResponseWorkflow {
@@ -47,3 +55,10 @@ export interface ApiRequestCreateWorkflow extends ApiRequestUpdateWorkflow {
 export interface ApiResponseDeleteWorkflow {
   deletedCount: number;
 };
+
+export interface JsonFlowComponentState {
+  name?: string,
+  functions: FunctionWorkflow[],
+  resources: ResourceWorkflow[],
+  annotations: {}
+}
