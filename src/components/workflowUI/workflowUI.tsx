@@ -79,26 +79,27 @@ interface JsonFlowComponentProps {
 }
 
 interface JsonFlowComponentState {
-    name: string | any,
-    functions: ({
+    name?: string,
+    functions: {
         name: string,
         class_specification_id: string,
         class_specification_version: string,
         output_mapping: {
-            "next-step": string
-        } | any,
-        annotations: {} | any,
-    } | any)[],
-    resources: ({
+            "next-step"?: string
+        },
+        annotations: {},
+    }[],
+    resources: {
         name: string,
         class_type: string,
         output_mapping: {
-            new_request: string
-        } | any,
+            new_request?: string
+        },
         configurations: {
-
+            host?: string,
+            methods?: string
         }
-    }|any)[],
+    }[],
     annotations: {}
 }
 
@@ -110,8 +111,23 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
     const [jsonFile, setFile] = useState<JsonFlowComponentState>(dummyFile);
 
     useEffect(() => {
-        if(value){
-            console.log("Hi apple");
+        if(value){let newEdge: Edge={
+            id: "e_"+r.name+"_"+r.output_mapping["new_request"],
+            source: r.name,
+            target: r.output_mapping["new_request"]? r.output_mapping["new_request"]: "",
+            markerEnd: {
+                type: MarkerType.ArrowClosed,
+                width: 20,
+                height: 20,
+                color: '#ff0000'
+            },
+            style: {
+                strokeWidth: 2,
+                stroke: '#ff0000',
+            }
+        };
+
+            initialEdges.push(newEdge);
             value.name = "Passage";
             setFile(value);
         }
@@ -121,34 +137,35 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
         let initialNodes : Node[] = [], initialEdges: Edge[] = []; //  Nodes To INIT Flow
         let i = 2, e_n = 0,o_n = 0, space = 100; // Nodes idxs IDs and Position
 
-        jsonFile.functions.forEach(f => {
+        value.functions.forEach(f => {
             let newNode: Node={
                 id: f.name,
                 position: { x: 2*space, y: i*space },
                 data: { label: f.name }
             };
-
-            let newEdge: Edge={
-                id: "e_"+f.name+"_"+f.output_mapping["next-step"],
-                source: f.name,
-                target: f.output_mapping["next-step"],
-                markerEnd: {
-                    type: MarkerType.ArrowClosed,
-                    width: 20,
-                    height: 20,
-                    color: '#000000'
-                },
-                style: {
-                    strokeWidth: 2,
-                    stroke: '#000000',
-                }
-            };
-
+            if(f.output_mapping["next-step"]){
+                let newEdge: Edge={
+                    id: "e_"+f.name+"_"+f.output_mapping["next-step"],
+                    source: f.name,
+                    target: f.output_mapping["next-step"],
+                    markerEnd: {
+                        type: MarkerType.ArrowClosed,
+                        width: 20,
+                        height: 20,
+                        color: '#000000'
+                    },
+                    style: {
+                        strokeWidth: 2,
+                        stroke: '#000000',
+                    }
+                };
+                initialEdges.push(newEdge);
+            }
             initialNodes.push(newNode);
-            initialEdges.push(newEdge);
             i++;
+
         });//Create a node and an edge from each function entry, normal nodes
-        jsonFile.resources.forEach(r => {
+        value.resources.forEach(r => {
 
             let newNode: Node ={
                 id: r.name,
@@ -160,7 +177,7 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                 style: styleResourceNode
             };
 
-            if (r.output_mapping["new_request"]){
+            if (r.output_mapping?.new_request){
                 newNode.position = {x: 0, y: e_n*space};
                 e_n++;
             }else{
@@ -168,24 +185,25 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                 o_n++;
             }
 
-            let newEdge: Edge={
-                id: "e_"+r.name+"_"+r.output_mapping["new_request"],
-                source: r.name,
-                target: r.output_mapping["new_request"]? r.output_mapping["new_request"]: "",
-                markerEnd: {
-                    type: MarkerType.ArrowClosed,
-                    width: 20,
-                    height: 20,
-                    color: '#ff0000'
-                },
-                style: {
-                    strokeWidth: 2,
-                    stroke: '#ff0000',
-                }
-            };
-
+            if(r.output_mapping?.new_request){
+                let newEdge: Edge={
+                    id: "e_"+r.name+"_"+r.output_mapping["new_request"],
+                    source: r.name,
+                    target: r.output_mapping["new_request"]? r.output_mapping["new_request"]: "",
+                    markerEnd: {
+                        type: MarkerType.ArrowClosed,
+                        width: 20,
+                        height: 20,
+                        color: '#ff0000'
+                    },
+                    style: {
+                        strokeWidth: 2,
+                        stroke: '#ff0000',
+                    }
+                };
+                initialEdges.push(newEdge);
+            }
             initialNodes.push(newNode);
-            initialEdges.push(newEdge);
             i++;
         });//Create a node and an edge from each resource entry. Entry points nodes.
 

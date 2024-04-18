@@ -17,26 +17,27 @@ import { Button } from '@/components/ui/button';
 import Flow from "@/components/workflowUI/workflowUI";
 
 interface JsonFlowComponentState {
-    name: string | any,
-    functions: ({
+    name?: string,
+    functions: {
         name: string,
         class_specification_id: string,
         class_specification_version: string,
         output_mapping: {
-            "next-step": string
-        } | any,
-        annotations: {} | any,
-    } | any)[],
-    resources: ({
+            "next-step"?: string
+        },
+        annotations: {},
+    }[],
+    resources: {
         name: string,
         class_type: string,
         output_mapping: {
-            new_request: string
-        } | any,
+            new_request?: string
+        },
         configurations: {
-
+            host?: string,
+            methods?: string
         }
-    }|any)[],
+    }[],
     annotations: {}
 }
 
