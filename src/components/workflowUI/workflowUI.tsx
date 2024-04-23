@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import ReactFlow, {
     MiniMap,
     Controls,
@@ -16,58 +16,35 @@ import ReactFlow, {
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
 import {JsonFlowComponentState} from "@/types/workflows";
-import {read} from "node:fs";
+import {start} from "node:repl";
 
 //Nodes Style modes
-let styleResourceNode = {
+const styleResourceNodeOut = {
     background: 'rgba(217,90,109,0.78)'
 }
-
-//DEMO data file
-let dummyFile = {
-    "name": "Dummy",
-    "functions": [
-        {
-            "name": "hello-world",
-            "class_specification_id": "hello-node",
-            "class_specification_version": "0.1",
-            "output_mapping": {
-                "next-step": "Bye-apple"
-            },
-            "annotations": {}
-        },
-        {
-            "name": "Bye-apple",
-            "class_specification_id": "goodbye-node",
-            "class_specification_version": "0.1",
-            "output_mapping": {
-                "next-step": "End"
-            },
-            "annotations": {}
-        }
-    ],
-    "resources": [
-        {
-            "name": "Start",
-            "class_type": "",
-            "output_mapping": {
-                "new_request": "hello-world"
-            },
-            "configurations": {
-                "host": "localhost",
-                "methods": "POST"
-            }
-        },
-        {
-            "name": "End",
-            "class_type": "",
-            "output_mapping": {},
-            "configurations": {}
-        }
-    ],
-    "annotations": {}
-};
-
+const styleResourceNodeIn = {
+    background: 'rgb(66,232,48)'
+}
+const edgeEndResource = {
+    type: MarkerType.ArrowClosed,
+    width: 20,
+    height: 20,
+    color: '#ff0000'
+}
+const edgeEndFunction = {
+    type: MarkerType.ArrowClosed,
+    width: 20,
+    height: 20,
+    color: '#000000'
+}
+const edgeStyleResource = {
+    strokeWidth: 2,
+    stroke: '#ff0000',
+}
+const edgeStyleFunction = {
+    strokeWidth: 2,
+    stroke: '#000000',
+}
 const fitViewOptions: FitViewOptions = {
     padding: 0.05,
 };
@@ -79,18 +56,17 @@ interface JsonFlowComponentProps {
     readOnly?: boolean;
 }
 
-
 const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
     const [isInteractive, setIsInteractive] = useState(false);  //  Allow user interact with nodes
-    const [jsonFile, setFile] = useState<JsonFlowComponentState>(dummyFile);
 
     useEffect(() => {
 
-        let initialNodes : Node[] = [], initialEdges: Edge[] = []; //  Nodes To INIT Flow
-        let i = 2, e_n = 0,o_n = 0, space = 100; // Nodes idxs IDs and Position
+        let initialNodes : Node[] = [], initialEdges: Edge[] = [], resourceEdges: Edge[] = [];//  Nodes To INIT Flow
+        let i = 2, e_n = 0, o_n = 0, space = 75; // Nodes idxs IDs and Position
+
 
         value.functions.forEach(f => {
             let newNode: Node={
@@ -103,16 +79,8 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                     id: "e_"+f.name+"_"+f.output_mapping["next-step"],
                     source: f.name,
                     target: f.output_mapping["next-step"],
-                    markerEnd: {
-                        type: MarkerType.ArrowClosed,
-                        width: 20,
-                        height: 20,
-                        color: '#000000'
-                    },
-                    style: {
-                        strokeWidth: 2,
-                        stroke: '#000000',
-                    }
+                    markerEnd: edgeEndFunction,
+                    style: edgeStyleFunction
                 };
                 initialEdges.push(newEdge);
             }
@@ -129,7 +97,7 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                     y: 0
                 },
                 data: { label: r.name },
-                style: styleResourceNode
+                style: styleResourceNodeIn
             };
 
             if (r.output_mapping?.new_request){
@@ -141,47 +109,47 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
             }
 
             if(r.output_mapping?.new_request){
-                let newEdge: Edge={
+                const newEdge: Edge={
                     id: "e_"+r.name+"_"+r.output_mapping["new_request"],
                     source: r.name,
                     target: r.output_mapping["new_request"]? r.output_mapping["new_request"]: "",
-                    markerEnd: {
-                        type: MarkerType.ArrowClosed,
-                        width: 20,
-                        height: 20,
-                        color: '#ff0000'
-                    },
-                    style: {
-                        strokeWidth: 2,
-                        stroke: '#ff0000',
-                    }
+                    markerEnd: edgeEndResource,
+                    style: edgeStyleResource
                 };
-                initialEdges.push(newEdge);
+                resourceEdges.push(newEdge);
+            }else{
+                //  If resource node does not have new request, it's considered an ENDPOINT.
+                newNode.style = styleResourceNodeOut;
+                initialEdges.forEach(e =>{
+                    const nodes = e.id.split("_").slice(1);
+                    if (nodes.includes(r.name)){
+                        e.markerEnd = edgeEndResource;
+                        e.style = edgeStyleResource;
+                    }
+                });
             }
+
             initialNodes.push(newNode);
             i++;
         });//Create a node and an edge from each resource entry. Entry points nodes.
 
-        if(readOnly)
-            setIsInteractive(!readOnly);
-        setFile(value);
         setNodes(initialNodes);
-        setEdges(initialEdges);
+        setEdges(initialEdges.concat(resourceEdges));
         setIsMounted(true);
     }, []);
 
-    const onClickNode = (event: any, nodeClicked: any) => {
+    const handleClickNode = (event: any, nodeClicked: any) => {
         console.log(nodeClicked);
     }; //Function to execute on node click
-    const onConnect = useCallback(
+    const handleConnect = useCallback(
         (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
     );
-    const onNodesChange: OnNodesChange = useCallback(
+    const handleNodesChange: OnNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
         [setNodes],
     );
-    const onEdgesChange: OnEdgesChange = useCallback(
+    const handleEdgesChange: OnEdgesChange = useCallback(
         (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
         [setEdges],
     );
@@ -191,14 +159,14 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                onNodeClick={onClickNode}
+                onNodesChange={handleNodesChange}
+                onEdgesChange={handleEdgesChange}
+                onConnect={handleConnect}
+                onNodeClick={handleClickNode}
                 fitView
                 fitViewOptions={fitViewOptions}
-                nodesDraggable={isInteractive}
-                nodesConnectable={isInteractive}
+                nodesDraggable={!readOnly}
+                nodesConnectable={!readOnly}
             >
                 <Controls/>
                 <MiniMap/>
