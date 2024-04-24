@@ -80,7 +80,7 @@ export default function WorkflowView() {
                 <CardHeader></CardHeader>
                 <CardContent>
                     <StrictMode>
-                        <Flow value={workflowJSON as JsonFlowComponentState} readOnly={true}/>
+                        <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false}/>
                     </StrictMode>
                 </CardContent>
               </Card>

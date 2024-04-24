@@ -16,7 +16,8 @@ export interface FunctionWorkflow {
   class_specification_id: string,
   class_specification_version: string,
   output_mapping: {
-    "next-step"?: string
+    //"next-step"?: string
+    [key: string]:  string
   },
   annotations: {},
 };
@@ -25,7 +26,7 @@ export interface ResourceWorkflow {
   name: string,
   class_type: string,
   output_mapping: {
-    new_request?: string
+    [key: string]:  string
   },
   configurations: {
     host?: string,

@@ -16,7 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
 import {JsonFlowComponentState} from "@/types/workflows";
-import {start} from "node:repl";
+import dagre from 'dagre';
 
 //Nodes Style modes
 const styleResourceNodeOut = {
@@ -48,6 +48,8 @@ const edgeStyleFunction = {
 const fitViewOptions: FitViewOptions = {
     padding: 0.05,
 };
+const nodeWidth = 172;
+const nodeHeight = 36;
 
 interface JsonFlowComponentProps {
     value: JsonFlowComponentState;
@@ -56,11 +58,46 @@ interface JsonFlowComponentProps {
     readOnly?: boolean;
 }
 
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
+    // Top-Bottom('TB') or Left-Right('LR')
+    const isHorizontal = direction === 'LR';
+    dagreGraph.setGraph({ rankdir: direction });
+
+    nodes.forEach((node) => {
+        dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+    });
+
+    edges.forEach((edge) => {
+        dagreGraph.setEdge(edge.source, edge.target);
+    });
+
+    dagre.layout(dagreGraph);
+
+    nodes.forEach((node) => {
+        const nodeWithPosition = dagreGraph.node(node.id);
+        node.targetPosition = isHorizontal ? 'left' : 'top';
+        node.sourcePosition = isHorizontal ? 'right' : 'bottom';
+
+        // We are shifting the dagre node position (anchor=center center) to the top left
+        // so it matches the React Flow node anchor point (top left).
+        node.position = {
+            x: nodeWithPosition.x - nodeWidth / 2,
+            y: nodeWithPosition.y - nodeHeight / 2,
+        };
+
+        return node;
+    });
+
+    return { nodes, edges };
+};
+
 const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
-    const [isInteractive, setIsInteractive] = useState(false);  //  Allow user interact with nodes
 
     useEffect(() => {
 
@@ -71,14 +108,20 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
         value.functions.forEach(f => {
             let newNode: Node={
                 id: f.name,
-                position: { x: 2*space, y: i*space },
-                data: { label: f.name }
+                position: { x: 0, y: 0 },
+                data: { label: f.name },
+                width: nodeWidth,
+                height: nodeHeight
             };
-            if(f.output_mapping["next-step"]){
+            ////    TEST
+            if(f.name.includes("data-parsing"))
+                f.output_mapping["hi apple"] = "state-management-v2";
+            ////
+            for(let out in f.output_mapping){
                 let newEdge: Edge={
-                    id: "e_"+f.name+"_"+f.output_mapping["next-step"],
+                    id: "e_"+f.name+"_"+f.output_mapping[out],
                     source: f.name,
-                    target: f.output_mapping["next-step"],
+                    target: f.output_mapping[out],
                     markerEnd: edgeEndFunction,
                     style: edgeStyleFunction
                 };
@@ -97,26 +140,22 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                     y: 0
                 },
                 data: { label: r.name },
-                style: styleResourceNodeIn
+                style: styleResourceNodeIn,
+                width: nodeWidth,
+                height: nodeHeight
             };
 
-            if (r.output_mapping?.new_request){
-                newNode.position = {x: 0, y: e_n*space};
-                e_n++;
-            }else{
-                newNode.position = {x: 4*space, y: i*space + o_n*space};
-                o_n++;
-            }
-
-            if(r.output_mapping?.new_request){
-                const newEdge: Edge={
-                    id: "e_"+r.name+"_"+r.output_mapping["new_request"],
-                    source: r.name,
-                    target: r.output_mapping["new_request"]? r.output_mapping["new_request"]: "",
-                    markerEnd: edgeEndResource,
-                    style: edgeStyleResource
-                };
-                resourceEdges.push(newEdge);
+            if(r.output_mapping){
+                for(let out in r.output_mapping){
+                    const newEdge: Edge={
+                        id: "e_"+r.name+"_"+r.output_mapping[out],
+                        source: r.name,
+                        target: r.output_mapping[out],
+                        markerEnd: edgeEndResource,
+                        style: edgeStyleResource
+                    };
+                    resourceEdges.push(newEdge);
+                }
             }else{
                 //  If resource node does not have new request, it's considered an ENDPOINT.
                 newNode.style = styleResourceNodeOut;
@@ -133,8 +172,14 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
             i++;
         });//Create a node and an edge from each resource entry. Entry points nodes.
 
-        setNodes(initialNodes);
-        setEdges(initialEdges.concat(resourceEdges));
+        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+            initialNodes,
+            initialEdges.concat(resourceEdges),
+            'LR'
+        );
+
+        setNodes(layoutedNodes);
+        setEdges(layoutedEdges);
         setIsMounted(true);
     }, []);
 
