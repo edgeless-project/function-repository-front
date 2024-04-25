@@ -1,18 +1,19 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import ReactFlow, {
-    MiniMap,
-    Controls,
-    Background,
     addEdge,
-    MarkerType,
-    Edge,
-    Node,
-    OnNodesChange,
-    applyNodeChanges,
-    OnEdgesChange,
     applyEdgeChanges,
+    applyNodeChanges,
+    Background,
+    Connection,
+    ConnectionLineType,
+    Controls,
+    Edge,
     FitViewOptions,
-    Connection
+    MarkerType,
+    MiniMap,
+    Node,
+    OnEdgesChange,
+    OnNodesChange
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
 import {JsonFlowComponentState} from "@/types/workflows";
@@ -38,11 +39,11 @@ const edgeEndFunction = {
     color: '#000000'
 }
 const edgeStyleResource = {
-    strokeWidth: 2,
+    strokeWidth: 1,
     stroke: '#ff0000',
 }
 const edgeStyleFunction = {
-    strokeWidth: 2,
+    strokeWidth: 1,
     stroke: '#000000',
 }
 const fitViewOptions: FitViewOptions = {
@@ -81,7 +82,7 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
         node.targetPosition = isHorizontal ? 'left' : 'top';
         node.sourcePosition = isHorizontal ? 'right' : 'bottom';
 
-        // We are shifting the dagre node position (anchor=center center) to the top left
+        // We are shifting the dagre node position (anchor = center center) to the top left
         // so it matches the React Flow node anchor point (top left).
         node.position = {
             x: nodeWithPosition.x - nodeWidth / 2,
@@ -100,10 +101,8 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-
-        let initialNodes : Node[] = [], initialEdges: Edge[] = [], resourceEdges: Edge[] = [];//  Nodes To INIT Flow
-        let i = 2, e_n = 0, o_n = 0, space = 75; // Nodes idxs IDs and Position
-
+        //  Nodes To INIT Flow
+        let initialNodes : Node[] = [], initialEdges: Edge[] = [], resourceEdges: Edge[] = [];
 
         value.functions.forEach(f => {
             let newNode: Node={
@@ -113,22 +112,19 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                 width: nodeWidth,
                 height: nodeHeight
             };
-            ////    TEST
-            if(f.name.includes("data-parsing"))
-                f.output_mapping["hi apple"] = "state-management-v2";
-            ////
+
             for(let out in f.output_mapping){
                 let newEdge: Edge={
                     id: "e_"+f.name+"_"+f.output_mapping[out],
                     source: f.name,
                     target: f.output_mapping[out],
+                    type: ConnectionLineType.Step,
                     markerEnd: edgeEndFunction,
-                    style: edgeStyleFunction
+                    style: edgeStyleFunction,
                 };
                 initialEdges.push(newEdge);
             }
             initialNodes.push(newNode);
-            i++;
 
         });//Create a node and an edge from each function entry, normal nodes
         value.resources.forEach(r => {
@@ -151,6 +147,7 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                         id: "e_"+r.name+"_"+r.output_mapping[out],
                         source: r.name,
                         target: r.output_mapping[out],
+                        type: ConnectionLineType.Step,
                         markerEnd: edgeEndResource,
                         style: edgeStyleResource
                     };
@@ -169,13 +166,12 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
             }
 
             initialNodes.push(newNode);
-            i++;
         });//Create a node and an edge from each resource entry. Entry points nodes.
 
         const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
             initialNodes,
             initialEdges.concat(resourceEdges),
-            'LR'
+            'TB'
         );
 
         setNodes(layoutedNodes);
@@ -208,6 +204,7 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                 onEdgesChange={handleEdgesChange}
                 onConnect={handleConnect}
                 onNodeClick={handleClickNode}
+                connectionLineType={ConnectionLineType.Step}
                 fitView
                 fitViewOptions={fitViewOptions}
                 nodesDraggable={!readOnly}
