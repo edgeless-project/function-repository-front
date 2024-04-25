@@ -1,196 +1,214 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import ReactFlow, {
-    MiniMap,
-    Controls,
-    Background,
     addEdge,
-    MarkerType,
-    Edge,
-    Node,
-    OnConnect,
-    OnNodesChange,
-    applyNodeChanges,
-    OnEdgesChange,
     applyEdgeChanges,
+    applyNodeChanges,
+    Background,
+    Connection,
+    ConnectionLineType,
+    Controls,
+    Edge,
     FitViewOptions,
-    Connection
+    MarkerType,
+    MiniMap,
+    Node,
+    OnEdgesChange,
+    OnNodesChange
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
+import {JsonFlowComponentState} from "@/types/workflows";
+import dagre from 'dagre';
 
 //Nodes Style modes
-let styleResourceNode = {
+const styleResourceNodeOut = {
     background: 'rgba(217,90,109,0.78)'
 }
-
-//DEMO data file
-const fileData = {
-    "name": "health-care-uc",
-    "functions": [
-        {
-            "name": "data-parsing",
-            "class_specification_id": "data-parser",
-            "class_specification_version": "0.1",
-            "output_mapping": {
-                "next-step": "ml-preprocessing"
-            },
-            "annotations": {}
-        },
-        {
-            "name": "ml-preprocessing",
-            "class_specification_id": "ml-preprocessor",
-            "class_specification_version": "0.1",
-            "output_mapping": {
-                "next-step": "state-management"
-            },
-            "annotations": {}
-        },
-        {
-            "name": "state-management",
-            "class_specification_id": "state-manager",
-            "class_specification_version": "0.1",
-            "output_mapping": {
-                "next-step": "http-egress"
-            },
-            "annotations": {}
-        }
-    ],
-    "resources": [
-        {
-            "name": "http-ingress",
-            "class_type": "http-ingress",
-            "output_mapping": {
-                "new_request": "data-parsing"
-            },
-            "configurations": {
-                "host": "localhost",
-                "methods": "POST"
-            }
-        },
-        {
-            "name": "http-egress",
-            "class_type": "http-egress",
-            "output_mapping": {},
-            "configurations": {}
-        }
-    ],
-    "annotations": {}
-};
-
-
-let initialNodes : Node[] = [], initialEdges: Edge[] = []; //  Nodes To INIT Flow
-let i = 2, e_n = 0,o_n = 0, space = 100; // Nodes idxs IDs and Position
-let interactive = true; //  Allow user interact with nodes
-
-fileData.functions.forEach(f => {
-    let newNode: Node={
-        id: f.name,
-        position: { x: 2*space, y: i*space },
-        data: { label: f.name }
-    };
-
-    let newEdge: Edge={
-        id: "e_"+f.name+"_"+f.output_mapping["next-step"],
-        source: f.name,
-        target: f.output_mapping["next-step"],
-        markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 20,
-            height: 20,
-            color: '#000000'
-        },
-        style: {
-            strokeWidth: 2,
-            stroke: '#000000',
-        }
-    };
-
-    initialNodes.push(newNode);
-    initialEdges.push(newEdge);
-    i++;
-});//Create a node and an edge from each function entry, normal nodes
-fileData.resources.forEach(r => {
-
-    let newNode: Node ={
-        id: r.name,
-        position: {
-            x: 0,
-            y: 0
-        },
-        data: { label: r.name },
-        style: styleResourceNode
-    };
-
-    if (r.output_mapping["new_request"]){
-        newNode.position = {x: 0, y: e_n*space};
-        e_n++;
-    }else{
-        newNode.position = {x: 4*space, y: i*space + o_n*space};
-        o_n++;
-    }
-
-    let newEdge: Edge={
-        id: "e_"+r.name+"_"+r.output_mapping["new_request"],
-        source: r.name,
-        target: r.output_mapping["new_request"]? r.output_mapping["new_request"]: "",
-        markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 20,
-            height: 20,
-            color: '#ff0000'
-        },
-        style: {
-            strokeWidth: 2,
-            stroke: '#ff0000',
-        }
-    };
-
-    initialNodes.push(newNode);
-    initialEdges.push(newEdge);
-    i++;
-});//Create a node and an edge from each resource entry. Entry points nodes.
-
+const styleResourceNodeIn = {
+    background: 'rgb(66,232,48)'
+}
+const edgeEndResource = {
+    type: MarkerType.ArrowClosed,
+    width: 20,
+    height: 20,
+    color: '#ff0000'
+}
+const edgeEndFunction = {
+    type: MarkerType.ArrowClosed,
+    width: 20,
+    height: 20,
+    color: '#000000'
+}
+const edgeStyleResource = {
+    strokeWidth: 1,
+    stroke: '#ff0000',
+}
+const edgeStyleFunction = {
+    strokeWidth: 1,
+    stroke: '#000000',
+}
 const fitViewOptions: FitViewOptions = {
     padding: 0.05,
 };
+const nodeWidth = 172;
+const nodeHeight = 36;
 
-const Flow:React.FC = () => {
-    const [nodes, setNodes] = useState<Node[]>(initialNodes);
-    const [edges, setEdges] = useState<Edge[]>(initialEdges);
+interface JsonFlowComponentProps {
+    value: JsonFlowComponentState;
+    // onChange?: (value: object) => void;
+    // onError?: (hasError: boolean) => void;
+    readOnly?: boolean;
+}
+
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
+    // Top-Bottom('TB') or Left-Right('LR')
+    const isHorizontal = direction === 'LR';
+    dagreGraph.setGraph({ rankdir: direction });
+
+    nodes.forEach((node) => {
+        dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+    });
+
+    edges.forEach((edge) => {
+        dagreGraph.setEdge(edge.source, edge.target);
+    });
+
+    dagre.layout(dagreGraph);
+
+    nodes.forEach((node) => {
+        const nodeWithPosition = dagreGraph.node(node.id);
+        node.targetPosition = isHorizontal ? 'left' : 'top';
+        node.sourcePosition = isHorizontal ? 'right' : 'bottom';
+
+        // We are shifting the dagre node position (anchor = center center) to the top left
+        // so it matches the React Flow node anchor point (top left).
+        node.position = {
+            x: nodeWithPosition.x - nodeWidth / 2,
+            y: nodeWithPosition.y - nodeHeight / 2,
+        };
+
+        return node;
+    });
+
+    return { nodes, edges };
+};
+
+const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
+    const [nodes, setNodes] = useState<Node[]>([]);
+    const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        //  Nodes To INIT Flow
+        let initialNodes : Node[] = [], initialEdges: Edge[] = [], resourceEdges: Edge[] = [];
+
+        value.functions.forEach(f => {
+            let newNode: Node={
+                id: f.name,
+                position: { x: 0, y: 0 },
+                data: { label: f.name },
+                width: nodeWidth,
+                height: nodeHeight
+            };
+
+            for(let out in f.output_mapping){
+                let newEdge: Edge={
+                    id: "e_"+f.name+"_"+f.output_mapping[out],
+                    source: f.name,
+                    target: f.output_mapping[out],
+                    type: ConnectionLineType.Step,
+                    markerEnd: edgeEndFunction,
+                    style: edgeStyleFunction,
+                };
+                initialEdges.push(newEdge);
+            }
+            initialNodes.push(newNode);
+
+        });//Create a node and an edge from each function entry, normal nodes
+        value.resources.forEach(r => {
+
+            let newNode: Node ={
+                id: r.name,
+                position: {
+                    x: 0,
+                    y: 0
+                },
+                data: { label: r.name },
+                style: styleResourceNodeIn,
+                width: nodeWidth,
+                height: nodeHeight
+            };
+
+            if(r.output_mapping){
+                for(let out in r.output_mapping){
+                    const newEdge: Edge={
+                        id: "e_"+r.name+"_"+r.output_mapping[out],
+                        source: r.name,
+                        target: r.output_mapping[out],
+                        type: ConnectionLineType.Step,
+                        markerEnd: edgeEndResource,
+                        style: edgeStyleResource
+                    };
+                    resourceEdges.push(newEdge);
+                }
+            }else{
+                //  If resource node does not have new request, it's considered an ENDPOINT.
+                newNode.style = styleResourceNodeOut;
+                initialEdges.forEach(e =>{
+                    const nodes = e.id.split("_").slice(1);
+                    if (nodes.includes(r.name)){
+                        e.markerEnd = edgeEndResource;
+                        e.style = edgeStyleResource;
+                    }
+                });
+            }
+
+            initialNodes.push(newNode);
+        });//Create a node and an edge from each resource entry. Entry points nodes.
+
+        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+            initialNodes,
+            initialEdges.concat(resourceEdges),
+            'TB'
+        );
+
+        setNodes(layoutedNodes);
+        setEdges(layoutedEdges);
         setIsMounted(true);
     }, []);
 
-    const onClickNode = (event: any, nodeClicked: any) => {
+    const handleClickNode = (event: any, nodeClicked: any) => {
         console.log(nodeClicked);
     }; //Function to execute on node click
-    const onConnect = useCallback(
+    const handleConnect = useCallback(
         (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
     );
-    const onNodesChange: OnNodesChange = useCallback(
+    const handleNodesChange: OnNodesChange = useCallback(
         (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
         [setNodes],
     );
-    const onEdgesChange: OnEdgesChange = useCallback(
+    const handleEdgesChange: OnEdgesChange = useCallback(
         (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
         [setEdges],
     );
 
     return isMounted ? (
-        <div style={{width: '80vw', height: '90vh'}}>
+        <div style={{width: '80vw', height: '80vh'}}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                onNodeClick={onClickNode}
+                onNodesChange={handleNodesChange}
+                onEdgesChange={handleEdgesChange}
+                onConnect={handleConnect}
+                onNodeClick={handleClickNode}
+                connectionLineType={ConnectionLineType.Step}
                 fitView
                 fitViewOptions={fitViewOptions}
-                nodesDraggable={interactive}
-                nodesConnectable={interactive}
+                nodesDraggable={!readOnly}
+                nodesConnectable={!readOnly}
             >
                 <Controls/>
                 <MiniMap/>

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import {StrictMode, useEffect, useState} from 'react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -14,11 +14,13 @@ import { getWorkflow } from '@/services/workflowServices';
 import Spinner from '@/components/utils/Spinner';
 import JSONEditorComponent from '@/components/JSONEditor/JSONEditorComponent';
 import { Button } from '@/components/ui/button';
+import Flow from "@/components/workflowUI/workflowUI";
+import { JsonFlowComponentState } from "@/types/workflows";
+
 
 export default function WorkflowView() {
   const router = useRouter();
   const name = router.query.name;
-
   const [workflow, setWorkflow] = useState<ApiResponseWorkflow | null>(null);
   const [workflowJSON, setWorkflowJSON] = useState<object | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,13 +73,15 @@ export default function WorkflowView() {
               <TabsTrigger value="visual-builder">Visual Builder</TabsTrigger>
             </TabsList>
             <TabsContent value="json-editor">
-              <JSONEditorComponent value={workflowJSON as object} readOnly={true} />
+              <JSONEditorComponent value={workflowJSON as Object} readOnly={true} />
             </TabsContent>
             <TabsContent value="visual-builder">
               <Card>
                 <CardHeader></CardHeader>
                 <CardContent>
-                  <p>TODO: Visual Builder</p>
+                    <StrictMode>
+                        <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false}/>
+                    </StrictMode>
                 </CardContent>
               </Card>
             </TabsContent>

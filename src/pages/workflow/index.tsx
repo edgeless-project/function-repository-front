@@ -75,7 +75,7 @@ export default function WorkflowList() {
           <CardTitle>List of workflows</CardTitle>
           {!workflowsLoading && <CardDescription>{total} workflows found</CardDescription>}
           <div className="flex justify-end">
-          <Button asChild className="ml-2">
+          <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
             <Link href={'/workflow/create'}>Create new workflow</Link>
           </Button>
           </div>
@@ -100,13 +100,13 @@ export default function WorkflowList() {
                   <TableCell>{w.createdAt}</TableCell>
                   <TableCell>{w.updatedAt}</TableCell>
                   <TableCell className="text-right">
-                    <Button asChild className="ml-2">
+                    <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/workflow/view/${w.name}`}>View</Link>
                     </Button>
-                    <Button asChild className="ml-2">
+                    <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/workflow/edit/${w.name}`}>Edit</Link>
                     </Button>
-                    <Button asChild className="ml-2">
+                    <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/workflow/delete/${w.name}`}>Delete</Link>
                     </Button>
                   </TableCell>

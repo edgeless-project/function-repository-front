@@ -6,9 +6,7 @@ export default function Page() {
   return (
     <Layout title='Workflow'>
         <div id='rootFlow'/>
-        <StrictMode>
-            <Flow />
-        </StrictMode>
+        <p>TODO: Index Page</p>
     </Layout>
   );
 }
