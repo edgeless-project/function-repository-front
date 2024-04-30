@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {StrictMode, useCallback, useEffect, useState} from 'react';
 import ReactFlow, {
     addEdge,
     applyEdgeChanges,
@@ -13,11 +13,13 @@ import ReactFlow, {
     MiniMap,
     Node,
     OnEdgesChange,
-    OnNodesChange
+    OnNodesChange, Panel
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
-import {JsonFlowComponentState} from "@/types/workflows";
+import {FunctionWorkflow, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import dagre from 'dagre';
+import {Card, CardContent, CardHeader} from "@/components/ui/card";
+import NodeDataPanel from "@/components/workflowUI/dataPanel";
 
 //Nodes Style modes
 const styleResourceNodeOut = {
@@ -59,9 +61,9 @@ interface JsonFlowComponentProps {
     readOnly?: boolean;
 }
 
+//Order nodes for display
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
-
 const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
     // Top-Bottom('TB') or Left-Right('LR')
     const isHorizontal = direction === 'LR';
@@ -99,6 +101,8 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
+    const [loadPanel, setLoadPanel] = useState(false);
+    const [selNode, setSelNode] = useState<Node>();
 
     useEffect(() => {
         //  Nodes To INIT Flow
@@ -179,8 +183,45 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
         setIsMounted(true);
     }, []);
 
+    const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow => {
+
+        const nullReturn = {
+            name: "none",
+            class_specification_id: "",
+            class_specification_version: "",
+            output_mapping: {},
+            annotations: {}
+        };
+        let a = null;
+
+        value.resources.forEach(r => {
+            if(r.name.includes(id))
+                a = r;
+        });
+
+        if (a != null) return a;
+
+        value.functions.forEach(f=>{
+            if (f.name.includes(id))
+                a = f;
+        });
+
+        return a? a: nullReturn;
+    };
+
+    const displayNodeData = (id:string)=>{
+        let a = getDataFromNode(id);
+
+        return a ? (
+            <StrictMode>
+                <NodeDataPanel {...a}/>
+            </StrictMode>
+        ): null;
+    };
+
     const handleClickNode = (event: any, nodeClicked: any) => {
-        console.log(nodeClicked);
+        setSelNode(nodeClicked);
+        setLoadPanel(!loadPanel);
     }; //Function to execute on node click
     const handleConnect = useCallback(
         (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
@@ -210,8 +251,18 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                 nodesDraggable={!readOnly}
                 nodesConnectable={!readOnly}
             >
-                <Controls/>
-                <MiniMap/>
+                {loadPanel && selNode? <Panel className="m-0 h-max" position="top-right">
+                    <Card>
+                        <CardHeader>{selNode.id}</CardHeader>
+                        <CardContent>
+                           <div style={{width: '20vw', height: '70vh'}}>
+                               {displayNodeData(selNode.id)}
+                           </div>
+                        </CardContent>
+                    </Card>
+                </Panel>: ""}
+                <Controls showInteractive={false}/>
+                {/*<MiniMap/>*/}
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
             </ReactFlow>
         </div>

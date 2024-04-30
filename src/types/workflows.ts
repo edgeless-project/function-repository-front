@@ -19,7 +19,7 @@ export interface FunctionWorkflow {
     //"next-step"?: string
     [key: string]:  string
   },
-  annotations: {},
+  annotations: {}
 };
 
 export interface ResourceWorkflow {
