@@ -187,8 +187,13 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
 
         const nullReturn = {
             name: "none",
-            class_specification_id: "",
-            class_specification_version: "",
+            class_specification: {
+                function_type: "",
+                id: "",
+                version: "",
+                code_file_id: "",
+                outputs: []=[]
+            },
             output_mapping: {},
             annotations: {}
         };
