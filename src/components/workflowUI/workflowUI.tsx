@@ -1,4 +1,4 @@
-import React, {StrictMode, useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import ReactFlow, {
     addEdge,
     applyEdgeChanges,
@@ -54,10 +54,8 @@ const fitViewOptions: FitViewOptions = {
 const nodeWidth = 172;
 const nodeHeight = 36;
 
-interface JsonFlowComponentProps {
+interface WorkFlowComponentProps {
     value: JsonFlowComponentState;
-    // onChange?: (value: object) => void;
-    // onError?: (hasError: boolean) => void;
     readOnly?: boolean;
 }
 
@@ -97,12 +95,12 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
     return { nodes, edges };
 };
 
-const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
+const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
     const [loadPanel, setLoadPanel] = useState(false);
-    const [selNode, setSelNode] = useState<Node>();
+    const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|null>(null);
 
     useEffect(() => {
         //  Nodes To INIT Flow
@@ -183,20 +181,8 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
         setIsMounted(true);
     }, []);
 
-    const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow => {
+    const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|null => {
 
-        const nullReturn = {
-            name: "none",
-            class_specification: {
-                function_type: "",
-                id: "",
-                version: "",
-                code_file_id: "",
-                outputs: []=[]
-            },
-            output_mapping: {},
-            annotations: {}
-        };
         let a = null;
 
         value.resources.forEach(r => {
@@ -211,21 +197,12 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                 a = f;
         });
 
-        return a? a: nullReturn;
-    };
-
-    const displayNodeData = (id:string)=>{
-        let a = getDataFromNode(id);
-
-        return a ? (
-            <StrictMode>
-                <NodeDataPanel {...a}/>
-            </StrictMode>
-        ): null;
+        return a;
     };
 
     const handleClickNode = (event: any, nodeClicked: any) => {
-        setSelNode(nodeClicked);
+        let node = getDataFromNode(nodeClicked.id)
+        setSelNode(node);
         setLoadPanel(!loadPanel);
     }; //Function to execute on node click
     const handleConnect = useCallback(
@@ -256,16 +233,16 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                 nodesDraggable={!readOnly}
                 nodesConnectable={!readOnly}
             >
-                {loadPanel && selNode? <Panel className="m-0 h-max" position="top-right">
+                {loadPanel && selNode && <Panel className="m-0 h-max !important" position="top-right">
                     <Card>
-                        <CardHeader>{selNode.id}</CardHeader>
+                        <CardHeader><h1>{selNode.name}</h1></CardHeader>
                         <CardContent>
                            <div style={{width: '20vw', height: '70vh'}}>
-                               {displayNodeData(selNode.id)}
+                               <NodeDataPanel node={selNode}/>
                            </div>
                         </CardContent>
                     </Card>
-                </Panel>: ""}
+                </Panel>}
                 <Controls showInteractive={false}/>
                 {/*<MiniMap/>*/}
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>

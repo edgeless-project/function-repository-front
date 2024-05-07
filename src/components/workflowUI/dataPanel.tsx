@@ -1,40 +1,26 @@
 import {FunctionWorkflow, ResourceWorkflow} from "@/types/workflows";
 import React from "react";
-import {Card, CardContent} from "@/components/ui/card";
+import {Card, CardContent, CardHeader} from "@/components/ui/card";
+import ResourceWorkFlowPanel from "@/components/workflowUI/ResourceWorkFlowPanel";
+import FunctionWorkFlowPanel from "@/components/workflowUI/FunctionWorkFlowPanel";
 
 function isFunction(data: FunctionWorkflow | ResourceWorkflow): data is FunctionWorkflow {
-    console.log(data);
     return (data as FunctionWorkflow).class_specification !== undefined;
 }
 
-const functionWorkflowInstance = (data: FunctionWorkflow) => {
-    return (
-        <ol>
-            <li>ID:     {data.class_specification.id}</li>
-            <li>FUNCTION TYPE:  {data.class_specification.function_type}</li>
-            <li>VERSION:    {data.class_specification.version}</li>
-            <li>CODE FILE ID:   {data.class_specification.code_file_id}</li>
-        </ol>
-    );
-};
+interface NodeDataPanelProps {
+    node:FunctionWorkflow|ResourceWorkflow;
+}
 
-const resourceWorkflowInstance = (data: ResourceWorkflow) => {
-
-    return(
-        <ol>
-            <li>CLASS TYPE:     {data.class_type}</li>
-        </ol>
-    );
-};
-
-const NodeDataPanel:React.FC<FunctionWorkflow|ResourceWorkflow> = (data) => {
+const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node}) => {
 
     return (
-        <Card>
-            <CardContent>
-                <p/>
-                <p>NAME: {data.name}</p>
-                {isFunction(data)? functionWorkflowInstance(data): resourceWorkflowInstance(data)}
+        <Card className="pt-6">
+            <CardContent className="m-6">
+                <p><b>NAME</b>: {node.name}</p>
+                {isFunction(node)?
+                    <FunctionWorkFlowPanel data={node}/>:
+                    <ResourceWorkFlowPanel data={node}/>}
             </CardContent>
         </Card>
     );
