@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -12,7 +13,7 @@ import Layout from "@/components/layout/Layout";
 import { ApiResponseWorkflow } from '@/types/workflows';
 import { getWorkflow } from '@/services/workflowServices';
 import Spinner from '@/components/utils/Spinner';
-import JSONEditorComponent from '@/components/JSONEditor/JSONEditorComponent';
+const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
 import { Button } from '@/components/ui/button';
 
 export default function WorkflowView() {
