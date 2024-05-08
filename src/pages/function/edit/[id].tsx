@@ -221,7 +221,7 @@ export default function FunctionEdit() {
                             variant="outline"
                             onClick={() => { router.back() }}
                         >Cancel</Button>
-                        <Button type="submit">Update</Button>
+                        <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Update</Button>
                     </CardFooter>
                 </form>
             </Form>

@@ -243,7 +243,7 @@ export default function FunctionCreate() {
                 variant="outline"
                 onClick={() => { router.back() }}
               >Cancel</Button>
-              <Button type="submit">Save</Button>
+              <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Save</Button>
             </CardFooter>
           </form>
         </Form>

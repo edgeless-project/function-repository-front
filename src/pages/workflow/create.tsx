@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import {StrictMode, useState} from 'react';
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -159,7 +159,7 @@ export default function WorkflowCreate() {
               variant="outline"
               onClick={() => { router.back() }}
             >Cancel</Button>
-            <Button type="submit">Save</Button>
+            <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Save</Button>
           </div>
         </form>
       </Form>

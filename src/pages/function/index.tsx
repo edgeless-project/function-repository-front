@@ -73,12 +73,12 @@ export default function FunctionList() {
     <Layout title="Functions">
       <Card>
         <CardHeader>
-          <CardTitle>List of functions</CardTitle>
+          <CardTitle className="text-edgeless-secondary-color">List of functions</CardTitle>
           {!functionsLoading && <CardDescription>{total} functions found</CardDescription>}
           <div className="flex justify-end">
-          <Button asChild className="ml-2 bg-[#6e2d9f]">
-            <Link href={'/function/create'}>Create new function</Link>
-          </Button>
+            <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+              <Link href={'/function/create'}>Create new function</Link>
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -105,13 +105,13 @@ export default function FunctionList() {
                   <TableCell>{fun.createdAt}</TableCell>
                   <TableCell>{fun.updatedAt}</TableCell>
                   <TableCell className="text-right">
-                    <Button asChild className="ml-2">
+                    <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/function/view/${fun.id}`}>View</Link>
                     </Button>
-                    <Button asChild className="ml-2">
+                    <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/function/edit/${fun.id}`}>Edit</Link>
                     </Button>
-                    <Button asChild className="ml-2">
+                    <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/function/delete/${fun.id}`}>Delete</Link>
                     </Button>
                   </TableCell>
