@@ -15,14 +15,13 @@ interface NodeDataPanelProps {
 const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node}) => {
 
     return (
-        <Card className="pt-6">
-            <CardContent className="m-6">
+        <p className="mt-4">
                 <p><b>NAME</b>: {node.name}</p>
                 {isFunction(node)?
                     <FunctionWorkFlowPanel data={node}/>:
                     <ResourceWorkFlowPanel data={node}/>}
-            </CardContent>
-        </Card>
+        </p>
+
     );
 }
 

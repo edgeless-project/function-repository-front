@@ -10,7 +10,6 @@ import ReactFlow, {
     Edge,
     FitViewOptions,
     MarkerType,
-    MiniMap,
     Node,
     OnEdgesChange,
     OnNodesChange, Panel
@@ -22,11 +21,14 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/dataPanel";
 
 //Nodes Style modes
+const styleFunctionNode = {
+    background: 'rgb(220,234,246)'
+}
 const styleResourceNodeOut = {
-    background: 'rgba(217,90,109,0.78)'
+    background: 'rgb(255,241,204)'
 }
 const styleResourceNodeIn = {
-    background: 'rgb(66,232,48)'
+    background: 'rgb(225,239,216)'
 }
 const edgeEndResource = {
     type: MarkerType.ArrowClosed,
@@ -49,7 +51,7 @@ const edgeStyleFunction = {
     stroke: '#000000',
 }
 const fitViewOptions: FitViewOptions = {
-    padding: 0.05,
+    padding: 0.5,
 };
 const nodeWidth = 172;
 const nodeHeight = 36;
@@ -101,6 +103,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
     const [isMounted, setIsMounted] = useState(false);
     const [loadPanel, setLoadPanel] = useState(false);
     const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|null>(null);
+    const [nodeColor, setNodeColor] = useState<string>(styleFunctionNode.background);
 
     useEffect(() => {
         //  Nodes To INIT Flow
@@ -112,7 +115,8 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                 position: { x: 0, y: 0 },
                 data: { label: f.name },
                 width: nodeWidth,
-                height: nodeHeight
+                height: nodeHeight,
+                style: styleFunctionNode
             };
 
             for(let out in f.output_mapping){
@@ -203,6 +207,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
     const handleClickNode = (event: any, nodeClicked: any) => {
         let node = getDataFromNode(nodeClicked.id)
         setSelNode(node);
+        setNodeColor(nodeClicked.style.background);
         setLoadPanel(!loadPanel);
     }; //Function to execute on node click
     const handleConnect = useCallback(
@@ -235,7 +240,9 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
             >
                 {loadPanel && selNode && <Panel className="m-0 h-max !important" position="top-right">
                     <Card>
-                        <CardHeader><h1>{selNode.name}</h1></CardHeader>
+                        <CardHeader  className={"rounded-md border-b-5 border-indigo-500"} style={{background: nodeColor}}>
+                            <p className="font-sans text-xl font-medium text-center">{selNode.name}</p>
+                        </CardHeader>
                         <CardContent>
                            <div style={{width: '20vw', height: '70vh'}}>
                                <NodeDataPanel node={selNode}/>
@@ -244,7 +251,6 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                     </Card>
                 </Panel>}
                 <Controls showInteractive={false}/>
-                {/*<MiniMap/>*/}
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
             </ReactFlow>
         </div>
