@@ -13,13 +13,18 @@ export interface ApiResponseGetWorkflows {
 
 export interface FunctionWorkflow {
   name: string,
-  class_specification_id: string,
-  class_specification_version: string,
+  class_specification:{
+    function_type: string,
+    id: string,
+    version: string,
+    code_file_id: string,
+    outputs:[]
+  },
   output_mapping: {
     //"next-step"?: string
     [key: string]:  string
   },
-  annotations: {},
+  annotations: {}
 };
 
 export interface ResourceWorkflow {

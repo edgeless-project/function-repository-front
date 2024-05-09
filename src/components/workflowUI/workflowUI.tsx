@@ -10,21 +10,25 @@ import ReactFlow, {
     Edge,
     FitViewOptions,
     MarkerType,
-    MiniMap,
     Node,
     OnEdgesChange,
-    OnNodesChange
+    OnNodesChange, Panel
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
-import {JsonFlowComponentState} from "@/types/workflows";
+import {FunctionWorkflow, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import dagre from 'dagre';
+import {Card, CardContent, CardHeader} from "@/components/ui/card";
+import NodeDataPanel from "@/components/workflowUI/dataPanel";
 
 //Nodes Style modes
+const styleFunctionNode = {
+    background: 'rgb(220,234,246)'
+}
 const styleResourceNodeOut = {
-    background: 'rgba(217,90,109,0.78)'
+    background: 'rgb(255,241,204)'
 }
 const styleResourceNodeIn = {
-    background: 'rgb(66,232,48)'
+    background: 'rgb(225,239,216)'
 }
 const edgeEndResource = {
     type: MarkerType.ArrowClosed,
@@ -47,21 +51,19 @@ const edgeStyleFunction = {
     stroke: '#000000',
 }
 const fitViewOptions: FitViewOptions = {
-    padding: 0.05,
+    padding: 0.5,
 };
 const nodeWidth = 172;
 const nodeHeight = 36;
 
-interface JsonFlowComponentProps {
+interface WorkFlowComponentProps {
     value: JsonFlowComponentState;
-    // onChange?: (value: object) => void;
-    // onError?: (hasError: boolean) => void;
     readOnly?: boolean;
 }
 
+//Order nodes for display
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
-
 const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
     // Top-Bottom('TB') or Left-Right('LR')
     const isHorizontal = direction === 'LR';
@@ -95,10 +97,13 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
     return { nodes, edges };
 };
 
-const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
+const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
+    const [loadPanel, setLoadPanel] = useState(false);
+    const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|null>(null);
+    const [nodeColor, setNodeColor] = useState<string>(styleFunctionNode.background);
 
     useEffect(() => {
         //  Nodes To INIT Flow
@@ -110,7 +115,8 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                 position: { x: 0, y: 0 },
                 data: { label: f.name },
                 width: nodeWidth,
-                height: nodeHeight
+                height: nodeHeight,
+                style: styleFunctionNode
             };
 
             for(let out in f.output_mapping){
@@ -179,8 +185,30 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
         setIsMounted(true);
     }, []);
 
+    const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|null => {
+
+        let a = null;
+
+        value.resources.forEach(r => {
+            if(r.name.includes(id))
+                a = r;
+        });
+
+        if (a != null) return a;
+
+        value.functions.forEach(f=>{
+            if (f.name.includes(id))
+                a = f;
+        });
+
+        return a;
+    };
+
     const handleClickNode = (event: any, nodeClicked: any) => {
-        console.log(nodeClicked);
+        let node = getDataFromNode(nodeClicked.id)
+        setSelNode(node);
+        setNodeColor(nodeClicked.style.background);
+        setLoadPanel(!loadPanel);
     }; //Function to execute on node click
     const handleConnect = useCallback(
         (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
@@ -210,8 +238,19 @@ const Flow:React.FC<JsonFlowComponentProps> = ({value,readOnly}) => {
                 nodesDraggable={!readOnly}
                 nodesConnectable={!readOnly}
             >
-                <Controls/>
-                <MiniMap/>
+                {loadPanel && selNode && <Panel className="m-0 h-max !important" position="top-right">
+                    <Card>
+                        <CardHeader  className={"rounded-md border-b-5 border-indigo-500"} style={{background: nodeColor}}>
+                            <p className="font-sans text-xl font-medium text-center">{selNode.name}</p>
+                        </CardHeader>
+                        <CardContent>
+                           <div style={{width: '20vw', height: '70vh'}}>
+                               <NodeDataPanel node={selNode}/>
+                           </div>
+                        </CardContent>
+                    </Card>
+                </Panel>}
+                <Controls showInteractive={false}/>
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
             </ReactFlow>
         </div>
