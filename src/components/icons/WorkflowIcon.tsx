@@ -10,6 +10,7 @@ export default function WorkflowIcon (props: any) {
       {...props}
     >
       <defs>
+
         <style>
           {
             ".a{fill:none;stroke:#6e2d9f;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px}"
