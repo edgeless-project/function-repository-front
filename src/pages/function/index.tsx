@@ -33,6 +33,8 @@ import { fetchFunctions } from "@/services/functionServices";
 import Layout from "@/components/layout/Layout";
 import { FunctionMinified } from "@/types/functions";
 import Spinner from "@/components/utils/Spinner";
+import {date, format} from "@formkit/tempo";
+const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
 export default function FunctionList() {
 
@@ -102,8 +104,8 @@ export default function FunctionList() {
                   <TableCell className="font-medium">{fun.id}</TableCell>
                   <TableCell>{fun.function_type}</TableCell>
                   <TableCell>{fun.version}</TableCell>
-                  <TableCell>{fun.createdAt}</TableCell>
-                  <TableCell>{fun.updatedAt}</TableCell>
+                  <TableCell>{format(date(fun.createdAt), timeFormatGeneral,"en")}</TableCell>
+                  <TableCell>{format(date(fun.updatedAt), timeFormatGeneral,"en")}</TableCell>
                   <TableCell className="text-right">
                     <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/function/view/${fun.id}`}>View</Link>

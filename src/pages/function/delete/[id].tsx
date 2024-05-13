@@ -2,13 +2,15 @@ import { useRouter } from 'next/router';
 
 import Layout from "@/components/layout/Layout";
 import {useEffect, useState} from "react";
-import {ApiResponseGetFunctionVersions, FunctionComplete} from "@/types/functions";
-import {deleteFunction, getFunctionVersions, getFunctionVersionsComplete} from "@/services/functionServices";
+import {FunctionComplete} from "@/types/functions";
+import {deleteFunction, getFunctionVersionsComplete} from "@/services/functionServices";
 import Spinner from "@/components/utils/Spinner";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Button} from "@/components/ui/button";
 import DialogDelete from '@/components/utils/DialogDelete'
+import {date, format} from "@formkit/tempo";
+const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
 export default function FunctionDelete() {
   const router = useRouter();
@@ -111,8 +113,8 @@ export default function FunctionDelete() {
                     <TableCell>{v.version}</TableCell>
                     <TableCell>{v.function_type}</TableCell>
                     <TableCell>{v.outputs.join(', ')}</TableCell>
-                    <TableCell>{v.createdAt}</TableCell>
-                    <TableCell>{v.updatedAt}</TableCell>
+                    <TableCell>{format(date(v.createdAt), timeFormatGeneral,"en")}</TableCell>
+                    <TableCell>{format(date(v.updatedAt), timeFormatGeneral,"en")}</TableCell>
                     <TableCell className="text-right">
                       <Button
                           className="ml-2 red"

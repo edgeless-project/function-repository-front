@@ -20,6 +20,8 @@ import Spinner from '@/components/utils/Spinner';
 import { Button } from '@/components/ui/button';
 import { FunctionComplete } from '@/types/functions';
 import { getFunctionVersionsComplete } from '@/services/functionServices';
+import {date, format} from "@formkit/tempo";
+const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
 export default function FunctionView() {
   const router = useRouter();
@@ -75,8 +77,8 @@ export default function FunctionView() {
                   <TableCell>{fun.version}</TableCell>
                   <TableCell>{fun.function_type}</TableCell>
                   <TableCell>{fun.outputs.join(', ')}</TableCell>
-                  <TableCell>{fun.createdAt}</TableCell>
-                  <TableCell>{fun.updatedAt}</TableCell>
+                  <TableCell>{format(date(fun.createdAt), timeFormatGeneral,"en")}</TableCell>
+                  <TableCell>{format(date(fun.updatedAt), timeFormatGeneral,"en")}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
