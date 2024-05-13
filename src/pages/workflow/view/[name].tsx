@@ -17,7 +17,9 @@ const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEd
 import { Button } from '@/components/ui/button';
 import Flow from "@/components/workflowUI/workflowUI";
 import { JsonFlowComponentState } from "@/types/workflows";
+import {date, format} from "@formkit/tempo";
 
+const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
 export default function WorkflowView() {
   const router = useRouter();
@@ -55,11 +57,11 @@ export default function WorkflowView() {
           </div>
           <div className="flex my-3">
             <div className="w-48 font-bold">Created at:</div>
-            <div className="w-96">{workflow.createdAt}</div>
+            <div className="w-96">{format(date(workflow.createdAt), timeFormatGeneral,"en")}</div>
           </div>
           <div className="flex my-3">
             <div className="w-48 font-bold">Updated at:</div>
-            <div className="w-96">{workflow.updatedAt}</div>
+            <div className="w-96">{format(date(workflow.updatedAt), timeFormatGeneral,"en")}</div>
           </div>
         </CardContent>
       </Card>}

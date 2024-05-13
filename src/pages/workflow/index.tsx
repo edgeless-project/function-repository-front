@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
+import { format, date } from "@formkit/tempo"
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -13,7 +12,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -32,6 +30,8 @@ import Layout from "@/components/layout/Layout";
 import { WorkflowMinified } from "@/types/workflows";
 import Spinner from "@/components/utils/Spinner";
 import { fetchWorkflows } from "@/services/workflowServices";
+
+const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
 export default function WorkflowList() {
 
@@ -97,8 +97,8 @@ export default function WorkflowList() {
               {workflows.map(w => (
                 <TableRow key={w.name}>
                   <TableCell className="font-medium">{w.name}</TableCell>
-                  <TableCell>{w.createdAt}</TableCell>
-                  <TableCell>{w.updatedAt}</TableCell>
+                  <TableCell>{format(date(w.createdAt), timeFormatGeneral,"en")}</TableCell>
+                  <TableCell>{format(date(w.updatedAt), timeFormatGeneral,"en")}</TableCell>
                   <TableCell className="text-right">
                     <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
                       <Link href={`/workflow/view/${w.name}`}>View</Link>
