@@ -50,6 +50,16 @@ const edgeStyleFunction = {
     strokeWidth: 1,
     stroke: '#000000',
 }
+const edgeStyleResourceStart = {
+    strokeWidth: 1,
+    stroke: '#77dd77',
+}
+const edgeStartResource = {
+    type: MarkerType.ArrowClosed,
+    width: 20,
+    height: 20,
+    color: '#77dd77'
+}
 const fitViewOptions: FitViewOptions = {
     padding: 0.5,
 };
@@ -154,8 +164,8 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                         source: r.name,
                         target: r.output_mapping[out],
                         type: ConnectionLineType.Step,
-                        markerEnd: edgeEndResource,
-                        style: edgeStyleResource
+                        markerEnd: edgeStartResource,
+                        style: edgeStyleResourceStart
                     };
                     resourceEdges.push(newEdge);
                 }
