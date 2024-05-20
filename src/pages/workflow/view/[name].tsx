@@ -73,7 +73,7 @@ export default function WorkflowView() {
           <Tabs defaultValue="json-editor" className="w-full">
             <TabsList>
               <TabsTrigger value="json-editor">JSON</TabsTrigger>
-              <TabsTrigger value="visual-builder">Visual Builder</TabsTrigger>
+              <TabsTrigger value="visual-builder">Workflow UI</TabsTrigger>
             </TabsList>
             <TabsContent value="json-editor">
               <JSONEditorComponent value={workflowJSON as Object} readOnly={true} />

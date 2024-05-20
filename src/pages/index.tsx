@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Page() {
     return (
-        <Layout title='Workflow'>
+        <Layout title='Dashboard'>
             <div id='home' className="grid grid-cols-3 gap-4">
                 <div id="1">
                     <Link href="/function">
@@ -13,7 +13,7 @@ export default function Page() {
                                 <CardTitle className="text-center">Functions Management</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p>Click in this card to access and manage your functions.</p>
+                                <p>Click on this card to access and manage your functions.</p>
                             </CardContent>
                         </Card>
                     </Link>
@@ -25,7 +25,7 @@ export default function Page() {
                                 <CardTitle className="text-center">Workflow Management</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p>Click in this card to access and manage your workflows.</p>
+                                <p>Click on this card to access and manage your workflows.</p>
                             </CardContent>
                         </Card>
                     </Link>

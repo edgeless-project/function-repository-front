@@ -122,7 +122,7 @@ export default function WorkflowEdit() {
           <Tabs defaultValue="json-editor" className="w-full">
             <TabsList>
               <TabsTrigger value="json-editor">JSON</TabsTrigger>
-              <TabsTrigger value="visual-builder">Visual Builder</TabsTrigger>
+              <TabsTrigger value="visual-builder">Workflow UI</TabsTrigger>
             </TabsList>
             <TabsContent value="json-editor">
               <JSONEditorComponent value={workflowJSON as object} onChange={handleJSONChange} onError={handleJSONError} />
@@ -131,7 +131,7 @@ export default function WorkflowEdit() {
               <Card>
                 <CardHeader></CardHeader>
                 <CardContent>
-                  <p>TODO: Visual Builder</p>
+                  <p>TODO: Workflow UI</p>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -143,7 +143,7 @@ export default function WorkflowEdit() {
           variant="outline"
           onClick={() => { router.back() }}
         >Cancel</Button>
-        <Button onClick={handleSubmit}>Save</Button>
+        <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" onClick={handleSubmit}>Save</Button>
       </div>
       <DialogSave
         isOpen={modalOpen}

@@ -34,31 +34,31 @@ const edgeEndResource = {
     type: MarkerType.ArrowClosed,
     width: 20,
     height: 20,
-    color: '#ff0000'
+    color: '#826a2e'
 }
 const edgeEndFunction = {
     type: MarkerType.ArrowClosed,
     width: 20,
     height: 20,
-    color: '#000000'
+    color: '#555555'
 }
 const edgeStyleResource = {
     strokeWidth: 1,
-    stroke: '#ff0000',
+    stroke: '#826a2e',
 }
 const edgeStyleFunction = {
     strokeWidth: 1,
-    stroke: '#000000',
+    stroke: '#555555',
 }
 const edgeStyleResourceStart = {
     strokeWidth: 1,
-    stroke: '#77dd77',
+    stroke: '#58ad58',
 }
 const edgeStartResource = {
     type: MarkerType.ArrowClosed,
     width: 20,
     height: 20,
-    color: '#77dd77'
+    color: '#58ad58'
 }
 const fitViewOptions: FitViewOptions = {
     padding: 0.5,

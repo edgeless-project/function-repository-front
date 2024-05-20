@@ -72,7 +72,7 @@ export default function WorkflowList() {
     <Layout title="Workflows">
       <Card>
         <CardHeader>
-          <CardTitle className="text-edgeless-primary-color">List of workflows</CardTitle>
+          <CardTitle>List of workflows</CardTitle>
           {!workflowsLoading && <CardDescription>{total} workflows found</CardDescription>}
           <div className="flex justify-end">
           <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">

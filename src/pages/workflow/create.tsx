@@ -138,7 +138,7 @@ export default function WorkflowCreate() {
               <Tabs defaultValue="json-editor" className="w-full">
                 <TabsList>
                   <TabsTrigger value="json-editor">JSON Editor</TabsTrigger>
-                  <TabsTrigger value="visual-builder">Visual Builder</TabsTrigger>
+                  <TabsTrigger value="visual-builder">Workflow UI</TabsTrigger>
                 </TabsList>
                 <TabsContent value="json-editor">
                   <JSONEditorComponent value={workflowJSON} onChange={handleJSONChange} onError={handleJSONError} />
@@ -147,7 +147,7 @@ export default function WorkflowCreate() {
                   <Card>
                     <CardHeader></CardHeader>
                     <CardContent>
-                      <p>TODO: Visual Builder</p>
+                      <p>TODO: Workflow UI</p>
                     </CardContent>
                   </Card>
                 </TabsContent>

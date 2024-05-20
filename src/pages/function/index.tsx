@@ -75,7 +75,7 @@ export default function FunctionList() {
     <Layout title="Functions">
       <Card>
         <CardHeader>
-          <CardTitle className="text-edgeless-primary-color">List of functions</CardTitle>
+          <CardTitle>List of functions</CardTitle>
           {!functionsLoading && <CardDescription>{total} functions found</CardDescription>}
           <div className="flex justify-end">
             <Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
@@ -90,7 +90,7 @@ export default function FunctionList() {
           {!functionsLoading && <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">Id</TableHead>
+                <TableHead>Id</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Latest version</TableHead>
                 <TableHead>Created At</TableHead>
