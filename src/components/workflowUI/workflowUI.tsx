@@ -20,6 +20,7 @@ import dagre from 'dagre';
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/dataPanel";
 
+const edgeNodeSeparator = "###";
 //Nodes Style modes
 const styleFunctionNode = {
     background: 'rgb(220,234,246)'
@@ -94,8 +95,8 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
         node.targetPosition = isHorizontal ? 'left' : 'top';
         node.sourcePosition = isHorizontal ? 'right' : 'bottom';
 
-        // We are shifting the dagre node position (anchor = center center) to the top left
-        // so it matches the React Flow node anchor point (top left).
+        // We are shifting the dagre node position (anchor = center) to the top left
+        // it matches the React Flow node anchor point (top left).
         node.position = {
             x: nodeWithPosition.x - nodeWidth / 2,
             y: nodeWithPosition.y - nodeHeight / 2,
@@ -131,7 +132,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
 
             for(let out in f.output_mapping){
                 let newEdge: Edge={
-                    id: "e_"+f.name+"_"+f.output_mapping[out],
+                    id: "e_"+f.name+edgeNodeSeparator+f.output_mapping[out],
                     source: f.name,
                     target: f.output_mapping[out],
                     type: ConnectionLineType.Step,
@@ -160,7 +161,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
             if(r.output_mapping){
                 for(let out in r.output_mapping){
                     const newEdge: Edge={
-                        id: "e_"+r.name+"_"+r.output_mapping[out],
+                        id: "e_"+r.name+edgeNodeSeparator+r.output_mapping[out],
                         source: r.name,
                         target: r.output_mapping[out],
                         type: ConnectionLineType.Step,
@@ -173,7 +174,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                 //  If resource node does not have new request, it's considered an ENDPOINT.
                 newNode.style = styleResourceNodeOut;
                 initialEdges.forEach(e =>{
-                    const nodes = e.id.split("_").slice(1);
+                    const nodes = e.id.split(edgeNodeSeparator).slice(1);
                     if (nodes.includes(r.name)){
                         e.markerEnd = edgeEndResource;
                         e.style = edgeStyleResource;
