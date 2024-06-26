@@ -248,6 +248,9 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                 fitViewOptions={fitViewOptions}
                 nodesDraggable={!readOnly}
                 nodesConnectable={!readOnly}
+                connectOnClick={!readOnly}
+                deleteKeyCode={readOnly?null:"Backspace"}
+                disableKeyboardA11y={readOnly}
             >
                 {loadPanel && selNode && <Panel className="m-0 h-max !important" position="top-right">
                     <Card>

@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Layout from "@/components/layout/Layout";
-import { ApiRequestUpdateWorkflow, ApiResponseWorkflow } from '@/types/workflows';
+import {ApiRequestUpdateWorkflow, ApiResponseWorkflow, JsonFlowComponentState} from '@/types/workflows';
 import { getWorkflow, updateWorkflow } from '@/services/workflowServices';
 import Spinner from '@/components/utils/Spinner';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ export default function WorkflowEdit() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [resultOk, setResultOk] = useState(false);
+  const [tabIdx, setTabIdx] = useState("");
 
 
   useEffect(() => {
@@ -119,19 +120,28 @@ export default function WorkflowEdit() {
           <CardTitle>Workflow definition</CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="json-editor" className="w-full">
+          {tabIdx==="visual-builder" && <div className="float-right">
+            <button className="bg-green-400 hover:bg-green-300 text-white py-2 px-4 mr-4 rounded">
+              Add Function
+            </button>
+            <button className="bg-lime-400 hover:bg-lime-300 text-white py-2 px-6 rounded">
+              Add Resource
+            </button>
+          </div>}
+          <Tabs defaultValue="json-editor" onValueChange={(tabName) => setTabIdx(tabName)} className="w-full">
             <TabsList>
               <TabsTrigger value="json-editor">JSON</TabsTrigger>
               <TabsTrigger value="visual-builder">Workflow UI</TabsTrigger>
             </TabsList>
             <TabsContent value="json-editor">
-              <JSONEditorComponent value={workflowJSON as object} onChange={handleJSONChange} onError={handleJSONError} />
+              <JSONEditorComponent value={workflowJSON as object} onChange={handleJSONChange}
+                                   onError={handleJSONError}/>
             </TabsContent>
             <TabsContent value="visual-builder">
               <Card>
                 <CardHeader></CardHeader>
                 <CardContent>
-                  <p>TODO: Workflow UI</p>
+                  <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false}/>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -139,9 +149,11 @@ export default function WorkflowEdit() {
         </CardContent>
       </Card>}
       <div className="flex justify-between my-8">
-        <Button 
-          variant="outline"
-          onClick={() => { router.back() }}
+        <Button
+            variant="outline"
+            onClick={() => {
+              router.back()
+            }}
         >Cancel</Button>
         <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" onClick={handleSubmit}>Save</Button>
       </div>
