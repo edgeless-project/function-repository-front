@@ -19,6 +19,8 @@ import {FunctionWorkflow, JsonFlowComponentState, ResourceWorkflow} from "@/type
 import dagre from 'dagre';
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/dataPanel";
+import {node} from "prop-types";
+import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
 
 const edgeNodeSeparator = "###";
 //Nodes Style modes
@@ -132,7 +134,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
 
             for(let out in f.output_mapping){
                 let newEdge: Edge={
-                    id: "e_"+f.name+edgeNodeSeparator+f.output_mapping[out],
+                    id: "e"+edgeNodeSeparator+f.name+edgeNodeSeparator+f.output_mapping[out],
                     source: f.name,
                     target: f.output_mapping[out],
                     type: ConnectionLineType.Step,
@@ -161,7 +163,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
             if(r.output_mapping){
                 for(let out in r.output_mapping){
                     const newEdge: Edge={
-                        id: "e_"+r.name+edgeNodeSeparator+r.output_mapping[out],
+                        id: "e"+edgeNodeSeparator+r.name+edgeNodeSeparator+r.output_mapping[out],
                         source: r.name,
                         target: r.output_mapping[out],
                         type: ConnectionLineType.Step,
@@ -194,7 +196,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
         setNodes(layoutedNodes);
         setEdges(layoutedEdges);
         setIsMounted(true);
-    }, []);
+    }, [value.functions, value.resources]);
 
     const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|null => {
 
@@ -215,22 +217,51 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
         return a;
     };
 
-    const handleClickNode = (event: any, nodeClicked: any) => {
+    const handleClickNode = (event: any, nodeClicked: any) => {//Function to execute on node click
         let node = getDataFromNode(nodeClicked.id)
         setSelNode(node);
         setNodeColor(nodeClicked.style.background);
         setLoadPanel(!loadPanel);
-    }; //Function to execute on node click
+    };
+    
     const handleConnect = useCallback(
         (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
     );
     const handleNodesChange: OnNodesChange = useCallback(
-        (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-        [setNodes],
+        (changes) => {
+            setNodes((nodes) => applyNodeChanges(changes, nodes));  //Set graphic changes
+
+            let delNodes : string[]=[];
+            changes.forEach(ch =>{  //Classify changes
+                if(ch.type === "remove"){
+                    const nod = ch as NodeRemoveChange;
+                    delNodes.push(nod.id);
+                }
+            });
+            if(delNodes.length>0){  //Delete Nodes
+                value.functions = value.functions.filter(function(nod){
+                    return !delNodes.includes(nod.name)});
+                value.resources = value.resources.filter(function(nod){
+                    return !delNodes.includes(nod.name)});
+            }
+        },
+        [setNodes, value],
     );
+
     const handleEdgesChange: OnEdgesChange = useCallback(
-        (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+        (changes) => {
+            setEdges((eds) => applyEdgeChanges(changes, eds));  //Set graphic changes
+
+            let delEdge : string[]=[];
+            changes.forEach(ch =>{  //Classify changes
+                if(ch.type === "remove"){
+                    const nod = ch as EdgeRemoveChange;
+                    delEdge.push(nod.id);
+                }
+            });
+            console.log("Deleted edges: ",delEdge);
+        },
         [setEdges],
     );
 
