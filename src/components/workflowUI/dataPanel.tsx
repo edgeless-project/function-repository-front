@@ -1,24 +1,25 @@
-import {FunctionWorkflow, ResourceWorkflow} from "@/types/workflows";
+import {FunctionWorkflow, FunctionWorkflow_redux, ResourceWorkflow} from "@/types/workflows";
 import React from "react";
 import ResourceWorkFlowPanel from "@/components/workflowUI/ResourceWorkFlowPanel";
 import FunctionWorkFlowPanel from "@/components/workflowUI/FunctionWorkFlowPanel";
 
-function isFunction(data: FunctionWorkflow | ResourceWorkflow): data is FunctionWorkflow {
-    return (data as FunctionWorkflow).class_specification !== undefined;
+function isResource(data: FunctionWorkflow | FunctionWorkflow_redux | ResourceWorkflow): data is ResourceWorkflow {
+    return (data as ResourceWorkflow).class_type !== undefined ;
 }
 
 interface NodeDataPanelProps {
-    node:FunctionWorkflow|ResourceWorkflow;
+    node:FunctionWorkflow|ResourceWorkflow|FunctionWorkflow_redux;
 }
 
 const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node}) => {
 
+
     return (
         <ol className="mt-4">
                 <p><b>NAME</b>: {node.name}</p>
-                {isFunction(node)?
-                    <FunctionWorkFlowPanel data={node}/>:
-                    <ResourceWorkFlowPanel data={node}/>}
+                {isResource(node)?
+                    <ResourceWorkFlowPanel data={node}/>:
+                    <FunctionWorkFlowPanel data={node}/>}
         </ol>
 
     );

@@ -15,11 +15,10 @@ import ReactFlow, {
     OnNodesChange, Panel
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
-import {FunctionWorkflow, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
+import {FunctionWorkflow, FunctionWorkflow_redux, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import dagre from 'dagre';
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/dataPanel";
-import {node} from "prop-types";
 import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
 
 const edgeNodeSeparator = "###";
@@ -115,14 +114,14 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
     const [loadPanel, setLoadPanel] = useState(false);
-    const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|null>(null);
+    const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|FunctionWorkflow_redux|null>(null);
     const [nodeColor, setNodeColor] = useState<string>(styleFunctionNode.background);
 
     useEffect(() => {
         //  Nodes To INIT Flow
         let initialNodes : Node[] = [], initialEdges: Edge[] = [], resourceEdges: Edge[] = [];
 
-        value.functions.forEach(f => {
+        value.functions.forEach(f => {//Create a node and an edge from each function entry, normal nodes
             let newNode: Node={
                 id: f.name,
                 position: { x: 0, y: 0 },
@@ -145,8 +144,8 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
             }
             initialNodes.push(newNode);
 
-        });//Create a node and an edge from each function entry, normal nodes
-        value.resources.forEach(r => {
+        });
+        value.resources.forEach(r => {  //Create a node and an edge from each resource entry. Entry points nodes.
 
             let newNode: Node ={
                 id: r.name,
@@ -185,7 +184,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
             }
 
             initialNodes.push(newNode);
-        });//Create a node and an edge from each resource entry. Entry points nodes.
+        });
 
         const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
             initialNodes,
@@ -198,7 +197,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
         setIsMounted(true);
     }, [value.functions, value.resources]);
 
-    const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|null => {
+    const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|FunctionWorkflow_redux|null => {
 
         let a = null;
 
@@ -217,8 +216,9 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
         return a;
     };
 
-    const handleClickNode = (event: any, nodeClicked: any) => {//Function to execute on node click
+    const handleClickNode = (event: any, nodeClicked: any) => { //Function to execute on node click
         let node = getDataFromNode(nodeClicked.id)
+        console.log(node);
         setSelNode(node);
         setNodeColor(nodeClicked.style.background);
         setLoadPanel(!loadPanel);
@@ -230,16 +230,16 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
     );
     const handleNodesChange: OnNodesChange = useCallback(
         (changes) => {
-            setNodes((nodes) => applyNodeChanges(changes, nodes));  //Set graphic changes
+            setNodes((nodes) => applyNodeChanges(changes, nodes));  //Load graphic changes
 
             let delNodes : string[]=[];
-            changes.forEach(ch =>{  //Classify changes
+            changes.forEach(ch =>{  //Classify changes by type
                 if(ch.type === "remove"){
                     const nod = ch as NodeRemoveChange;
                     delNodes.push(nod.id);
                 }
             });
-            if(delNodes.length>0){  //Delete Nodes
+            if(delNodes.length>0){  //Delete Nodes from json data
                 value.functions = value.functions.filter(function(nod){
                     return !delNodes.includes(nod.name)});
                 value.resources = value.resources.filter(function(nod){
@@ -251,10 +251,10 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
 
     const handleEdgesChange: OnEdgesChange = useCallback(
         (changes) => {
-            setEdges((eds) => applyEdgeChanges(changes, eds));  //Set graphic changes
+            setEdges((eds) => applyEdgeChanges(changes, eds));  //Load graphic changes
 
             let delEdge : string[]=[];
-            changes.forEach(ch =>{  //Classify changes
+            changes.forEach(ch =>{  //Classify changes by type
                 if(ch.type === "remove"){
                     const nod = ch as EdgeRemoveChange;
                     delEdge.push(nod.id);

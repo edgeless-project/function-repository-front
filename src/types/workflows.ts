@@ -11,6 +11,17 @@ export interface ApiResponseGetWorkflows {
   offset: number;
 };
 
+export interface FunctionWorkflow_redux {
+  name: string,
+  class_specification_id: string,
+  class_specification_version: string,
+  output_mapping: {
+    //"next-step"?: string
+    [key: string]:  string
+  },
+  annotations: {}
+};
+
 export interface FunctionWorkflow {
   name: string,
   class_specification:{
