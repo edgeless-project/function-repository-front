@@ -290,7 +290,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                         </CardHeader>
                         <CardContent>
                            <div style={{width: '20vw', height: '70vh'}}>
-                               <NodeDataPanel node={selNode}/>
+                               <NodeDataPanel node={selNode} readOnly={readOnly?readOnly:false}/>
                            </div>
                         </CardContent>
                     </Card>
