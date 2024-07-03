@@ -218,7 +218,6 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
 
     const handleClickNode = (event: any, nodeClicked: any) => { //Function to execute on node click
         let node = getDataFromNode(nodeClicked.id)
-        console.log(node);
         setSelNode(node);
         setNodeColor(nodeClicked.style.background);
         setLoadPanel(!loadPanel);
@@ -260,7 +259,6 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                     delEdge.push(nod.id);
                 }
             });
-            console.log("Deleted edges: ",delEdge);
         },
         [setEdges],
     );
