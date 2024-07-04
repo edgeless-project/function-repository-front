@@ -11,7 +11,7 @@ export interface ApiResponseGetWorkflows {
   offset: number;
 };
 
-export interface FunctionWorkflow_redux {
+export interface FunctionWorkflowBasic {
   name: string,
   class_specification_id: string,
   class_specification_version: string,

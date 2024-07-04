@@ -1,14 +1,14 @@
-import {FunctionWorkflow, FunctionWorkflow_redux} from "@/types/workflows";
+import {FunctionWorkflow, FunctionWorkflowBasic} from "@/types/workflows";
 import React from "react";
 
 interface functionWorkflowInstanceProps {
-    data: FunctionWorkflow | FunctionWorkflow_redux;
+    data: FunctionWorkflow | FunctionWorkflowBasic;
 }
 
 const functionWorkflowInstance:React.FC<functionWorkflowInstanceProps> = ({data}) => {
     //Loads data on regards of class specification struct
-    if((data as FunctionWorkflow_redux).class_specification_id !== undefined){
-        data = data as FunctionWorkflow_redux;
+    if((data as FunctionWorkflowBasic).class_specification_id !== undefined){
+        data = data as FunctionWorkflowBasic;
         return (
             <ol>
                 <li><b>ID</b>:     {data.class_specification_id}</li>

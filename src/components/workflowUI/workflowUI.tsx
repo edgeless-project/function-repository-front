@@ -15,7 +15,7 @@ import ReactFlow, {
     OnNodesChange, Panel
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
-import {FunctionWorkflow, FunctionWorkflow_redux, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
+import {FunctionWorkflow, FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import dagre from 'dagre';
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/dataPanel";
@@ -114,7 +114,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
     const [loadPanel, setLoadPanel] = useState(false);
-    const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|FunctionWorkflow_redux|null>(null);
+    const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic|null>(null);
     const [nodeColor, setNodeColor] = useState<string>(styleFunctionNode.background);
 
     useEffect(() => {
@@ -197,7 +197,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
         setIsMounted(true);
     }, [value.functions, value.resources]);
 
-    const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|FunctionWorkflow_redux|null => {
+    const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic|null => {
 
         let a = null;
 
@@ -239,9 +239,9 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                 }
             });
             if(delNodes.length>0){  //Delete Nodes from json data
-                value.functions = value.functions.filter(function(nod){
+                value.functions = value.functions.filter(nod => {
                     return !delNodes.includes(nod.name)});
-                value.resources = value.resources.filter(function(nod){
+                value.resources = value.resources.filter(nod => {
                     return !delNodes.includes(nod.name)});
             }
         },
