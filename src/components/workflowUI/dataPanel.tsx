@@ -1,14 +1,15 @@
-import {FunctionWorkflow, FunctionWorkflow_redux, ResourceWorkflow} from "@/types/workflows";
+import {FunctionWorkflow, FunctionWorkflowBasic, ResourceWorkflow} from "@/types/workflows";
 import React from "react";
 import ResourceWorkFlowPanel from "@/components/workflowUI/ResourceWorkFlowPanel";
 import FunctionWorkFlowPanel from "@/components/workflowUI/FunctionWorkFlowPanel";
 
-function isResource(data: FunctionWorkflow | FunctionWorkflow_redux | ResourceWorkflow): data is ResourceWorkflow {
+function isResource(data: FunctionWorkflow | FunctionWorkflowBasic | ResourceWorkflow): data is ResourceWorkflow {
     return (data as ResourceWorkflow).class_type !== undefined ;
 }
 
 interface NodeDataPanelProps {
-    node:FunctionWorkflow|ResourceWorkflow|FunctionWorkflow_redux;
+    node:FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic;
+    readOnly: boolean;
 }
 
 const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node}) => {
