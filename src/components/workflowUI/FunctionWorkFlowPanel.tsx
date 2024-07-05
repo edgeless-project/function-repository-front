@@ -10,20 +10,20 @@ const functionWorkflowInstance:React.FC<functionWorkflowInstanceProps> = ({data}
     if((data as FunctionWorkflowBasic).class_specification_id !== undefined){
         data = data as FunctionWorkflowBasic;
         return (
-            <ol>
+            <li>
                 <li><b>ID</b>:     {data.class_specification_id}</li>
                 <li><b>VERSION</b>:    {data.class_specification_version}</li>
-            </ol>
+            </li>
         );
     }else{
         data = data as FunctionWorkflow;
         return (
-            <ol>
+            <li>
                 <li><b>ID</b>:     {data.class_specification.id}</li>
                 <li><b>FUNCTION TYPE</b>:  {data.class_specification.function_type}</li>
                 <li><b>VERSION</b>:    {data.class_specification.version}</li>
                 <li><b>CODE FILE ID</b>:   {data.class_specification.code_file_id}</li>
-            </ol>
+            </li>
         );
     }
 

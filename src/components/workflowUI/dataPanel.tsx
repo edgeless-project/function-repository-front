@@ -9,24 +9,32 @@ function isResource(data: FunctionWorkflow | FunctionWorkflowBasic | ResourceWor
 
 interface NodeDataPanelProps {
     node:FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic;
-    readOnly: boolean;
+    readOnly?: boolean;
 }
 
 const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node, readOnly}) => {
+    let buttonArea = null;
+    if(readOnly !== undefined && !readOnly){
+        buttonArea =
+            <div className="flex justify-center">
+                <div className="h-max grid content-end">
+                    <button className="bg-red-600 hover:bg-red-500 text-white py-2 px-32 rounded">Delete</button>
+                </div>
+            </div>
+    }
+//max-h-full
 
     return (
-        <ol className="mt-4">
-            <p><b>NAME</b>: {node.name}</p>
-            {isResource(node)?
-                <ResourceWorkFlowPanel data={node}/>:
-                <FunctionWorkFlowPanel data={node}/>
-            }
-            {readOnly?
-                null:
-                <button>Delete</button>
+        <div className="max-w-full ">
+            <ol className="mt-4">
+                <li><b>NAME</b>: {node.name}</li>
+                {isResource(node) ?
+                    <ResourceWorkFlowPanel data={node}/> :
+                    <FunctionWorkFlowPanel data={node}/>
+                }
+            </ol>
+        </div>
 
-            }
-        </ol>
 
     );
 }

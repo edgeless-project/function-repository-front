@@ -216,8 +216,14 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
         return a;
     };
 
+    const deleteNode = () =>{
+        setNodes((els)=>els.filter((node)=>node.id !== selNode?.name));
+        setLoadPanel(!loadPanel);
+        setSelNode(null);
+    };
+
     const handleClickNode = (event: any, nodeClicked: any) => { //Function to execute on node click
-        let node = getDataFromNode(nodeClicked.id)
+        let node = getDataFromNode(nodeClicked.id);
         setSelNode(node);
         setNodeColor(nodeClicked.style.background);
         setLoadPanel(!loadPanel);
@@ -227,6 +233,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
         (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
     );
+
     const handleNodesChange: OnNodesChange = useCallback(
         (changes) => {
             setNodes((nodes) => applyNodeChanges(changes, nodes));  //Load graphic changes
@@ -263,6 +270,8 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
         [setEdges],
     );
 
+    const proOptions = { hideAttribution: true };   //Hide attribution or watermark from grid
+
     return isMounted ? (
         <div style={{width: '80vw', height: '80vh'}}>
             <ReactFlow
@@ -279,6 +288,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                 nodesConnectable={!readOnly}
                 connectOnClick={!readOnly}
                 deleteKeyCode={readOnly?null:"Backspace"}
+                proOptions={proOptions}
                 disableKeyboardA11y={readOnly}
             >
                 {loadPanel && selNode && <Panel className="m-0 h-max !important" position="top-right">
@@ -287,9 +297,17 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                             <p className="font-sans text-xl font-medium text-center">{selNode.name}</p>
                         </CardHeader>
                         <CardContent>
-                           <div style={{width: '20vw', height: '70vh'}}>
-                               <NodeDataPanel node={selNode} readOnly={readOnly?readOnly:false}/>
-                           </div>
+                            <div style={{width: '20vw', height: '70vh'}} className="flex flex-col">
+                                <NodeDataPanel node={selNode} readOnly={readOnly ? readOnly : false}/>
+                                <div className="h-full grid content-end">
+                                    <div className="flex justify-center">
+                                        <button
+                                            className="bg-red-600 hover:bg-red-500 text-white py-2 px-32 rounded"
+                                            onClick={deleteNode}>Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </Panel>}
