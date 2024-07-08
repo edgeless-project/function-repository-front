@@ -20,6 +20,7 @@ import dagre from 'dagre';
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/dataPanel";
 import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
+import {node} from "prop-types";
 
 const edgeNodeSeparator = "###";
 //Nodes Style modes
@@ -202,14 +203,14 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
         let a = null;
 
         value.resources.forEach(r => {
-            if(r.name.includes(id))
+            if(r.name === id)
                 a = r;
         });
 
         if (a != null) return a;
 
         value.functions.forEach(f=>{
-            if (f.name.includes(id))
+            if (f.name === id)
                 a = f;
         });
 
@@ -243,6 +244,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly}) => {
                 if(ch.type === "remove"){
                     const nod = ch as NodeRemoveChange;
                     delNodes.push(nod.id);
+                    console.log(nod);
                 }
             });
             if(delNodes.length>0){  //Delete Nodes from json data
