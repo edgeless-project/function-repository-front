@@ -75,7 +75,7 @@ export interface ApiResponseDeleteWorkflow {
 
 export interface JsonFlowComponentState {
   name?: string,
-  functions: FunctionWorkflow[],
+  functions: (FunctionWorkflow | FunctionWorkflowBasic)[],
   resources: ResourceWorkflow[],
   annotations: {}
 }
