@@ -5,7 +5,7 @@ interface resourceWorkflowInstanceProps {
     data: ResourceWorkflow;
 }
 
-const resourceWorkflowInstance:React.FC<resourceWorkflowInstanceProps> = ({data}) => {
+const ResourceWorkflowPanel:React.FC<resourceWorkflowInstanceProps> = ({data}) => {
 
     return(
         <ol>
@@ -14,4 +14,4 @@ const resourceWorkflowInstance:React.FC<resourceWorkflowInstanceProps> = ({data}
     );
 };
 
-export default resourceWorkflowInstance;
+export default ResourceWorkflowPanel;

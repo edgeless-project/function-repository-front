@@ -18,7 +18,7 @@ import {BackgroundVariant} from "@reactflow/background";
 import {FunctionWorkflow, FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import dagre from 'dagre';
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
-import NodeDataPanel from "@/components/workflowUI/dataPanel";
+import NodeDataPanel from "@/components/workflowUI/NodeDataPanel";
 import CUPanel from "@/components/workflowUI/CUPanel";
 import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
 
@@ -118,6 +118,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
     const [loadPanel, isLoadPanel] = useState(false);
     const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic|null>(null);
     const [nodeColor, setNodeColor] = useState<string>(styleFunctionNode.background);
+    const [editNode, isEditNode] = useState(false);
 
     const renderNodeFromData = useCallback(() => {
         //  Nodes To INIT Flow
@@ -184,7 +185,6 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
                     }
                 });
             }
-
             initialNodes.push(newNode);
         });
 
@@ -207,19 +207,15 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
     const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic => {
 
         let a = null;
-
         value.resources.forEach(r => {
             if(r.name === id)
                 a = r;
         });
-
         if (a != null) return a;
-
         value.functions.forEach(f=>{
             if (f.name === id)
                 a = f;
         });
-
         if (a != null) return a;
         return null as unknown as FunctionWorkflow;
     };
@@ -233,8 +229,14 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
         setNodes((els)=>els.filter((node)=>node.id !== selNode?.name));
     }
 
+    const handleEdit = () => {
+        isLoadPanel(false);
+        isEditNode(true);
+    };
+
     const handleDeleteNode = () =>{
         isLoadPanel(false);
+        isEditNode(false);
         if(selNode != null) deleteNodeData(selNode.name);
     };
 
@@ -249,9 +251,10 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
 
     const handleClickNode = (event: any, nodeClicked: any) => { //Function to execute on node click
         let node = getDataFromNode(nodeClicked.id);
-        setSelNode(node);
         setNodeColor(nodeClicked.style.background);
-        isLoadPanel(!loadPanel);
+        setSelNode(node);
+        isEditNode(false);
+        if(node.name === selNode?.name) isLoadPanel(!loadPanel);
     };
     
     const handleConnect = useCallback(
@@ -322,10 +325,16 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
                                 <NodeDataPanel node={selNode} readOnly={readOnly ? readOnly : false}/>
                                 <div className="h-full grid content-end">
                                     <div className="flex justify-center">
-                                        {!readOnly && <button
-                                            className="bg-red-600 hover:bg-red-500 text-white py-2 px-32 rounded"
-                                            onClick={handleDeleteNode}>Delete
-                                        </button>}
+                                        {!readOnly && <div className="grid grid-cols-1">
+                                            <button
+                                                className="bg-green-500 hover:bg-green-400 text-white py-2 px-32 rounded"
+                                                onClick={handleEdit}>Edit
+                                            </button>
+                                            <button
+                                                className="bg-red-600 hover:bg-red-500 text-white py-2 px-32 rounded"
+                                                onClick={handleDeleteNode}>Delete
+                                            </button>
+                                        </div>}
                                     </div>
                                 </div>
                             </div>
@@ -335,7 +344,8 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
                 <Controls showInteractive={false}/>
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
             </ReactFlow>
-            {loadPanel && selNode && !readOnly && <CUPanel node={getDataFromNode(selNode.name)} value={value} onChange={handleEditNode} />}
+            {!loadPanel && editNode && selNode && !readOnly &&
+                <CUPanel node={getDataFromNode(selNode.name)} value={value} onChange={handleEditNode} />}
         </div>
     ) : null;
 }

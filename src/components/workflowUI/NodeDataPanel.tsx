@@ -13,16 +13,6 @@ interface NodeDataPanelProps {
 }
 
 const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node, readOnly}) => {
-    let buttonArea = null;
-    if(readOnly !== undefined && !readOnly){
-        buttonArea =
-            <div className="flex justify-center">
-                <div className="h-max grid content-end">
-                    <button className="bg-red-600 hover:bg-red-500 text-white py-2 px-32 rounded">Delete</button>
-                </div>
-            </div>
-    }
-//max-h-full
 
     return (
         <div className="max-w-full ">

@@ -15,7 +15,7 @@ import { getWorkflow } from '@/services/workflowServices';
 import Spinner from '@/components/utils/Spinner';
 const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
 import { Button } from '@/components/ui/button';
-import Flow from "@/components/workflowUI/workflowUI";
+import Flow from "@/components/workflowUI/WorkflowUI";
 import { JsonFlowComponentState } from "@/types/workflows";
 import {date, format} from "@formkit/tempo";
 

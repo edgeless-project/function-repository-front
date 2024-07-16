@@ -5,7 +5,7 @@ interface functionWorkflowInstanceProps {
     data: FunctionWorkflow | FunctionWorkflowBasic;
 }
 
-const functionWorkflowInstance:React.FC<functionWorkflowInstanceProps> = ({data}) => {
+const FunctionWorkflowPanel:React.FC<functionWorkflowInstanceProps> = ({data}) => {
     //Loads data on regards of class specification struct
     if((data as FunctionWorkflowBasic).class_specification_id !== undefined){
         data = data as FunctionWorkflowBasic;
@@ -29,4 +29,4 @@ const functionWorkflowInstance:React.FC<functionWorkflowInstanceProps> = ({data}
 
 };
 
-export default functionWorkflowInstance;
+export default FunctionWorkflowPanel;

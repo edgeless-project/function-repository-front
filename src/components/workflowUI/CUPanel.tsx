@@ -19,7 +19,7 @@ const CUPanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
         const nodeFun = node as FunctionWorkflow;
         const nodeFunBasic = node as FunctionWorkflowBasic;
 
-        if (nodeFun.class_specification != undefined) {
+        if (nodeFun.class_specification !== undefined) {
             setClassFunType(nodeFun.class_specification.function_type);
             setClassVersionV(nodeFun.class_specification.version);
             setClassIdV(nodeFun.class_specification.id);
@@ -30,8 +30,8 @@ const CUPanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
     }, [node]);
 
     const handleSave = () => {
-        value.functions.forEach(f => {
-            if(f.name == node.name){
+        value.functions.forEach(f => {  //Save data from each function if modified
+            if(f.name === node.name){
                 if("class_specification_version" in f){
                     if (classVersionV != "")  f.class_specification_version = classVersionV;
                     if (classIdV != "") f.class_specification_id = classIdV;
@@ -42,35 +42,49 @@ const CUPanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
                     if (funType != "") f.output_mapping.type = funType;
                     f.name = name;
                 }
+            }else{
+                Object.keys(f.output_mapping).forEach(k => {
+                    if(f.output_mapping[k] === node.name) f.output_mapping[k] = name;
+                });
             }
         })
-        if (onChange != undefined) onChange(value);
+
+        value.resources.forEach(r => {  //Save data from resource if modified
+           if(r.name === node.name){
+               r.name = name;
+           }
+        });
+        if (onChange !== undefined) onChange(value);
     }
 
-    const divComplex = ((node as FunctionWorkflow).class_specification != undefined)?
+    const divComplex =
         <li><b>Function Type</b>:
             <input value={funType}
                    onChange={e =>
                        setClassFunType(e.target.value)}/>
-        </li>:"";
+        </li>;
+
+    const divFunctionBasic =
+        <li>
+            <li><b>ID</b>: {classIdV} </li>
+            <li><b>Version</b>: <input value={classVersionV}
+                               onChange={e => setClassVersionV(e.target.value)}/></li>
+            { ((node as FunctionWorkflow).class_specification != undefined)? divComplex:"" }
+        </li>
 
     return (
         <div className="absolute top-0 left-0">
             <Card>
                 <CardHeader className={"rounded-md border-b-5 border-indigo-500"}
                             style={{background: 'rgb(220,234,246)'}}>
-                    <p className="font-sans text-xl font-medium text-center">Title</p>
+                    <p className="font-sans text-xl font-medium text-center">Edit node: {name}</p>
                 </CardHeader>
                 <CardContent>
                     <div style={{width: '20vw', height: '30vh'}} className="flex flex-col mt-4">
                         <ol>
                             <li><b>NAME</b>: <input value={name}
                                                     onChange={e => setName(e.target.value)}/></li>
-                            <li><b>ID</b>: <input value={classIdV}
-                                                  onChange={e => setClassIdV(e.target.value)}/></li>
-                            <li><b>Version</b>: <input value={classVersionV}
-                                                       onChange={e => setClassVersionV(e.target.value)}/></li>
-                            {divComplex}
+                            {(node as ResourceWorkflow).class_type === undefined? divFunctionBasic: ""}
                         </ol>
                         <div className="h-full grid content-end justify-center">
                             <button

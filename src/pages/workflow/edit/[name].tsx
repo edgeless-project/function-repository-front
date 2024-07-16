@@ -15,7 +15,7 @@ import { getWorkflow, updateWorkflow } from '@/services/workflowServices';
 import Spinner from '@/components/utils/Spinner';
 import { Button } from '@/components/ui/button';
 import DialogSave from '@/components/utils/DialogSave';
-import Flow from '@/components/workflowUI/workflowUI';
+import Flow from '@/components/workflowUI/WorkflowUI';
 import {date, format} from "@formkit/tempo";
 const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
