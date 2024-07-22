@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -17,6 +17,8 @@ import { Button } from '@/components/ui/button';
 import DialogSave from '@/components/utils/DialogSave';
 import Flow from '@/components/workflowUI/WorkflowUI';
 import {date, format} from "@formkit/tempo";
+import CreatePanel from "@/components/workflowUI/CreatePanel";
+import {getAlignmentSides} from "@floating-ui/utils";
 const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
@@ -33,6 +35,7 @@ export default function WorkflowEdit() {
   const [saveMessage, setSaveMessage] = useState('');
   const [resultOk, setResultOk] = useState(false);
   const [tabIdx, setTabIdx] = useState("");
+  const [createNode, isCreateNode] = useState(false);
 
 
   useEffect(() => {
@@ -84,6 +87,10 @@ export default function WorkflowEdit() {
 
   };
 
+  const closeNewResource = () => {
+    isCreateNode(false);
+  };
+
   const closeModal = () => {
     if (resultOk) {
       router.back();
@@ -121,7 +128,7 @@ export default function WorkflowEdit() {
         </CardHeader>
         <CardContent>
           {tabIdx==="visual-builder" && <div className="float-right">
-            <button className="bg-green-400 hover:bg-green-300 text-white py-2 px-4 mr-4 rounded">
+            <button className="bg-green-400 hover:bg-green-300 text-white py-2 px-4 mr-4 rounded" onClick={() => isCreateNode(true)}>
               Add Function
             </button>
             <button className="bg-lime-400 hover:bg-lime-300 text-white py-2 px-6 rounded">
@@ -140,8 +147,11 @@ export default function WorkflowEdit() {
             <TabsContent value="visual-builder">
               <Card>
                 <CardHeader></CardHeader>
-                <CardContent>
+                <CardContent className="relative">
                   <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false}/>
+                  {createNode && <div className="absolute top-0 left-5">
+                  <CreatePanel isResource={false} value={workflowJSON as JsonFlowComponentState} onChange={handleJSONChange} onClose={closeNewResource} />
+                </div>}
                 </CardContent>
               </Card>
             </TabsContent>

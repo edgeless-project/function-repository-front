@@ -19,8 +19,9 @@ import {FunctionWorkflow, FunctionWorkflowBasic, JsonFlowComponentState, Resourc
 import dagre from 'dagre';
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/NodeDataPanel";
-import CUPanel from "@/components/workflowUI/CUPanel";
+import UpdatePanel from "@/components/workflowUI/UpdatePanel";
 import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
+import CreatePanel from "@/components/workflowUI/CreatePanel";
 
 const edgeNodeSeparator = "###";
 //Nodes Style modes
@@ -119,6 +120,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
     const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic|null>(null);
     const [nodeColor, setNodeColor] = useState<string>(styleFunctionNode.background);
     const [editNode, isEditNode] = useState(false);
+    const [createNode, isCreateNode] = useState(false);
 
     const renderNodeFromData = useCallback(() => {
         //  Nodes To INIT Flow
@@ -344,8 +346,9 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
                 <Controls showInteractive={false}/>
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
             </ReactFlow>
-            {!loadPanel && editNode && selNode && !readOnly &&
-                <CUPanel node={getDataFromNode(selNode.name)} value={value} onChange={handleEditNode} />}
+            {!loadPanel && editNode && selNode && !readOnly && !createNode &&
+                <UpdatePanel node={getDataFromNode(selNode.name)} value={value} onChange={handleEditNode} />}
+
         </div>
     ) : null;
 }

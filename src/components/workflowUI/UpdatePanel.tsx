@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {FunctionWorkflow, FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
+import {Input} from "@/components/ui/input";
 
 interface CUPanelProps{
     node: FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic,
@@ -8,7 +9,7 @@ interface CUPanelProps{
     onChange?: (value: object) => void;
 }
 
-const CUPanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
+const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
 
     const [name, setName] = useState(node.name);
     const [funType, setClassFunType] = useState("");
@@ -58,16 +59,16 @@ const CUPanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
     }
 
     const divComplex =
-        <li><b>Function Type</b>:
-            <input value={funType}
+        <li><label><b>Function Type</b></label>
+            <Input value={funType}
                    onChange={e =>
                        setClassFunType(e.target.value)}/>
         </li>;
 
     const divFunctionBasic =
         <li>
-            <li><b>ID</b>: {classIdV} </li>
-            <li><b>Version</b>: <input value={classVersionV}
+            <li><br/><b>Class ID:</b>  {classIdV} </li>
+            <li><label><b>Class Version</b></label> <Input value={classVersionV}
                                onChange={e => setClassVersionV(e.target.value)}/></li>
             { ((node as FunctionWorkflow).class_specification != undefined)? divComplex:"" }
         </li>
@@ -82,7 +83,7 @@ const CUPanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
                 <CardContent>
                     <div style={{width: '20vw', height: '30vh'}} className="flex flex-col mt-4">
                         <ol>
-                            <li><b>NAME</b>: <input value={name}
+                            <li><label><b>NAME</b></label><Input value={name}
                                                     onChange={e => setName(e.target.value)}/></li>
                             {(node as ResourceWorkflow).class_type === undefined? divFunctionBasic: ""}
                         </ol>
@@ -99,4 +100,4 @@ const CUPanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
     );
 }
 
-export default CUPanel;
+export default UpdatePanel;
