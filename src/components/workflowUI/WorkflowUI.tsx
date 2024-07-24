@@ -21,7 +21,6 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/NodeDataPanel";
 import UpdatePanel from "@/components/workflowUI/UpdatePanel";
 import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
-import CreatePanel from "@/components/workflowUI/CreatePanel";
 
 const edgeNodeSeparator = "###";
 //Nodes Style modes
@@ -74,6 +73,7 @@ interface WorkFlowComponentProps {
     value: JsonFlowComponentState;
     onChange?: (value: object) => void;
     readOnly?: boolean;
+    reload?: boolean;
 }
 
 //Order nodes for display
@@ -112,7 +112,7 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
     return { nodes, edges };
 };
 
-const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
+const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload}) => {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
@@ -203,7 +203,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
     useEffect(() => {
         renderNodeFromData();
         setIsMounted(true);
-    }, [renderNodeFromData, value.functions, value.resources]);
+    }, [renderNodeFromData, reload]);
 
 
     const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic => {
@@ -242,7 +242,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
         if(selNode != null) deleteNodeData(selNode.name);
     };
 
-    const handleEditNode = (value: object) => {
+    const handleEditJSON = (value: object) => {
         if (onChange) {
             onChange(value);
         }
@@ -263,6 +263,15 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
         (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
         [setEdges]
     );
+
+    const handleCloseEditNode = () => {
+        isEditNode(false);
+    }
+
+    const handlePanelClose = () => {
+        isLoadPanel(false);
+        setSelNode(null);
+    }
 
     const handleNodesChange: OnNodesChange = useCallback(
         (changes) => {
@@ -319,7 +328,15 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
             >
                 {loadPanel && selNode && <Panel className="m-0 h-max !important" position="top-right">
                     <Card>
-                        <CardHeader  className={"rounded-md border-b-5 border-indigo-500"} style={{background: nodeColor}}>
+                        <CardHeader className="rounded-md border-b-5 border-indigo-500 relative"
+                                    style={{background: nodeColor}}>
+                            <button type="button" className="absolute top-3 right-3" onClick={handlePanelClose}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                     strokeWidth="1.5"
+                                     stroke="currentColor" className="size-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
                             <p className="font-sans text-xl font-medium text-center">{selNode.name}</p>
                         </CardHeader>
                         <CardContent>
@@ -327,13 +344,13 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
                                 <NodeDataPanel node={selNode} readOnly={readOnly ? readOnly : false}/>
                                 <div className="h-full grid content-end">
                                     <div className="flex justify-center">
-                                        {!readOnly && <div className="grid grid-cols-1">
+                                    {!readOnly && <div className="grid grid-cols-1">
                                             <button
                                                 className="bg-green-500 hover:bg-green-400 text-white py-2 px-32 rounded"
                                                 onClick={handleEdit}>Edit
                                             </button>
                                             <button
-                                                className="bg-red-600 hover:bg-red-500 text-white py-2 px-32 rounded"
+                                                className="bg-red-600 hover:bg-red-500 text-white mt-1 py-2 px-32 rounded"
                                                 onClick={handleDeleteNode}>Delete
                                             </button>
                                         </div>}
@@ -347,7 +364,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange}) => {
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
             </ReactFlow>
             {!loadPanel && editNode && selNode && !readOnly && !createNode &&
-                <UpdatePanel node={getDataFromNode(selNode.name)} value={value} onChange={handleEditNode} />}
+                <UpdatePanel node={getDataFromNode(selNode.name)} value={value} onChange={handleEditJSON} onClose={handleCloseEditNode} />}
 
         </div>
     ) : null;

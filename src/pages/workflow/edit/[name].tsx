@@ -18,7 +18,6 @@ import DialogSave from '@/components/utils/DialogSave';
 import Flow from '@/components/workflowUI/WorkflowUI';
 import {date, format} from "@formkit/tempo";
 import CreatePanel from "@/components/workflowUI/CreatePanel";
-import {getAlignmentSides} from "@floating-ui/utils";
 const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
@@ -34,8 +33,9 @@ export default function WorkflowEdit() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [resultOk, setResultOk] = useState(false);
-  const [tabIdx, setTabIdx] = useState("");
+  const [tabIdx, setTabIdx] = useState("json-editor");
   const [createNode, isCreateNode] = useState(false);
+  const [reloadWorkflow, setReloadWorkflow] = useState(false);
 
 
   useEffect(() => {
@@ -53,6 +53,7 @@ export default function WorkflowEdit() {
 
   const handleJSONChange = (jsonData: object) => {
     setWorkflowJSON(jsonData);
+    setReloadWorkflow(v => !v);
   };
 
   const handleJSONError = (hasJSONError: boolean) => {
@@ -135,7 +136,7 @@ export default function WorkflowEdit() {
               Add Resource
             </button>
           </div>}
-          <Tabs defaultValue="json-editor" onValueChange={(tabName) => setTabIdx(tabName)} className="w-full">
+          <Tabs defaultValue="json-editor" onValueChange={(tabName) => setTabIdx(tabName)} value={tabIdx} className="w-full">
             <TabsList>
               <TabsTrigger value="json-editor">JSON</TabsTrigger>
               <TabsTrigger value="visual-builder">Workflow UI</TabsTrigger>
@@ -148,7 +149,7 @@ export default function WorkflowEdit() {
               <Card>
                 <CardHeader></CardHeader>
                 <CardContent className="relative">
-                  <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false}/>
+                  <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false} onChange={handleJSONChange} reload={reloadWorkflow}/>
                   {createNode && <div className="absolute top-0 left-5">
                   <CreatePanel isResource={false} value={workflowJSON as JsonFlowComponentState} onChange={handleJSONChange} onClose={closeNewResource} />
                 </div>}

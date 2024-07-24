@@ -6,10 +6,11 @@ import {Input} from "@/components/ui/input";
 interface CUPanelProps{
     node: FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic,
     value: JsonFlowComponentState,
-    onChange?: (value: object) => void;
+    onChange?: (value: object) => void,
+    onClose?: () => void;
 }
 
-const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
+const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) => {
 
     const [name, setName] = useState(node.name);
     const [funType, setClassFunType] = useState("");
@@ -91,6 +92,10 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange}) => {
                             <button
                                 className="bg-green-500 hover:bg-green-400 text-white py-2 px-32 rounded"
                                 onClick={handleSave}>Save
+                            </button>
+                            <button
+                                className="bg-red-500 hover:bg-red-400 text-white mt-1 py-2 px-32 rounded"
+                                onClick={onClose}>Cancel
                             </button>
                         </div>
                     </div>

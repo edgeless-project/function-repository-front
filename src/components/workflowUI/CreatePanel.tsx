@@ -2,8 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {FunctionWorkflowBasic, JsonFlowComponentState} from "@/types/workflows";
 import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
-import {fetchFunctions, getFunctionsSimilarId, getFunctionVersions} from "@/services/functionServices";
+import { getFunctionsSimilarId, getFunctionVersions} from "@/services/functionServices";
 import {FunctionMinified} from "@/types/functions";
 
 interface CUPanelProps{
@@ -34,7 +33,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
     }, [classSpecificationId]);
 
     const handleSave = () => {
-        if(!isResource && name !== undefined && classSpecificationId !== undefined && classSpecificationId !== ""){
+        if(!isResource && name !== undefined && classSpecificationId !== undefined && classSpecificationVersion !== ""){
             const newFunction:FunctionWorkflowBasic ={
                 name: name,
                 class_specification_id: classSpecificationId,
@@ -47,6 +46,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
 
         value.resources.forEach(r => {});
         if (onChange !== undefined) onChange(value);
+        if (onClose !== undefined) onClose();
     }
 
     const setVersions = (id: string) => {
@@ -73,7 +73,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
             <li>
                 <b>Class Id:</b>
                 <div className="relative">
-                    <input value={classSpecificationId}
+                    <Input value={classSpecificationId}
                            onChange={e => {
                                setClassSpecificationId(e.target.value);
                            }}/>
@@ -120,7 +120,11 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                     <div className="h-full grid content-end justify-center">
                         <button
                             className="bg-green-500 hover:bg-green-400 text-white py-2 px-32 rounded"
-                            onClick={handleSave}>Save
+                            onClick={handleSave}>Confirm
+                        </button>
+                        <button
+                            className="bg-red-500 hover:bg-red-400 text-white mt-1 py-2 px-32 rounded"
+                            onClick={onClose}>Cancel
                         </button>
                     </div>
                 </div>
