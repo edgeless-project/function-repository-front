@@ -9,7 +9,7 @@ interface CUPanelProps{
     isResource: boolean,
     value: JsonFlowComponentState,
     onChange?: (value: object) => void,
-    onClose?: () => void
+    onClose?: () => void;
 }
 
 const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClose}) => {
@@ -19,9 +19,13 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
     const [classSpecificationVersion, setClassSpecificationVersion] = useState("");
     const [functions, setFunctions] = useState<FunctionMinified[] | []>([]);
     const [functionVersions, setFunctionVersions] = useState<string[]>([]);
+    const [isCorrect, setIsCorrect] = useState(false);
 
     useEffect(() => {
-        if(classSpecificationId.length>3){
+        if(classSpecificationId.length>3){  // Get IDs from functions
+            setFunctionVersions([]);
+            setClassSpecificationVersion("");
+            setIsCorrect(false);
             getFunctionsSimilarId(classSpecificationId)
                 .then(functions => {
                     setFunctions(functions.items);
@@ -57,8 +61,25 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                 })
             }
         });
-    }
+    };
 
+    const handleSelectVersion = (id:string) => {    // Tests node data correctness and allows creation
+        setClassSpecificationVersion(id);
+        if (!isResource){
+            functions.forEach(f => {
+               if(f.id === classSpecificationId && functionVersions.includes(id)){
+                   setIsCorrect(true);
+               }
+            });
+        }
+    };
+
+    const handleSelectID = (id: string) => {
+        if (id.length>1){
+            setClassSpecificationId(id);
+            setVersions(id);
+        }
+    };
 
     const getResource =
         <ol>I
@@ -77,10 +98,9 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                            onChange={e => {
                                setClassSpecificationId(e.target.value);
                            }}/>
-                    <select className="absolute top-2 right-1" onChange={e => {
-                        setClassSpecificationId(e.target.value);
-                        setVersions(e.target.value);
-                    }}>
+                    <select className="absolute top-2 right-1"
+                            onChange={e => handleSelectID(e.target.value)}>
+                        <option/>
                         {functions.map(fun => (
                             <option key={fun.id}>{fun.id}</option>
                         ))}
@@ -88,7 +108,10 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                 </div>
             </li>
             <li>
-                <b>Class Version:</b><select className="ml-4" onChange={e => setClassSpecificationVersion(e.target.value)}>
+                <b>Class Version:</b><
+                select className="ml-4"
+                       onChange={e => handleSelectVersion(e.target.value)}>
+                <option/>
                 {functionVersions.map(ver => (
                     <option key={ver}>{ver}</option>
                 ))}
@@ -119,8 +142,8 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                     {isResource? getResource:getFunction}
                     <div className="h-full grid content-end justify-center">
                         <button
-                            className="bg-green-500 hover:bg-green-400 text-white py-2 px-32 rounded"
-                            onClick={handleSave}>Confirm
+                            className={(isCorrect?"bg-green-500 hover:bg-green-400":"bg-green-200") + " text-white py-2 px-32 rounded"}
+                            onClick={handleSave} disabled={!isCorrect}>Confirm
                         </button>
                         <button
                             className="bg-red-500 hover:bg-red-400 text-white mt-1 py-2 px-32 rounded"
