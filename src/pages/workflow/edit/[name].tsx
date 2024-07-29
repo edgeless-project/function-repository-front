@@ -35,6 +35,7 @@ export default function WorkflowEdit() {
   const [resultOk, setResultOk] = useState(false);
   const [tabIdx, setTabIdx] = useState("json-editor");
   const [createNode, isCreateNode] = useState(false);
+  const [createResource, isCreateNodeResource] = useState(false);
   const [reloadWorkflow, setReloadWorkflow] = useState(false);
 
 
@@ -88,6 +89,17 @@ export default function WorkflowEdit() {
 
   };
 
+  const createNodeFunction = () => {
+    isCreateNodeResource(false);
+    isCreateNode(true)
+
+  }
+
+  const createNodeResource = () => {
+    isCreateNodeResource(true);
+    isCreateNode(true)
+  }
+
   const closeNewResource = () => {
     isCreateNode(false);
   };
@@ -129,10 +141,10 @@ export default function WorkflowEdit() {
         </CardHeader>
         <CardContent>
           {tabIdx==="visual-builder" && <div className="float-right">
-            <button className="bg-green-400 hover:bg-green-300 text-white py-2 px-4 mr-4 rounded" onClick={() => isCreateNode(true)}>
+            <button className="bg-green-400 hover:bg-green-300 text-white py-2 px-4 mr-4 rounded" onClick={() => createNodeFunction()}>
               Add Function
             </button>
-            <button className="bg-lime-400 hover:bg-lime-300 text-white py-2 px-6 rounded">
+            <button className="bg-lime-400 hover:bg-lime-300 text-white py-2 px-6 rounded" onClick={() => createNodeResource()}>
               Add Resource
             </button>
           </div>}
@@ -151,7 +163,7 @@ export default function WorkflowEdit() {
                 <CardContent className="relative">
                   <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false} onChange={handleJSONChange} reload={reloadWorkflow}/>
                   {createNode && <div className="absolute top-0 left-5">
-                  <CreatePanel isResource={false} value={workflowJSON as JsonFlowComponentState} onChange={handleJSONChange} onClose={closeNewResource} />
+                  <CreatePanel isResource={createResource} value={workflowJSON as JsonFlowComponentState} onChange={handleJSONChange} onClose={closeNewResource} />
                 </div>}
                 </CardContent>
               </Card>

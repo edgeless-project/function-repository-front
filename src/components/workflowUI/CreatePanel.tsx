@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
-import {FunctionWorkflowBasic, JsonFlowComponentState} from "@/types/workflows";
+import {FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import {Input} from "@/components/ui/input";
-import { getFunctionsSimilarId, getFunctionVersions} from "@/services/functionServices";
+import {getFunctionsSimilarId, getFunctionVersions} from "@/services/functionServices";
 import {FunctionMinified} from "@/types/functions";
+const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES as string);
 
 interface CUPanelProps{
     isResource: boolean,
@@ -15,29 +16,32 @@ interface CUPanelProps{
 const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClose}) => {
     const [name ,setName] = useState("");
     const [classType, setClassType] = useState("");
+    const [listClassType, setListClassType] = useState(stringClassType.split(","));
     const [classSpecificationId , setClassSpecificationId] = useState("");
     const [classSpecificationVersion, setClassSpecificationVersion] = useState("");
-    const [functions, setFunctions] = useState<FunctionMinified[] | []>([]);
-    const [functionVersions, setFunctionVersions] = useState<string[]>([]);
+    const [listFunctions, setListFunctions] = useState<FunctionMinified[] | []>([]);
+    const [listFunctionVersions, setListFunctionVersions] = useState<string[]>([]);
     const [isCorrect, setIsCorrect] = useState(false);
+
 
     useEffect(() => {
         if(classSpecificationId.length>3){  // Get IDs from functions
-            setFunctionVersions([]);
+            setListFunctionVersions([]);
             setClassSpecificationVersion("");
             setIsCorrect(false);
             getFunctionsSimilarId(classSpecificationId)
                 .then(functions => {
-                    setFunctions(functions.items);
+                    setListFunctions(functions.items);
                 })
                 .catch(error => console.error(error));
         }else{
-            setFunctions([]);
+            setListFunctions([]);
         }
     }, [classSpecificationId]);
 
+
     const handleSave = () => {
-        if(!isResource && name !== undefined && classSpecificationId !== undefined && classSpecificationVersion !== ""){
+        if(!isResource && name !== undefined && classSpecificationId !== "" && classSpecificationVersion !== ""){
             const newFunction:FunctionWorkflowBasic ={
                 name: name,
                 class_specification_id: classSpecificationId,
@@ -46,33 +50,81 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                 annotations: {}
             }
             value.functions.push(newFunction);
+        }else if(isResource && name !== "" && classType !== ""){
+            //TODO
+            const newResource: ResourceWorkflow = {
+                name: name,
+                class_type: classType,
+                output_mapping: {},
+                configurations: {}
+            }
+            value.resources.push(newResource);
         }
 
-        value.resources.forEach(r => {});
         if (onChange !== undefined) onChange(value);
         if (onClose !== undefined) onClose();
     }
 
+    const handleSetName = (name: string) => {   //Checks name is not repeated between nodes.
+        setName(name);
+        if (name !== ""){
+            handleIsCorrect(name);
+        }else {
+            setIsCorrect(false);
+        }
+    };
+
     const setVersions = (id: string) => {
-        functions.forEach(f => {
+        listFunctions.forEach(f => {
             if (f.id === id){
                 getFunctionVersions(id).then(versions => {
-                    setFunctionVersions(versions.versions);
+                    setListFunctionVersions(versions.versions);
                 })
             }
         });
     };
 
-    const handleSelectVersion = (id:string) => {    // Tests node data correctness and allows creation
+    const handleSelectVersion = (id:string) => {
         setClassSpecificationVersion(id);
+        handleIsCorrect("",id);
+    };
+
+    const handleIsCorrect = (n?: string, id?: string) => {    // Tests node data correctness and allows creation
         if (!isResource){
-            functions.forEach(f => {
-               if(f.id === classSpecificationId && functionVersions.includes(id)){
-                   setIsCorrect(true);
+            listFunctions.forEach(f => {
+               if(f.id === classSpecificationId && (listFunctionVersions.includes(classSpecificationVersion) || listFunctionVersions.includes(id as string)) && name !== ""){
+                   //TODO: Error? values do not update on setSomething used.
+                   let exists = false;
+                   value.functions.forEach(f =>{
+                       if (f.name === name || f.name === n){
+                           exists = true;
+                       }
+                   });
+                   exists?setIsCorrect(false):setIsCorrect(true);
                }
             });
+        }else{
+            if (id === undefined) id = "";
+            if ((classType !== "" || id !== "") && name !== "") {
+                let exists = false;
+                value.resources.forEach(r => {
+                    if (r.name === name || r.name === n){
+                        exists = true;
+                    }
+                });
+                exists?setIsCorrect(false):setIsCorrect(true);
+            }else setIsCorrect(false);
         }
     };
+
+    const handleSelectType = (type: string) => {
+        if (type !== "" && listClassType.includes(type)){
+            setClassType(type);
+            handleIsCorrect("",type);
+        }else{
+            setIsCorrect(false);
+        }
+    }
 
     const handleSelectID = (id: string) => {
         if (id.length>1){
@@ -82,11 +134,16 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
     };
 
     const getResource =
-        <ol>I
-            <li><b>Class Type</b>: <Input value={classType}
-                                          onChange={e => {
-                                              setClassType(e.target.value)
-                                          }}/></li>
+        <ol>
+            <li><b>Class Type</b>:
+                <select className="mt-2"
+                        onChange={e => handleSelectType(e.target.value)}>
+                    <option/>
+                    {listClassType.map(cT => (
+                        <option key={cT}>{cT}</option>
+                    ))}
+                </select>
+            </li>
         </ol>;
 
     const getFunction =
@@ -101,7 +158,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                     <select className="absolute top-2 right-1"
                             onChange={e => handleSelectID(e.target.value)}>
                         <option/>
-                        {functions.map(fun => (
+                        {listFunctions.map(fun => (
                             <option key={fun.id}>{fun.id}</option>
                         ))}
                     </select>
@@ -112,7 +169,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                 select className="ml-4"
                        onChange={e => handleSelectVersion(e.target.value)}>
                 <option/>
-                {functionVersions.map(ver => (
+                {listFunctionVersions.map(ver => (
                     <option key={ver}>{ver}</option>
                 ))}
                 </select>
@@ -137,7 +194,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                 <div style={{width: '20vw', height: '40vh'}} className="flex flex-col mt-4">
                     <ol>
                         <li><label>NAME</label><Input type="text" value={name}
-                                                      onChange={e => {setName(e.target.value)}}/></li>
+                                                      onChange={e => {handleSetName(e.target.value)}}/></li>
                     </ol>
                     {isResource? getResource:getFunction}
                     <div className="h-full grid content-end justify-center">
