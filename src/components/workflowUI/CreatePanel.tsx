@@ -39,9 +39,8 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
         }
     }, [classSpecificationId]);
 
-
     const handleSave = () => {
-        if(!isResource && name !== undefined && classSpecificationId !== "" && classSpecificationVersion !== ""){
+        if(!isResource && name !== "" && classSpecificationId !== "" && classSpecificationVersion !== ""){
             const newFunction:FunctionWorkflowBasic ={
                 name: name,
                 class_specification_id: classSpecificationId,
@@ -51,7 +50,6 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
             }
             value.functions.push(newFunction);
         }else if(isResource && name !== "" && classType !== ""){
-            //TODO
             const newResource: ResourceWorkflow = {
                 name: name,
                 class_type: classType,
@@ -65,7 +63,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
         if (onClose !== undefined) onClose();
     }
 
-    const handleSetName = (name: string) => {   //Checks name is not repeated between nodes.
+    const handleSetName = (name: string) => {   // Checks name is not repeated between nodes.
         setName(name);
         if (name !== ""){
             handleIsCorrect(name);
@@ -74,7 +72,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
         }
     };
 
-    const setVersions = (id: string) => {
+    const setVersions = (id: string) => {   // Gets possible versions from function
         listFunctions.forEach(f => {
             if (f.id === id){
                 getFunctionVersions(id).then(versions => {
@@ -87,34 +85,6 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
     const handleSelectVersion = (id:string) => {
         setClassSpecificationVersion(id);
         handleIsCorrect("",id);
-    };
-
-    const handleIsCorrect = (n?: string, id?: string) => {    // Tests node data correctness and allows creation
-        if (!isResource){
-            listFunctions.forEach(f => {
-               if(f.id === classSpecificationId && (listFunctionVersions.includes(classSpecificationVersion) || listFunctionVersions.includes(id as string)) && name !== ""){
-                   //TODO: Error? values do not update on setSomething used.
-                   let exists = false;
-                   value.functions.forEach(f =>{
-                       if (f.name === name || f.name === n){
-                           exists = true;
-                       }
-                   });
-                   exists?setIsCorrect(false):setIsCorrect(true);
-               }
-            });
-        }else{
-            if (id === undefined) id = "";
-            if ((classType !== "" || id !== "") && name !== "") {
-                let exists = false;
-                value.resources.forEach(r => {
-                    if (r.name === name || r.name === n){
-                        exists = true;
-                    }
-                });
-                exists?setIsCorrect(false):setIsCorrect(true);
-            }else setIsCorrect(false);
-        }
     };
 
     const handleSelectType = (type: string) => {
@@ -130,6 +100,35 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
         if (id.length>1){
             setClassSpecificationId(id);
             setVersions(id);
+        }
+    };
+
+    const handleIsCorrect = (n?: string, id?: string) => {  // Tests node data correctness and allows creation
+        if (!isResource){
+            listFunctions.forEach(f => {
+                if(f.id === classSpecificationId && (listFunctionVersions.includes(classSpecificationVersion) || listFunctionVersions.includes(id as string)) && name !== ""){
+                    //TODO: Values do not update on setSomething used?
+                    //TODO: Names not to repeat on any type?
+                    let exists = false;
+                    value.functions.forEach(f =>{
+                        if (f.name === name || f.name === n){
+                            exists = true;
+                        }
+                    });
+                    exists?setIsCorrect(false):setIsCorrect(true);
+                }
+            });
+        }else{
+            if (id === undefined) id = "";
+            if ((classType !== "" || id !== "") && name !== "") {
+                let exists = false;
+                value.resources.forEach(r => {
+                    if (r.name === name || r.name === n){
+                        exists = true;
+                    }
+                });
+                exists?setIsCorrect(false):setIsCorrect(true);
+            }else setIsCorrect(false);
         }
     };
 
