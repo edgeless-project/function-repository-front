@@ -141,10 +141,10 @@ export default function WorkflowEdit() {
         </CardHeader>
         <CardContent>
           {tabIdx==="visual-builder" && <div className="float-right">
-            <button className="bg-green-400 hover:bg-green-300 text-white py-2 px-4 mr-4 rounded" onClick={() => createNodeFunction()}>
+            <button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 mr-4 rounded" onClick={() => createNodeFunction()}>
               Add Function
             </button>
-            <button className="bg-lime-400 hover:bg-lime-300 text-white py-2 px-6 rounded" onClick={() => createNodeResource()}>
+            <button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-6 rounded" onClick={() => createNodeResource()}>
               Add Resource
             </button>
           </div>}
