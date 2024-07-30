@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {FunctionWorkflow, FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import {Input} from "@/components/ui/input";
+import {getFunctionVersions} from "@/services/functionServices";
 
 interface CUPanelProps{
     node: FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic,
@@ -16,6 +17,7 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
     const [funType, setClassFunType] = useState("");
     const [classIdV, setClassIdV] = useState("");
     const [classVersionV, setClassVersionV] = useState("");
+    const [listFunctionVersions, setListFunctionVersions] = useState<string[]>([]);
 
     useEffect(() => {
         const nodeFun = node as FunctionWorkflow;
@@ -29,7 +31,12 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
             setClassVersionV(nodeFunBasic.class_specification_version);
             setClassIdV(nodeFunBasic.class_specification_id);
         }
-    }, [node]);
+
+        getFunctionVersions(classIdV).then(versions => {
+            setListFunctionVersions(versions.versions);
+        })
+        
+    }, [classIdV, node]);
 
     const handleSave = () => {
         value.functions.forEach(f => {  //Save data from each function if modified
@@ -68,10 +75,18 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
 
     const divFunctionBasic =
         <li>
-            <li><br/><b>Class ID:</b>  {classIdV} </li>
-            <li><label><b>Class Version</b></label> <Input value={classVersionV}
-                               onChange={e => setClassVersionV(e.target.value)}/></li>
-            { ((node as FunctionWorkflow).class_specification != undefined)? divComplex:"" }
+            <li><br/><b>Class Specification ID</b>  {classIdV} </li>
+            <li><label><b>Class Specification Version</b></label>
+                <select className="mt-2"
+                        onChange={e => setClassVersionV(e.target.value)}>
+                    <option/>
+                    {listFunctionVersions && listFunctionVersions.map(v => (
+                        <option selected={classVersionV === v} key={v}>{v}</option>
+                    ))}
+                </select>
+            </li>
+
+            {((node as FunctionWorkflow).class_specification != undefined) ? divComplex : ""}
         </li>
 
     return (
@@ -88,13 +103,13 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
                                                     onChange={e => setName(e.target.value)}/></li>
                             {(node as ResourceWorkflow).class_type === undefined? divFunctionBasic: ""}
                         </ol>
-                        <div className="h-full grid content-end justify-center">
+                        <div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
                             <button
-                                className="bg-green-500 hover:bg-green-400 text-white py-2 px-32 rounded"
+                                className="bg-green-500 hover:bg-green-400 text-white py-2 px-4 rounded"
                                 onClick={handleSave}>Save
                             </button>
                             <button
-                                className="bg-red-500 hover:bg-red-400 text-white mt-1 py-2 px-32 rounded"
+                                className="bg-red-500 hover:bg-red-400 text-white py-2 px-4 rounded"
                                 onClick={onClose}>Cancel
                             </button>
                         </div>

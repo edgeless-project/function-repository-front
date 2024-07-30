@@ -77,7 +77,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
             if (f.id === id){
                 getFunctionVersions(id).then(versions => {
                     setListFunctionVersions(versions.versions);
-                })
+                });
             }
         });
     };
@@ -148,7 +148,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
     const getFunction =
         <ol>
             <li>
-                <b>Class Id:</b>
+                <b>Class Specification Id:</b>
                 <div className="relative">
                     <Input value={classSpecificationId}
                            onChange={e => {
@@ -164,8 +164,8 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                 </div>
             </li>
             <li>
-                <b>Class Version:</b><
-                select className="ml-4"
+                <b>Class Specification Version:</b>
+                <select className="ml-4"
                        onChange={e => handleSelectVersion(e.target.value)}>
                 <option/>
                 {listFunctionVersions.map(ver => (
@@ -196,13 +196,13 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                                                       onChange={e => {handleSetName(e.target.value)}}/></li>
                     </ol>
                     {isResource? getResource:getFunction}
-                    <div className="h-full grid content-end justify-center">
+                    <div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
                         <button
-                            className={(isCorrect?"bg-green-500 hover:bg-green-400":"bg-green-200") + " text-white py-2 px-32 rounded"}
+                            className={(isCorrect?"bg-green-500 hover:bg-green-400":"bg-green-200") + " text-white py-2 px-4 rounded"}
                             onClick={handleSave} disabled={!isCorrect}>Confirm
                         </button>
                         <button
-                            className="bg-red-500 hover:bg-red-400 text-white mt-1 py-2 px-32 rounded"
+                            className="bg-red-500 hover:bg-red-400 text-white py-2 px-4 rounded"
                             onClick={onClose}>Cancel
                         </button>
                     </div>
