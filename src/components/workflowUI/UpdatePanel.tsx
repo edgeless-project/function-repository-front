@@ -78,10 +78,11 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
             <li><br/><b>Class Specification ID</b>  {classIdV} </li>
             <li><label><b>Class Specification Version</b></label>
                 <select className="mt-2"
+                        value={classVersionV}
                         onChange={e => setClassVersionV(e.target.value)}>
                     <option/>
                     {listFunctionVersions && listFunctionVersions.map(v => (
-                        <option selected={classVersionV === v} key={v}>{v}</option>
+                        <option key={v}>{v}</option>
                     ))}
                 </select>
             </li>

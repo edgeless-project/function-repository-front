@@ -4,6 +4,9 @@ import {FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@
 import {Input} from "@/components/ui/input";
 import {getFunctionsSimilarId, getFunctionVersions} from "@/services/functionServices";
 import {FunctionMinified} from "@/types/functions";
+import CreateResource from "@/components/workflowUI/CreateResource";
+import CreateFunction from "@/components/workflowUI/CreateFunction";
+import {boolean} from "zod";
 const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES as string);
 
 interface CUPanelProps{
@@ -15,165 +18,91 @@ interface CUPanelProps{
 
 const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClose}) => {
     const [name ,setName] = useState("");
-    const [classType, setClassType] = useState("");
+    const [isComplete, setIsComplete] = useState(false);
     const [listClassType, setListClassType] = useState(stringClassType.split(","));
-    const [classSpecificationId , setClassSpecificationId] = useState("");
-    const [classSpecificationVersion, setClassSpecificationVersion] = useState("");
-    const [listFunctions, setListFunctions] = useState<FunctionMinified[] | []>([]);
-    const [listFunctionVersions, setListFunctionVersions] = useState<string[]>([]);
-    const [isCorrect, setIsCorrect] = useState(false);
+    const [functionJson, setFunctionJson ] = useState<FunctionWorkflowBasic>({
+        name: "",
+        class_specification_id: "",
+        class_specification_version: "",
+        output_mapping: {},
+        annotations: {}
+    });
+
+    const [resourceJson, setResourceJson ] = useState<ResourceWorkflow>({
+        name: "",
+        class_type: "",
+        output_mapping: {},
+        configurations: {}
+    });
 
 
-    useEffect(() => {
-        if(classSpecificationId.length>3){  // Get IDs from functions
-            setListFunctionVersions([]);
-            setClassSpecificationVersion("");
-            setIsCorrect(false);
-            getFunctionsSimilarId(classSpecificationId)
-                .then(functions => {
-                    setListFunctions(functions.items);
-                })
-                .catch(error => console.error(error));
-        }else{
-            setListFunctions([]);
+    const handleSave = async () => {    //Async function to save data if correct .
+        const res = await handleIsCorrect();    //Function requests servers data to test correct information.
+        if (res) {
+            if (isResource)
+                value.resources.push({
+                    name: name,
+                    class_type: resourceJson.class_type,
+                    output_mapping: resourceJson.output_mapping,
+                    configurations: resourceJson.configurations
+                });
+            else
+                value.functions.push({
+                    name: name,
+                    class_specification_id: functionJson.class_specification_id,
+                    class_specification_version: functionJson.class_specification_version,
+                    output_mapping: functionJson.output_mapping,
+                    annotations: functionJson.annotations
+                });
+
+            if (onChange !== undefined) onChange(value);
         }
-    }, [classSpecificationId]);
-
-    const handleSave = () => {
-        if(!isResource && name !== "" && classSpecificationId !== "" && classSpecificationVersion !== ""){
-            const newFunction:FunctionWorkflowBasic ={
-                name: name,
-                class_specification_id: classSpecificationId,
-                class_specification_version: classSpecificationVersion,
-                output_mapping: {},
-                annotations: {}
-            }
-            value.functions.push(newFunction);
-        }else if(isResource && name !== "" && classType !== ""){
-            const newResource: ResourceWorkflow = {
-                name: name,
-                class_type: classType,
-                output_mapping: {},
-                configurations: {}
-            }
-            value.resources.push(newResource);
-        }
-
-        if (onChange !== undefined) onChange(value);
         if (onClose !== undefined) onClose();
     }
 
     const handleSetName = (name: string) => {   // Checks name is not repeated between nodes.
         setName(name);
-        if (name !== ""){
-            handleIsCorrect(name);
-        }else {
-            setIsCorrect(false);
-        }
     };
 
-    const setVersions = (id: string) => {   // Gets possible versions from function
-        listFunctions.forEach(f => {
-            if (f.id === id){
-                getFunctionVersions(id).then(versions => {
-                    setListFunctionVersions(versions.versions);
-                });
+    const handleIsCorrect = async (): Promise<boolean> => {  // Verifies node data correctness and allows creation
+        // Checks name not to be repeated
+        console.log("Name length", name.length);
+        if (!(name.length > 0)) return false;
+        value.resources.forEach(r => {
+            if (name === r.name) {
+                console.log("Name repeated in resources");
+                return false;
             }
         });
-    };
+        value.functions.forEach(f => {
+            if (name === f.name) {
+                console.log("Name repeated in functions");
+                return false;
+            }
+        });
 
-    const handleSelectVersion = (id:string) => {
-        setClassSpecificationVersion(id);
-        handleIsCorrect("",id);
-    };
-
-    const handleSelectType = (type: string) => {
-        if (type !== "" && listClassType.includes(type)){
-            setClassType(type);
-            handleIsCorrect("",type);
-        }else{
-            setIsCorrect(false);
-        }
-    }
-
-    const handleSelectID = (id: string) => {
-        if (id.length>1){
-            setClassSpecificationId(id);
-            setVersions(id);
-        }
-    };
-
-    const handleIsCorrect = (n?: string, id?: string) => {  // Tests node data correctness and allows creation
-        if (!isResource){
-            listFunctions.forEach(f => {
-                if(f.id === classSpecificationId && (listFunctionVersions.includes(classSpecificationVersion) || listFunctionVersions.includes(id as string)) && name !== ""){
-                    //TODO: Values do not update on setSomething used?
-                    //TODO: Names not to repeat on any type?
-                    let exists = false;
-                    value.functions.forEach(f =>{
-                        if (f.name === name || f.name === n){
-                            exists = true;
-                        }
-                    });
-                    exists?setIsCorrect(false):setIsCorrect(true);
+        let correctData = false;
+        if (isResource) {
+            listClassType.forEach(r => {
+                if (r === resourceJson.class_type) {
+                    console.log("Class type in resources correct");
+                    correctData = true;
                 }
             });
-        }else{
-            if (id === undefined) id = "";
-            if ((classType !== "" || id !== "") && name !== "") {
-                let exists = false;
-                value.resources.forEach(r => {
-                    if (r.name === name || r.name === n){
-                        exists = true;
+        } else {
+            // Verifies Id and version match
+            await getFunctionVersions(functionJson.class_specification_id).then(resp => {
+                resp.versions.forEach(v => {
+                    if (v === functionJson.class_specification_version) {
+                        console.log("Version specification in functions correct");
+                        correctData = true;
                     }
                 });
-                exists?setIsCorrect(false):setIsCorrect(true);
-            }else setIsCorrect(false);
+            });
         }
+        console.log("Not True?", correctData);
+        return correctData;
     };
-
-    const getResource =
-        <ol>
-            <li><b>Class Type</b>:
-                <select className="mt-2"
-                        onChange={e => handleSelectType(e.target.value)}>
-                    <option/>
-                    {listClassType.map(cT => (
-                        <option key={cT}>{cT}</option>
-                    ))}
-                </select>
-            </li>
-        </ol>;
-
-    const getFunction =
-        <ol>
-            <li>
-                <b>Class Specification Id:</b>
-                <div className="relative">
-                    <Input value={classSpecificationId}
-                           onChange={e => {
-                               setClassSpecificationId(e.target.value);
-                           }}/>
-                    <select className="absolute top-2 right-1"
-                            onChange={e => handleSelectID(e.target.value)}>
-                        <option/>
-                        {listFunctions.map(fun => (
-                            <option key={fun.id}>{fun.id}</option>
-                        ))}
-                    </select>
-                </div>
-            </li>
-            <li>
-                <b>Class Specification Version:</b>
-                <select className="ml-4"
-                       onChange={e => handleSelectVersion(e.target.value)}>
-                <option/>
-                {listFunctionVersions.map(ver => (
-                    <option key={ver}>{ver}</option>
-                ))}
-                </select>
-            </li>
-        </ol>;
 
     return (
         <Card>
@@ -195,11 +124,14 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                         <li><label>NAME</label><Input type="text" value={name}
                                                       onChange={e => {handleSetName(e.target.value)}}/></li>
                     </ol>
-                    {isResource? getResource:getFunction}
+                    {isResource?
+                        <CreateResource/>:
+                        <CreateFunction setIsCorrect={setIsComplete} setFunctionJson={setFunctionJson}/>
+                    }
                     <div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
                         <button
-                            className={(isCorrect?"bg-green-500 hover:bg-green-400":"bg-green-200") + " text-white py-2 px-4 rounded"}
-                            onClick={handleSave} disabled={!isCorrect}>Confirm
+                            className={((name!=="" && isComplete)?"bg-green-500 hover:bg-green-400":"bg-green-200") + " text-white py-2 px-4 rounded"}
+                            onClick={handleSave} disabled={(name==="" || !isComplete)}>Confirm
                         </button>
                         <button
                             className="bg-red-500 hover:bg-red-400 text-white py-2 px-4 rounded"
