@@ -8,7 +8,7 @@ import {FunctionWorkflowBasic} from "@/types/workflows";
 interface Props {
     setIsCorrect: Dispatch<SetStateAction<boolean>>,
     setFunctionJson : Dispatch<SetStateAction<FunctionWorkflowBasic>>,
-};
+}
 
 const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
     const [classSpecificationId, setClassSpecificationId] = React.useState("");

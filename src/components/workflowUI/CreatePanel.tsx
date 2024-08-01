@@ -7,6 +7,7 @@ import {FunctionMinified} from "@/types/functions";
 import CreateResource from "@/components/workflowUI/CreateResource";
 import CreateFunction from "@/components/workflowUI/CreateFunction";
 import {boolean} from "zod";
+import DialogSave from "@/components/utils/DialogSave";
 const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES as string);
 
 interface CUPanelProps{
@@ -19,6 +20,8 @@ interface CUPanelProps{
 const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClose}) => {
     const [name ,setName] = useState("");
     const [isComplete, setIsComplete] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
     const [listClassType, setListClassType] = useState(stringClassType.split(","));
     const [functionJson, setFunctionJson ] = useState<FunctionWorkflowBasic>({
         name: "",
@@ -34,7 +37,6 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
         output_mapping: {},
         configurations: {}
     });
-
 
     const handleSave = async () => {    //Async function to save data if correct .
         const res = await handleIsCorrect();    //Function requests servers data to test correct information.
@@ -56,8 +58,9 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                 });
 
             if (onChange !== undefined) onChange(value);
-        }
-        if (onClose !== undefined) onClose();
+            if (onClose !== undefined) onClose();
+        }else setModalOpen(true);
+
     }
 
     const handleSetName = (name: string) => {   // Checks name is not repeated between nodes.
@@ -66,18 +69,22 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
 
     const handleIsCorrect = async (): Promise<boolean> => {  // Verifies node data correctness and allows creation
         // Checks name not to be repeated
-        console.log("Name length", name.length);
-        if (!(name.length > 0)) return false;
+        let exist_name = false;
+        let name_len = true;
+        if (!(name.length > 0)) {
+            setModalMessage("'Name' not filled.")
+            name_len = false;
+        }
         value.resources.forEach(r => {
             if (name === r.name) {
-                console.log("Name repeated in resources");
-                return false;
+                setModalMessage("Name repeated.");
+                exist_name = true;
             }
         });
         value.functions.forEach(f => {
             if (name === f.name) {
-                console.log("Name repeated in functions");
-                return false;
+                setModalMessage("Name repeated.");
+                exist_name = true;
             }
         });
 
@@ -85,10 +92,10 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
         if (isResource) {
             listClassType.forEach(r => {
                 if (r === resourceJson.class_type) {
-                    console.log("Class type in resources correct");
                     correctData = true;
                 }
             });
+            if (!correctData) setModalMessage("Class type in resources not correct");
         } else {
             // Verifies Id and version match
             await getFunctionVersions(functionJson.class_specification_id).then(resp => {
@@ -98,10 +105,11 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                         correctData = true;
                     }
                 });
-            });
+            }).catch(() => setModalMessage("Class specification ID is not correct"));
+            if (!correctData) setModalMessage("Class specification ID and version do not match");
         }
-        console.log("Not True?", correctData);
-        return correctData;
+        console.log("Correct / Name / Length Name", correctData, exist_name, name_len);
+        return correctData && !exist_name && name_len;
     };
 
     return (
@@ -125,7 +133,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                                                       onChange={e => {handleSetName(e.target.value)}}/></li>
                     </ol>
                     {isResource?
-                        <CreateResource/>:
+                        <CreateResource setResourceJson={setResourceJson} setIsCorrect={setIsComplete}/>:
                         <CreateFunction setIsCorrect={setIsComplete} setFunctionJson={setFunctionJson}/>
                     }
                     <div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
@@ -140,6 +148,13 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                     </div>
                 </div>
             </CardContent>
+            <DialogSave
+                isOpen={modalOpen}
+                title="Error on create node"
+                description={modalMessage}
+                isLoading={false}
+                onClose={() => onClose ? onClose() :setModalOpen(false)}
+            />
         </Card>
     );
 }
