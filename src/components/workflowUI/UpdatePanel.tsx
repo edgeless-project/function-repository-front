@@ -68,17 +68,18 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
 
     const divComplex =
         <li><label><b>Function Type</b></label>
-            <Input value={funType}
+            <Input value={funType} className="mt-2 mb-4"
                    onChange={e =>
                        setClassFunType(e.target.value)}/>
         </li>;
 
     const divFunctionBasic =
         <li>
-            <li><br/><b>Class Specification ID</b><Input value={classIdV} disabled={true}></Input></li>
+            <li><br/><b>Class Specification ID</b>
+                <Input className="mt-2 mb-4" value={classIdV} disabled={true}></Input></li>
             <li><label><b>Class Specification Version</b></label>
                 <br/>
-                <select className="mt-2"
+                <select className="my-2"
                         value={classVersionV}
                         onChange={e => setClassVersionV(e.target.value)}>
                     <option/>

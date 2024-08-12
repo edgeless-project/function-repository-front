@@ -17,7 +17,7 @@ const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node, readOnly}) => {
     return (
         <div className="max-w-full ">
             <ol className="mt-4">
-                <li><b>NAME</b>: {node.name}</li>
+                <li><b>NAME:</b> {node.name}</li>
                 {isResource(node) ?
                     <ResourceWorkFlowPanel data={node}/> :
                     <FunctionWorkFlowPanel data={node}/>

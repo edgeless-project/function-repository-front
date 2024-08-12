@@ -68,7 +68,7 @@ const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
             <li>
                 <b>Class Specification Id</b>
                 <div className="relative">
-                    <Input value={classSpecificationId}
+                    <Input value={classSpecificationId} className="mt-2 mb-4"
                            onChange={e => {
                                setClassSpecificationId(e.target.value);
                            }}/>
