@@ -75,8 +75,9 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
 
     const divFunctionBasic =
         <li>
-            <li><br/><b>Class Specification ID</b>  {classIdV} </li>
+            <li><br/><b>Class Specification ID</b><Input value={classIdV} disabled={true}></Input></li>
             <li><label><b>Class Specification Version</b></label>
+                <br/>
                 <select className="mt-2"
                         value={classVersionV}
                         onChange={e => setClassVersionV(e.target.value)}>
@@ -95,7 +96,7 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
             <Card>
                 <CardHeader className={"rounded-md border-b-5 border-indigo-500"}
                             style={{background: 'rgb(220,234,246)'}}>
-                    <p className="font-sans text-xl font-medium text-center">Edit node: {name}</p>
+                    <p className="font-sans text-xl font-medium text-center">Edit &apos;{name}&apos;</p>
                 </CardHeader>
                 <CardContent>
                     <div style={{width: '20vw', height: '30vh'}} className="flex flex-col mt-4">

@@ -101,14 +101,12 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
             await getFunctionVersions(functionJson.class_specification_id).then(resp => {
                 resp.versions.forEach(v => {
                     if (v === functionJson.class_specification_version) {
-                        console.log("Version specification in functions correct");
                         correctData = true;
                     }
                 });
             }).catch(() => setModalMessage("Class specification ID is not correct"));
             if (!correctData) setModalMessage("Class specification ID and version do not match");
         }
-        console.log("Correct / Name / Length Name", correctData, exist_name, name_len);
         return correctData && !exist_name && name_len;
     };
 
@@ -129,7 +127,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
             <CardContent>
                 <div style={{width: '20vw', height: '40vh'}} className="flex flex-col mt-4">
                     <ol>
-                        <li><label>NAME</label><Input type="text" value={name}
+                        <li><label><b>NAME</b></label><Input type="text" value={name}
                                                       onChange={e => {handleSetName(e.target.value)}}/></li>
                     </ol>
                     {isResource?

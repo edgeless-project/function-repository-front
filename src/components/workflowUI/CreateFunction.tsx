@@ -66,7 +66,7 @@ const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
     return(
         <ol>
             <li>
-                <b>Class Specification Id:</b>
+                <b>Class Specification Id</b>
                 <div className="relative">
                     <Input value={classSpecificationId}
                            onChange={e => {
@@ -82,8 +82,9 @@ const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
                 </div>
             </li>
             <li>
-                <b>Class Specification Version:</b>
-                <select className="mt-2 ml-4"
+                <b>Class Specification Version</b>
+                <br/>
+                <select className="mt-2 min-w-12"
                         onChange={e => handleSelectVersion(e.target.value)}>
                     <option/>
                     {listFunctionVersions.map(ver => (

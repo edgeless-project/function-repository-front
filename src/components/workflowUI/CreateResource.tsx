@@ -27,7 +27,8 @@ const CreateResource:React.FC<props> = ({setIsCorrect, setResourceJson}) => {
 
     return(
         <ol>
-            <li><b>Class Type</b>:
+            <li><b>Class Type</b>
+                <br/>
                 <select className="mt-2"
                         onChange={e => handleSelectType(e.target.value)}>
                     <option/>
