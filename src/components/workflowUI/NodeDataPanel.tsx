@@ -15,7 +15,7 @@ interface NodeDataPanelProps {
 const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node, readOnly}) => {
 
     return (
-        <div className="max-w-full ">
+        <div className="">
             <ol className="mt-4">
                 <li><b>NAME:</b> {node.name}</li>
                 {isResource(node) ?

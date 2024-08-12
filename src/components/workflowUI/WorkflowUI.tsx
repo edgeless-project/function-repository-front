@@ -308,7 +308,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
     const proOptions = { hideAttribution: true };   //Hide attribution or watermark from grid
 
     return isMounted ? (
-        <div className="relative" style={{width: '80vw', height: '80vh'}}>
+        <div className="relative h-[47.5rem]">
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -340,17 +340,17 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
                             <p className="font-sans text-xl font-medium text-center">{selNode.name}</p>
                         </CardHeader>
                         <CardContent>
-                            <div style={{width: '20vw', height: '70vh'}} className="flex flex-col">
+                            <div className="flex flex-col w-80 h-[40.75rem] overflow-y-auto">
                                 <NodeDataPanel node={selNode} readOnly={readOnly ? readOnly : false}/>
                                 <div className="h-full grid content-end">
                                     <div className="flex justify-center">
                                     {!readOnly && <div className="grid grid-cols-1">
                                             <button
-                                                className="bg-green-500 hover:bg-green-400 text-white py-2 px-32 rounded"
+                                                className="bg-green-500 hover:bg-green-400 text-white py-2 w-72 rounded"
                                                 onClick={handleEdit}>Edit
                                             </button>
                                             <button
-                                                className="bg-red-600 hover:bg-red-500 text-white mt-1 py-2 px-32 rounded"
+                                                className="bg-red-600 hover:bg-red-500 text-white mt-1 py-2 w-72 rounded"
                                                 onClick={handleDeleteNode}>Delete
                                             </button>
                                         </div>}

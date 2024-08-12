@@ -124,8 +124,8 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                 </div>
                 <p className="font-sans text-xl font-medium text-center">Create {isResource ? "Resource" : "Function"}</p>
             </CardHeader>
-            <CardContent>
-                <div style={{width: '20vw', height: '40vh'}} className="flex flex-col gap-4 my-4">
+            <CardContent className="h-80">
+                <div className="flex flex-col gap-4 w-80 h-full my-4 overflow-y-auto">
                     <ol>
                         <li><label><b>NAME</b></label>
                             <Input type="text" value={name} className="mt-2"

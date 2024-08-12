@@ -162,7 +162,7 @@ export default function WorkflowEdit() {
                 <CardHeader></CardHeader>
                 <CardContent className="relative">
                   <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false} onChange={handleJSONChange} reload={reloadWorkflow}/>
-                  {createNode && <div className="absolute top-0 left-5">
+                  {createNode && <div className="absolute top-0 left-6">
                   <CreatePanel isResource={createResource} value={workflowJSON as JsonFlowComponentState} onChange={handleJSONChange} onClose={closeNewResource} />
                 </div>}
                 </CardContent>

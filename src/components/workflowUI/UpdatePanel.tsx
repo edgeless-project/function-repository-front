@@ -99,8 +99,8 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
                             style={{background: 'rgb(220,234,246)'}}>
                     <p className="font-sans text-xl font-medium text-center">Edit &apos;{name}&apos;</p>
                 </CardHeader>
-                <CardContent>
-                    <div style={{width: '20vw', height: '30vh'}} className="flex flex-col mt-4">
+                <CardContent className="h-80">
+                    <div className="flex flex-col w-80 h-full mt-4 overflow-y-auto">
                         <ol>
                             <li><label><b>NAME</b></label><Input value={name}
                                                     onChange={e => setName(e.target.value)}/></li>
