@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import Spinner from "@/components/utils/Spinner";
 
-interface DialogSaveProps {
+interface DialogDeleteProps {
   isOpen: boolean;
   title: string;
   description: string;
@@ -19,8 +19,7 @@ interface DialogSaveProps {
   onConfirm: () => void;
 }
 
-export default function DialogSave ({isOpen, title, description, isLoading, resultOK, onClose, onConfirm}: DialogSaveProps) {
-
+export default function DialogDelete ({isOpen, title, description, isLoading, resultOK, onClose, onConfirm}: DialogDeleteProps) {
   return (
     <Dialog open={isOpen}>
       <DialogContent className="sm:max-w-[425px]">

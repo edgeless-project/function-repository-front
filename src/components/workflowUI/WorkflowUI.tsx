@@ -12,7 +12,8 @@ import ReactFlow, {
     MarkerType,
     Node,
     OnEdgesChange,
-    OnNodesChange, Panel
+    OnNodesChange,
+    Panel
 } from 'reactflow';
 import {BackgroundVariant} from "@reactflow/background";
 import {FunctionWorkflow, FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
@@ -21,6 +22,8 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/NodeDataPanel";
 import UpdatePanel from "@/components/workflowUI/UpdatePanel";
 import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
+import DialogInput from '@/components/utils/DialogInput'
+import {getFunction} from "@/services/functionServices";
 
 const edgeNodeSeparator = "###";
 //Nodes Style modes
@@ -66,8 +69,21 @@ const edgeStartResource = {
 const fitViewOptions: FitViewOptions = {
     padding: 0.5,
 };
+
+const defaultEdgeOptions = {
+    style: edgeStyleFunction,
+    type: 'step',
+    markerEnd: edgeEndFunction,
+};
+
 const nodeWidth = 172;
 const nodeHeight = 36;
+
+interface createBranch {
+    source: string,
+    target: string;
+    options?: string[];
+}
 
 interface WorkFlowComponentProps {
     value: JsonFlowComponentState;
@@ -82,10 +98,10 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
     // Top-Bottom('TB') or Left-Right('LR')
     const isHorizontal = direction === 'LR';
-    dagreGraph.setGraph({ rankdir: direction });
+    dagreGraph.setGraph({rankdir: direction});
 
     nodes.forEach((node) => {
-        dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+        dagreGraph.setNode(node.id, {width: nodeWidth, height: nodeHeight});
     });
 
     edges.forEach((edge) => {
@@ -109,36 +125,39 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
         return node;
     });
 
-    return { nodes, edges };
+    return {nodes, edges};
 };
 
-const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload}) => {
+
+const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, reload}) => {
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
     const [loadPanel, isLoadPanel] = useState(false);
-    const [selNode, setSelNode] = useState<FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic|null>(null);
+    const [selNode, setSelNode] = useState<FunctionWorkflow | ResourceWorkflow | FunctionWorkflowBasic | null>(null);
     const [nodeColor, setNodeColor] = useState<string>(styleFunctionNode.background);
     const [editNode, isEditNode] = useState(false);
     const [createNode, isCreateNode] = useState(false);
+    const [isOpen, setOpen] = useState(false);
+    const [newBranch, setNewBranch] = useState<createBranch>();
 
     const renderNodeFromData = useCallback(() => {
         //  Nodes To INIT Flow
-        let initialNodes : Node[] = [], initialEdges: Edge[] = [], resourceEdges: Edge[] = [];
+        let initialNodes: Node[] = [], initialEdges: Edge[] = [], resourceEdges: Edge[] = [];
 
         value.functions.forEach(f => {//Create a node and an edge from each function entry, normal nodes
-            let newNode: Node={
+            let newNode: Node = {
                 id: f.name,
-                position: { x: 0, y: 0 },
-                data: { label: f.name },
+                position: {x: 0, y: 0},
+                data: {label: f.name},
                 width: nodeWidth,
                 height: nodeHeight,
                 style: styleFunctionNode
             };
 
-            for(let out in f.output_mapping){
-                let newEdge: Edge={
-                    id: "e"+edgeNodeSeparator+f.name+edgeNodeSeparator+f.output_mapping[out],
+            for (let out in f.output_mapping) {
+                let newEdge: Edge = {
+                    id: "e" + edgeNodeSeparator + f.name + edgeNodeSeparator + f.output_mapping[out],
                     source: f.name,
                     target: f.output_mapping[out],
                     type: ConnectionLineType.Step,
@@ -152,22 +171,22 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
         });
         value.resources.forEach(r => {  //Create a node and an edge from each resource entry. Entry points nodes.
 
-            let newNode: Node ={
+            let newNode: Node = {
                 id: r.name,
                 position: {
                     x: 0,
                     y: 0
                 },
-                data: { label: r.name },
+                data: {label: r.name},
                 style: styleResourceNodeIn,
                 width: nodeWidth,
                 height: nodeHeight
             };
 
-            if(r.output_mapping){
-                for(let out in r.output_mapping){
-                    const newEdge: Edge={
-                        id: "e"+edgeNodeSeparator+r.name+edgeNodeSeparator+r.output_mapping[out],
+            if (r.output_mapping) {
+                for (let out in r.output_mapping) {
+                    const newEdge: Edge = {
+                        id: "e" + edgeNodeSeparator + r.name + edgeNodeSeparator + r.output_mapping[out],
                         source: r.name,
                         target: r.output_mapping[out],
                         type: ConnectionLineType.Step,
@@ -176,12 +195,12 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
                     };
                     resourceEdges.push(newEdge);
                 }
-            }else{
+            } else {
                 //  If resource node does not have new request, it's considered an ENDPOINT.
                 newNode.style = styleResourceNodeOut;
-                initialEdges.forEach(e =>{
+                initialEdges.forEach(e => {
                     const nodes = e.id.split(edgeNodeSeparator).slice(1);
-                    if (nodes.includes(r.name)){
+                    if (nodes.includes(r.name)) {
                         e.markerEnd = edgeEndResource;
                         e.style = edgeStyleResource;
                     }
@@ -190,7 +209,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
             initialNodes.push(newNode);
         });
 
-        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
+        const {nodes: layoutedNodes, edges: layoutedEdges} = getLayoutedElements(
             initialNodes,
             initialEdges.concat(resourceEdges),
             'TB'
@@ -198,23 +217,29 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
 
         setNodes(layoutedNodes);
         setEdges(layoutedEdges);
-    },[value.functions, value.resources]);
+    }, [value.functions, value.resources]);
 
     useEffect(() => {
         renderNodeFromData();
         setIsMounted(true);
     }, [renderNodeFromData, reload]);
 
+    const addOutputMapping = (mapping: string, sourceName: string, targetName: string) => {
+        value.functions.forEach(f => {
+            if (f.name === sourceName && !f.output_mapping[mapping]) f.output_mapping[mapping] = targetName;    //TODO: Only one use per output type?
+        });
+        renderNodeFromData();
+    };
 
-    const getDataFromNode = (id: string):FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic => {
+    const getDataFromNode = (id: string): FunctionWorkflow | ResourceWorkflow | FunctionWorkflowBasic => {
 
         let a = null;
         value.resources.forEach(r => {
-            if(r.name === id)
+            if (r.name === id)
                 a = r;
         });
         if (a != null) return a;
-        value.functions.forEach(f=>{
+        value.functions.forEach(f => {
             if (f.name === id)
                 a = f;
         });
@@ -224,11 +249,13 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
 
     const deleteNodeData = (name: string) => {  //Delete node data from JSON
         value.functions = value.functions.filter(nod => {
-            return name != nod.name});
+            return name != nod.name
+        });
         value.resources = value.resources.filter(nod => {
-            return name != nod.name});
+            return name != nod.name
+        });
         setSelNode(null);
-        setNodes((els)=>els.filter((node)=>node.id !== selNode?.name));
+        setNodes((els) => els.filter((node) => node.id !== selNode?.name));
     }
 
     const handleEdit = () => {
@@ -236,10 +263,10 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
         isEditNode(true);
     };
 
-    const handleDeleteNode = () =>{
+    const handleDeleteNode = () => {
         isLoadPanel(false);
         isEditNode(false);
-        if(selNode != null) deleteNodeData(selNode.name);
+        if (selNode != null) deleteNodeData(selNode.name);
     };
 
     const handleEditJSON = (value: object) => {
@@ -256,11 +283,31 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
         setNodeColor(nodeClicked.style.background);
         setSelNode(node);
         isEditNode(false);
-        if(node.name === selNode?.name) isLoadPanel(!loadPanel);
+        if (node.name === selNode?.name) isLoadPanel(!loadPanel);
     };
-    
+
     const handleConnect = useCallback(
-        (params: Connection | Edge) => setEdges((eds) => addEdge(params, eds)),
+        (params: Connection | Edge) => {
+            setEdges((eds) => addEdge(params, eds));
+            if (params.source && params.target) {
+                value.functions.forEach(f => {
+                    if (f.name === params.source) {
+                        if ((f as FunctionWorkflowBasic).class_specification_id){
+                            const f_b = f as FunctionWorkflowBasic;
+                            getFunction(f_b.class_specification_id,f_b.class_specification_version).then(d => {
+                                setNewBranch({source: params.source as string, target: params.target as string, options: d.outputs})
+                                setOpen(true);
+                            });
+
+                        }else if((f as FunctionWorkflow).class_specification){
+                            const f_c = f as FunctionWorkflow;
+                            setNewBranch({source: params.source as string, target: params.target as string, options: f_c.class_specification.outputs});
+                            setOpen(true);
+                        }
+                    }
+                });
+            }
+        },
         [setEdges]
     );
 
@@ -276,15 +323,15 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
     const handleNodesChange: OnNodesChange = useCallback(
         (changes) => {
             setNodes((nodes) => applyNodeChanges(changes, nodes));  //Load graphic changes
-            let delNodes : string[]=[];
-            changes.forEach(ch =>{  //Classify changes by type
-                if(ch.type === "remove"){
+            let delNodes: string[] = [];
+            changes.forEach(ch => {  //Classify changes by type
+                if (ch.type === "remove") {
                     const nod = ch as NodeRemoveChange;
                     delNodes.push(nod.id);
                 }
             });
-            if(delNodes.length>0){  //Delete Nodes from json data
-                delNodes.forEach( n => deleteNodeData(n));
+            if (delNodes.length > 0) {  //Delete Nodes from json data
+                delNodes.forEach(n => deleteNodeData(n));
             }
         },
         [setNodes]
@@ -293,19 +340,35 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
     const handleEdgesChange: OnEdgesChange = useCallback(
         (changes) => {
             setEdges((eds) => applyEdgeChanges(changes, eds));  //Load graphic changes
-
-            let delEdge : string[]=[];
-            changes.forEach(ch =>{  //Classify changes by type
-                if(ch.type === "remove"){
-                    const nod = ch as EdgeRemoveChange;
-                    delEdge.push(nod.id);
+            changes.forEach(ch => {  //Classify changes by type
+                if (ch.type === "remove") {
+                    const e = ch as EdgeRemoveChange;
+                    const node = e.id.split(edgeNodeSeparator);
+                    value.functions.forEach(f => {
+                        if (node.length > 2 && f.name === node[1]) {
+                            for (let key in f.output_mapping) {
+                                if (f.output_mapping[key] === node[2]) {
+                                    delete f.output_mapping[key];
+                                }
+                            }
+                        }
+                    });
+                    value.resources.forEach(r => {
+                        if (node.length > 2 && r.name === node[1]) {
+                            for (let key in r.output_mapping) {
+                                if (r.output_mapping[key] === node[2]) {
+                                    delete r.output_mapping[key];
+                                }
+                            }
+                        }
+                    });
                 }
             });
         },
         [setEdges]
     );
 
-    const proOptions = { hideAttribution: true };   //Hide attribution or watermark from grid
+    const proOptions = {hideAttribution: true};   //Hide attribution or watermark from grid
 
     return isMounted ? (
         <div className="relative h-[47.5rem]">
@@ -317,12 +380,13 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
                 onConnect={handleConnect}
                 onNodeClick={handleClickNode}
                 connectionLineType={ConnectionLineType.Step}
+                defaultEdgeOptions={defaultEdgeOptions}
                 fitView
                 fitViewOptions={fitViewOptions}
                 nodesDraggable={!readOnly}
                 nodesConnectable={!readOnly}
                 connectOnClick={!readOnly}
-                deleteKeyCode={readOnly?null:"Backspace"}
+                deleteKeyCode={readOnly ? null : "Backspace"}
                 proOptions={proOptions}
                 disableKeyboardA11y={readOnly}
             >
@@ -344,7 +408,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
                                 <NodeDataPanel node={selNode} readOnly={readOnly ? readOnly : false}/>
                                 <div className="h-full grid content-end">
                                     <div className="flex justify-center">
-                                    {!readOnly && <div className="grid grid-cols-1">
+                                        {!readOnly && <div className="grid grid-cols-1">
                                             <button
                                                 className="bg-green-500 hover:bg-green-400 text-white py-2 w-72 rounded"
                                                 onClick={handleEdit}>Edit
@@ -357,6 +421,7 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
                                     </div>
                                 </div>
                             </div>
+                            0
                         </CardContent>
                     </Card>
                 </Panel>}
@@ -364,8 +429,21 @@ const Flow:React.FC<WorkFlowComponentProps> = ({value,readOnly, onChange, reload
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
             </ReactFlow>
             {!loadPanel && editNode && selNode && !readOnly && !createNode &&
-                <UpdatePanel node={getDataFromNode(selNode.name)} value={value} onChange={handleEditJSON} onClose={handleCloseEditNode} />}
+                <UpdatePanel node={getDataFromNode(selNode.name)} value={value} onChange={handleEditJSON}
+                             onClose={handleCloseEditNode}/>}
 
+            <DialogInput
+                isOpen={isOpen}
+                title={"New Branch"}
+                description={"Set new branch name"}
+                isLoading={!isMounted}
+                options={newBranch?.options}
+                onConfirm={(input: string) => newBranch ? addOutputMapping(input, newBranch.source, newBranch.target) : null}
+                onClose={() => {
+                    setOpen(false);
+                    renderNodeFromData();
+                }}
+            />
         </div>
     ) : null;
 }
