@@ -24,6 +24,7 @@ import UpdatePanel from "@/components/workflowUI/UpdatePanel";
 import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
 import DialogInput from '@/components/utils/DialogInput'
 import {getFunction} from "@/services/functionServices";
+import {isFunction} from "node:util";
 
 const edgeNodeSeparator = "###";
 //Nodes Style modes
@@ -82,6 +83,7 @@ const nodeHeight = 36;
 interface createBranch {
     source: string,
     target: string;
+    fromFunction: boolean;
     options?: string[];
 }
 
@@ -224,9 +226,13 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
         setIsMounted(true);
     }, [renderNodeFromData, reload]);
 
-    const addOutputMapping = (mapping: string, sourceName: string, targetName: string) => {
-        value.functions.forEach(f => {
+    const addOutputMapping = (mapping: string, sourceName: string, targetName: string, isFunction: boolean) => {
+
+        if (isFunction) value.functions.forEach(f => {
             if (f.name === sourceName && !f.output_mapping[mapping]) f.output_mapping[mapping] = targetName;    //TODO: Only one use per output type?
+        });
+        else value.resources.forEach(r => {
+            if (r.name === sourceName && !r.output_mapping[mapping]) r.output_mapping[mapping] = targetName;    //TODO: Only one use per output type?
         });
         renderNodeFromData();
     };
@@ -295,15 +301,21 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                         if ((f as FunctionWorkflowBasic).class_specification_id){
                             const f_b = f as FunctionWorkflowBasic;
                             getFunction(f_b.class_specification_id,f_b.class_specification_version).then(d => {
-                                setNewBranch({source: params.source as string, target: params.target as string, options: d.outputs})
+                                setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: d.outputs})
                                 setOpen(true);
                             });
 
                         }else if((f as FunctionWorkflow).class_specification){
                             const f_c = f as FunctionWorkflow;
-                            setNewBranch({source: params.source as string, target: params.target as string, options: f_c.class_specification.outputs});
+                            setNewBranch({source: params.source as string, target: params.target as string, fromFunction:true,options: f_c.class_specification.outputs});
                             setOpen(true);
                         }
+                    }
+                });
+                if(!isOpen) value.resources.forEach(r => {
+                    if (r.name === params.source) {
+                        setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false});
+                        setOpen(true);
                     }
                 });
             }
@@ -438,7 +450,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                 description={"Set new branch name"}
                 isLoading={!isMounted}
                 options={newBranch?.options}
-                onConfirm={(input: string) => newBranch ? addOutputMapping(input, newBranch.source, newBranch.target) : null}
+                onConfirm={(input: string) => newBranch ? addOutputMapping(input, newBranch.source, newBranch.target, newBranch.fromFunction) : null}
                 onClose={() => {
                     setOpen(false);
                     renderNodeFromData();
