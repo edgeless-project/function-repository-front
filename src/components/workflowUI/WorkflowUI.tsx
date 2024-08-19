@@ -232,7 +232,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
             if (f.name === sourceName && !f.output_mapping[mapping]) f.output_mapping[mapping] = targetName;    //TODO: Only one use per output type?
         });
         else value.resources.forEach(r => {
-            if (r.name === sourceName && !r.output_mapping[mapping]) r.output_mapping[mapping] = targetName;    //TODO: Only one use per output type?
+            if (r.name === sourceName && !r.output_mapping[mapping]) r.output_mapping[mapping] = targetName;    //TODO: Only one use per output type? Resource no fields name?
         });
         renderNodeFromData();
     };
