@@ -8,7 +8,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Spinner from "@/components/utils/Spinner";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
+import {FormControl} from "@/components/ui/form";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 interface DialogInputProps {
   isOpen: boolean;
@@ -20,8 +22,17 @@ interface DialogInputProps {
   onClose: () => void;
 }
 
-export default function DialogDelete ({isOpen, title, description, isLoading, options, onConfirm, onClose}: DialogInputProps) {
+export default function DialogInput ({isOpen, title, description, isLoading, options, onConfirm, onClose}: DialogInputProps) {
   const [value, setLocalValue] = useState("");
+  const [descText, setDescText] = useState("");
+
+  useEffect(() => {
+    setLocalValue("");  //Avoid value residues on open or close dialog
+    if (options?.length === 0)
+      setDescText("There are no possible connexions to be made");
+    else 
+      setDescText(description+":");
+  }, [options?.length]);
 
   const handleClose = () => {
     onConfirm(value);
@@ -29,27 +40,30 @@ export default function DialogDelete ({isOpen, title, description, isLoading, op
   };
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {!isLoading && <DialogDescription>
             <label>
-              {description}:
-              {options ?
-                  <select className="ml-4 my-2"
-                          value={value}
-                          onChange={e => setLocalValue(e.target.value)}>
-                    <option/>
-                    {options.map(v => (
-                        <option key={v}>{v}</option>
-                    ))}
-                  </select> :
-                  <input
-                      className="ml-4"
-                      value={value}
-                      onChange={e => setLocalValue(e.target.value)}
-                  />}
+              {descText}
+              {options ? (options.length > 0 ?
+                    <Select onValueChange={v => setLocalValue(v)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.map(v => (
+                            <SelectItem key={v} value={v}>{v}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select> :
+                    null):
+                <input
+                    className="ml-4"
+                    value={value}
+                    onChange={e => setLocalValue(e.target.value)}
+                />}
             </label>
           </DialogDescription>}
           {isLoading && <div className="flex items-center justify-center py-5">
@@ -59,7 +73,7 @@ export default function DialogDelete ({isOpen, title, description, isLoading, op
         </DialogHeader>
         {!isLoading && <DialogFooter className="flex justify-end">
           <Button variant="outline" onClick={onClose}>Close</Button>
-          <Button variant={value?"default":"ghost"} disabled={!value} onClick={handleClose}>Confirm</Button>
+          <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" variant={value?"default":"ghost"} disabled={!value} onClick={handleClose}>Confirm</Button>
         </DialogFooter>}
       </DialogContent>
     </Dialog>

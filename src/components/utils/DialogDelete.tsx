@@ -21,7 +21,7 @@ interface DialogDeleteProps {
 
 export default function DialogDelete ({isOpen, title, description, isLoading, resultOK, onClose, onConfirm}: DialogDeleteProps) {
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

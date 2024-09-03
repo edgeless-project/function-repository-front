@@ -22,9 +22,11 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import NodeDataPanel from "@/components/workflowUI/NodeDataPanel";
 import UpdatePanel from "@/components/workflowUI/UpdatePanel";
 import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
-import DialogInput from '@/components/utils/DialogInput'
+import DialogInput from '@/components/utils/DialogInput';
 import {getFunction} from "@/services/functionServices";
-import {isFunction} from "node:util";
+import {Button} from "@/components/ui/button";
+
+const outputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_OUTPUT as string).split(",");
 
 const edgeNodeSeparator = "###";
 //Nodes Style modes
@@ -229,10 +231,11 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
     const addOutputMapping = (mapping: string, sourceName: string, targetName: string, isFunction: boolean) => {
 
         if (isFunction) value.functions.forEach(f => {
-            if (f.name === sourceName && !f.output_mapping[mapping]) f.output_mapping[mapping] = targetName;    //TODO: Only one use per output type?
+            if (f.name === sourceName && !f.output_mapping[mapping]) f.output_mapping[mapping] = targetName;
         });
         else value.resources.forEach(r => {
-            if (r.name === sourceName && !r.output_mapping[mapping]) r.output_mapping[mapping] = targetName;    //TODO: Only one use per output type? Resource no fields name?
+            if (outputResources.includes(r.class_type) && r.name === sourceName && !r.output_mapping[mapping])
+                r.output_mapping["output_"+targetName] = targetName;
         });
         renderNodeFromData();
     };
@@ -301,20 +304,27 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                         if ((f as FunctionWorkflowBasic).class_specification_id){
                             const f_b = f as FunctionWorkflowBasic;
                             getFunction(f_b.class_specification_id,f_b.class_specification_version).then(d => {
-                                setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: d.outputs})
+                                let options: string[] = [];
+                                d.outputs.forEach((v) =>{if (!f_b.output_mapping[v]) options.push(v)});
+                                setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: options})
                                 setOpen(true);
                             });
 
                         }else if((f as FunctionWorkflow).class_specification){
                             const f_c = f as FunctionWorkflow;
-                            setNewBranch({source: params.source as string, target: params.target as string, fromFunction:true,options: f_c.class_specification.outputs});
+                            let options: string[] = [];
+                            f_c.class_specification.outputs.forEach((v) =>{if (!f_c.output_mapping[v]) options.push(v)});
+                            setNewBranch({source: params.source as string, target: params.target as string, fromFunction:true, options: options});
                             setOpen(true);
                         }
                     }
                 });
                 if(!isOpen) value.resources.forEach(r => {
-                    if (r.name === params.source) {
-                        setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false});
+                    if (r.name === params.source && outputResources.includes(r.class_type)) {
+                        setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: ["output_"+(params.target as string)]});
+                        setOpen(true);
+                    }else if (r.name === params.source){
+                        setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: []});
                         setOpen(true);
                     }
                 });
@@ -421,19 +431,18 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                                 <div className="h-full grid content-end">
                                     <div className="flex justify-center">
                                         {!readOnly && <div className="grid grid-cols-1">
-                                            <button
-                                                className="bg-green-500 hover:bg-green-400 text-white py-2 w-72 rounded"
+                                            <Button
+                                                className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 w-72 rounded"
                                                 onClick={handleEdit}>Edit
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button
                                                 className="bg-red-600 hover:bg-red-500 text-white mt-1 py-2 w-72 rounded"
                                                 onClick={handleDeleteNode}>Delete
-                                            </button>
+                                            </Button>
                                         </div>}
                                     </div>
                                 </div>
                             </div>
-                            0
                         </CardContent>
                     </Card>
                 </Panel>}
@@ -446,8 +455,8 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
 
             <DialogInput
                 isOpen={isOpen}
-                title={"New Branch"}
-                description={"Set new branch name"}
+                title={"New Connection"}
+                description={"Define output mapping"}
                 isLoading={!isMounted}
                 options={newBranch?.options}
                 onConfirm={(input: string) => newBranch ? addOutputMapping(input, newBranch.source, newBranch.target, newBranch.fromFunction) : null}

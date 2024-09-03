@@ -24,8 +24,6 @@ const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node, readOnly}) => {
                 }
             </ol>
         </div>
-
-
     );
 }
 

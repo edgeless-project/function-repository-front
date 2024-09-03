@@ -8,6 +8,7 @@ import CreateResource from "@/components/workflowUI/CreateResource";
 import CreateFunction from "@/components/workflowUI/CreateFunction";
 import {boolean} from "zod";
 import DialogSave from "@/components/utils/DialogSave";
+import {Button} from "@/components/ui/button";
 const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES as string);
 
 interface CUPanelProps{
@@ -126,9 +127,9 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
             </CardHeader>
             <CardContent className="h-80">
                 <div className="flex flex-col gap-4 w-80 h-full my-4 overflow-y-auto">
-                    <ol>
+                    <ol className="mx-1">
                         <li><label><b>NAME</b></label>
-                            <Input type="text" value={name} className="mt-2"
+                            <Input type="text" value={name} className="mt-1"
                                    onChange={e => {handleSetName(e.target.value)}}/></li>
                     </ol>
                     {isResource?
@@ -136,14 +137,15 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                         <CreateFunction setIsCorrect={setIsComplete} setFunctionJson={setFunctionJson}/>
                     }
                     <div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
-                        <button
-                            className={((name!=="" && isComplete)?"bg-green-500 hover:bg-green-400":"bg-green-200") + " text-white py-2 px-4 rounded"}
-                            onClick={handleSave} disabled={(name==="" || !isComplete)}>Confirm
-                        </button>
-                        <button
-                            className="bg-red-500 hover:bg-red-400 text-white py-2 px-4 rounded"
+                        <Button
+                            className="py-2 px-4 rounded"
+                            variant="outline"
                             onClick={onClose}>Cancel
-                        </button>
+                        </Button>
+                        <Button
+                            className={((name !== "" && isComplete) ? "bg-edgeless-primary-color hover:bg-edgeless-secondary-color" : "bg-indigo-100") + " text-white py-2 px-4 rounded"}
+                            onClick={handleSave} disabled={(name === "" || !isComplete)}>Confirm
+                        </Button>
                     </div>
                 </div>
             </CardContent>

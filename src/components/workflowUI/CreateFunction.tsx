@@ -3,6 +3,7 @@ import {Input} from "@/components/ui/input";
 import {FunctionMinified} from "@/types/functions";
 import {getFunctionsSimilarId, getFunctionVersions} from "@/services/functionServices";
 import {FunctionWorkflowBasic} from "@/types/workflows";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 
 interface Props {
@@ -64,33 +65,43 @@ const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
     };
 
     return(
-        <ol>
+        <ol className="mx-1">
             <li>
                 <b>Class Specification Id</b>
                 <div className="relative">
-                    <Input value={classSpecificationId} className="mt-2 mb-4"
+                    <Input value={classSpecificationId} className="mt-1 mb-4"
                            onChange={e => {
                                setClassSpecificationId(e.target.value);
                            }}/>
-                    <select className="absolute top-2 right-1"
-                            onChange={e => handleSelectID(e.target.value)}>
-                        <option/>
-                        {listFunctions.map(fun => (
-                            <option key={fun.id}>{fun.id}</option>
-                        ))}
-                    </select>
+                    <div className="absolute top-0 right-0">
+                        <Select onValueChange={v => handleSelectID(v)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select an ID" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {listFunctions.map(fun => (
+                                    <SelectItem key={fun.id} value={fun.id}>{fun.id}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </li>
             <li>
                 <b>Class Specification Version</b>
                 <br/>
-                <select className="mt-2 min-w-12"
-                        onChange={e => handleSelectVersion(e.target.value)}>
-                    <option/>
-                    {listFunctionVersions.map(ver => (
-                        <option key={ver}>{ver}</option>
-                    ))}
-                </select>
+                <div className="mt-2 min-w-12">
+                    <Select onValueChange={v => handleSelectVersion(v)}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a version" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {listFunctionVersions.map(ver => (
+                                <SelectItem key={ver} value={ver}>{ver}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </li>
         </ol>
     );

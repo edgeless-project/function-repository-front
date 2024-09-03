@@ -3,6 +3,8 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {FunctionWorkflow, FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import {Input} from "@/components/ui/input";
 import {getFunctionVersions} from "@/services/functionServices";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Button} from "@/components/ui/button";
 
 interface CUPanelProps{
     node: FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic,
@@ -79,14 +81,18 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
                 <Input className="mt-2 mb-4" value={classIdV} disabled={true}></Input></li>
             <li><label><b>Class Specification Version</b></label>
                 <br/>
-                <select className="my-2"
-                        value={classVersionV}
-                        onChange={e => setClassVersionV(e.target.value)}>
-                    <option/>
-                    {listFunctionVersions && listFunctionVersions.map(v => (
-                        <option key={v}>{v}</option>
-                    ))}
-                </select>
+                <div className="my-2">
+                    <Select onValueChange={v => setClassVersionV(v)} defaultValue={classVersionV}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a version" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {listFunctionVersions && listFunctionVersions.map(v => (
+                                <SelectItem key={v} value={v}>{v}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </li>
 
             {((node as FunctionWorkflow).class_specification != undefined) ? divComplex : ""}
@@ -101,20 +107,21 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
                 </CardHeader>
                 <CardContent className="h-80">
                     <div className="flex flex-col w-80 h-full mt-4 overflow-y-auto">
-                        <ol>
+                        <ol className="mx-1">
                             <li><label><b>NAME</b></label><Input value={name}
                                                     onChange={e => setName(e.target.value)}/></li>
                             {(node as ResourceWorkflow).class_type === undefined? divFunctionBasic: ""}
                         </ol>
                         <div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
-                            <button
-                                className="bg-green-500 hover:bg-green-400 text-white py-2 px-4 rounded"
-                                onClick={handleSave}>Save
-                            </button>
-                            <button
-                                className="bg-red-500 hover:bg-red-400 text-white py-2 px-4 rounded"
+                            <Button
+                                className="py-2 px-4 rounded"
+                                variant="outline"
                                 onClick={onClose}>Cancel
-                            </button>
+                            </Button>
+                            <Button
+                                className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 rounded"
+                                onClick={handleSave}>Save
+                            </Button>
                         </div>
                     </div>
                 </CardContent>
