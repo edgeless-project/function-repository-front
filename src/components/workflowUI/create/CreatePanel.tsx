@@ -1,15 +1,13 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import {Input} from "@/components/ui/input";
-import {getFunctionsSimilarId, getFunctionVersions} from "@/services/functionServices";
-import {FunctionMinified} from "@/types/functions";
-import CreateResource from "@/components/workflowUI/CreateResource";
-import CreateFunction from "@/components/workflowUI/CreateFunction";
-import {boolean} from "zod";
+import {getFunctionVersions} from "@/services/functionServices";
+import CreateResource from "@/components/workflowUI/create/CreateResource";
+import CreateFunction from "@/components/workflowUI/create/CreateFunction";
 import DialogSave from "@/components/utils/DialogSave";
 import {Button} from "@/components/ui/button";
-const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES as string);
+const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string);
 
 interface CUPanelProps{
     isResource: boolean,

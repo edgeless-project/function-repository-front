@@ -3,42 +3,52 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {FunctionWorkflow, FunctionWorkflowBasic, JsonFlowComponentState, ResourceWorkflow} from "@/types/workflows";
 import {Input} from "@/components/ui/input";
 import {getFunctionVersions} from "@/services/functionServices";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
+import UpdateFunction from "@/components/workflowUI/update/UpdateFunction";
 
-interface CUPanelProps{
+interface UpdatePanelProps{
     node: FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic,
     value: JsonFlowComponentState,
     onChange?: (value: object) => void,
     onClose?: () => void;
 }
 
-const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) => {
+const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}) => {
 
     const [name, setName] = useState(node.name);
     const [funType, setClassFunType] = useState("");
     const [classIdV, setClassIdV] = useState("");
     const [classVersionV, setClassVersionV] = useState("");
     const [listFunctionVersions, setListFunctionVersions] = useState<string[]>([]);
+    const [isResource, setIsResource] = useState(false);
+    const [isBasicFunction, setIsBasicFunction] = useState(false);
+
 
     useEffect(() => {
         const nodeFun = node as FunctionWorkflow;
         const nodeFunBasic = node as FunctionWorkflowBasic;
 
+        //Gets node type and retrieves function versions from server
         if (nodeFun.class_specification !== undefined) {
+            setIsResource(false);
+            setIsBasicFunction(false);
             setClassFunType(nodeFun.class_specification.function_type);
             setClassVersionV(nodeFun.class_specification.version);
             setClassIdV(nodeFun.class_specification.id);
-        } else {
+            getFunctionVersions(nodeFun.class_specification.id).then(versions => {setListFunctionVersions(versions.versions);});
+        } else if (nodeFunBasic.class_specification_id !== undefined){
+            setIsResource(false);
+            setIsBasicFunction(true);
             setClassVersionV(nodeFunBasic.class_specification_version);
             setClassIdV(nodeFunBasic.class_specification_id);
+            getFunctionVersions(nodeFunBasic.class_specification_id).then(versions => {setListFunctionVersions(versions.versions);});
+        }else {
+            setIsResource(true);
+            setIsBasicFunction(false);
+            setClassVersionV("");
+            setClassIdV("");
         }
-
-        getFunctionVersions(classIdV).then(versions => {
-            setListFunctionVersions(versions.versions);
-        })
-        
-    }, [classIdV, node]);
+    }, [node]);
 
     const handleSave = () => {
         value.functions.forEach(f => {  //Save data from each function if modified
@@ -68,36 +78,6 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
         if (onChange !== undefined) onChange(value);
     }
 
-    const divComplex =
-        <li><label><b>Function Type</b></label>
-            <Input value={funType} className="mt-2 mb-4"
-                   onChange={e =>
-                       setClassFunType(e.target.value)}/>
-        </li>;
-
-    const divFunctionBasic =
-        <li>
-            <li><br/><b>Class Specification ID</b>
-                <Input className="mt-2 mb-4" value={classIdV} disabled={true}></Input></li>
-            <li><label><b>Class Specification Version</b></label>
-                <br/>
-                <div className="my-2">
-                    <Select onValueChange={v => setClassVersionV(v)} defaultValue={classVersionV}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select a version" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {listFunctionVersions && listFunctionVersions.map(v => (
-                                <SelectItem key={v} value={v}>{v}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </li>
-
-            {((node as FunctionWorkflow).class_specification != undefined) ? divComplex : ""}
-        </li>
-
     return (
         <div className="absolute top-0 left-0">
             <Card>
@@ -110,7 +90,10 @@ const UpdatePanel:React.FC<CUPanelProps> = ({node, value, onChange, onClose}) =>
                         <ol className="mx-1">
                             <li><label><b>NAME</b></label><Input value={name}
                                                     onChange={e => setName(e.target.value)}/></li>
-                            {(node as ResourceWorkflow).class_type === undefined? divFunctionBasic: ""}
+                            {!isResource?
+                                <UpdateFunction funType={funType} setClassFunType={setClassFunType} classIdV={classIdV}
+                                                classVersionV={classVersionV} setClassVersionV={setClassVersionV}
+                                                listFunctionVersions={listFunctionVersions} complex={!isBasicFunction} />: null}
                         </ol>
                         <div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
                             <Button

@@ -1,7 +1,7 @@
 import React, {Dispatch, SetStateAction, useState} from "react";
 import {ResourceWorkflow} from "@/types/workflows";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES as string);
+const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string);
 
 interface props {
     setIsCorrect: Dispatch<SetStateAction<boolean>>,

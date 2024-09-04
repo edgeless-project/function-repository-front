@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import DialogSave from '@/components/utils/DialogSave';
 import Flow from '@/components/workflowUI/WorkflowUI';
 import {date, format} from "@formkit/tempo";
-import CreatePanel from "@/components/workflowUI/CreatePanel";
+import CreatePanel from "@/components/workflowUI/create/CreatePanel";
 const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
@@ -91,14 +91,14 @@ export default function WorkflowEdit() {
 
   const createNodeFunction = () => {
     isCreateNodeResource(false);
-    isCreateNode(true)
+    isCreateNode(true);
 
-  }
+  };
 
   const createNodeResource = () => {
     isCreateNodeResource(true);
-    isCreateNode(true)
-  }
+    isCreateNode(true);
+  };
 
   const closeNewResource = () => {
     isCreateNode(false);
@@ -141,12 +141,12 @@ export default function WorkflowEdit() {
         </CardHeader>
         <CardContent>
           {tabIdx==="visual-builder" && <div className="float-right">
-            <button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 mr-4 rounded" onClick={() => createNodeFunction()}>
+            <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 mr-4 rounded" onClick={createNodeFunction}>
               Add Function
-            </button>
-            <button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-6 rounded" onClick={() => createNodeResource()}>
+            </Button>
+            <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-6 rounded" onClick={createNodeResource}>
               Add Resource
-            </button>
+            </Button>
           </div>}
           <Tabs defaultValue="json-editor" onValueChange={(tabName) => setTabIdx(tabName)} value={tabIdx} className="w-full">
             <TabsList>
