@@ -124,14 +124,17 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
                 <p className="font-sans text-xl font-medium text-center">Create {isResource ? "Resource" : "Function"}</p>
             </CardHeader>
             <CardContent className="h-80">
-                <div className="flex flex-col gap-4 w-80 h-full my-4 overflow-y-auto">
-                    <ol className="mx-1">
-                        <li><label><b>NAME</b></label>
-                            <Input type="text" value={name} className="mt-1"
-                                   onChange={e => {handleSetName(e.target.value)}}/></li>
-                    </ol>
-                    {isResource?
-                        <CreateResource setResourceJson={setResourceJson} setIsCorrect={setIsComplete}/>:
+                <div className="flex flex-col gap-4 w-80 h-full my-4 mx-1 overflow-y-auto">
+                    <div>
+                        <label><b>NAME</b></label>
+                        <div className="mt-1 mx-1">
+                            <Input type="text" value={name}
+                               onChange={e => handleSetName(e.target.value)}/>
+                        </div>
+                    </div>
+
+                    {isResource ?
+                        <CreateResource setResourceJson={setResourceJson} setIsCorrect={setIsComplete}/> :
                         <CreateFunction setIsCorrect={setIsComplete} setFunctionJson={setFunctionJson}/>
                     }
                     <div className="h-full grid grid-cols-2 gap-2 content-end justify-center">

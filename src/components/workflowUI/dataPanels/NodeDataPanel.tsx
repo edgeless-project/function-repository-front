@@ -15,14 +15,12 @@ interface NodeDataPanelProps {
 const NodeDataPanel:React.FC<NodeDataPanelProps> = ({node, readOnly}) => {
 
     return (
-        <div className="">
-            <ol className="mt-4">
-                <li><b>NAME:</b> {node.name}</li>
-                {isResource(node) ?
-                    <ResourceWorkFlowPanel data={node}/> :
-                    <FunctionWorkFlowPanel data={node}/>
-                }
-            </ol>
+        <div className="mt-4">
+            <b>NAME:</b> {node.name}
+            {isResource(node) ?
+                <ResourceWorkFlowPanel data={node}/> :
+                <FunctionWorkFlowPanel data={node}/>
+            }
         </div>
     );
 }

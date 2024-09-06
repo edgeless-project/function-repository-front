@@ -8,9 +8,7 @@ interface resourceWorkflowInstanceProps {
 const ResourceWorkflowPanel:React.FC<resourceWorkflowInstanceProps> = ({data}) => {
 
     return(
-        <ol>
-            <li className="my-2"><b>CLASS TYPE:</b>    {data.class_type}</li>
-        </ol>
+            <div className="my-2"><b>CLASS TYPE:</b>    {data.class_type}</div>
     );
 };
 

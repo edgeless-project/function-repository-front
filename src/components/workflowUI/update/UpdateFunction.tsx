@@ -15,18 +15,19 @@ interface UpdateFunctionProps {
 const UpdateFunction:React.FC<UpdateFunctionProps> = ({funType,setClassFunType,classIdV,classVersionV,setClassVersionV, listFunctionVersions, complex}) => {
 
     const divComplex =
-        <li><label><b>Function Type</b></label>
+        <div>
+            <label><b>Function Type</b></label>
             <Input value={funType} className="mt-2 mb-4"
                    onChange={e =>
                        setClassFunType(e.target.value)}/>
-        </li>;
+        </div>;
 
 
     return (
-        <li>
-            <li><br/><b>Class Specification ID</b>
-                <Input className="mt-2 mb-4" value={classIdV} disabled={true}></Input></li>
-            <li><label><b>Class Specification Version</b></label>
+        <div>
+            <br/><b>Class Specification ID</b>
+                <Input className="mt-2 mb-4" value={classIdV} disabled={true}></Input>
+            <label><b>Class Specification Version</b></label>
                 <br/>
                 <div className="my-2">
                     <Select onValueChange={v => setClassVersionV(v)} value={classVersionV} defaultValue={classVersionV}>
@@ -40,9 +41,8 @@ const UpdateFunction:React.FC<UpdateFunctionProps> = ({funType,setClassFunType,c
                         </SelectContent>
                     </Select>
                 </div>
-            </li>
-            {complex? divComplex : null}
-        </li>
+            {complex && divComplex}
+        </div>
     );
 }
 

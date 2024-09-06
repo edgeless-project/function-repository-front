@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import {
-  Dialog, DialogClose,
+  Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import Spinner from "@/components/utils/Spinner";
 import React, {useEffect, useState} from "react";
-import {FormControl} from "@/components/ui/form";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 interface DialogInputProps {

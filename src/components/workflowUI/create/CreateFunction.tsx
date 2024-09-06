@@ -65,45 +65,40 @@ const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
     };
 
     return(
-        <ol className="mx-1">
-            <li>
-                <b>Class Specification Id</b>
-                <div className="relative">
-                    <Input value={classSpecificationId} className="mt-1 mb-4"
-                           onChange={e => {
-                               setClassSpecificationId(e.target.value);
-                           }}/>
-                    <div className="absolute top-0 right-0">
-                        <Select onValueChange={v => handleSelectID(v)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select an ID" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {listFunctions.map(fun => (
-                                    <SelectItem key={fun.id} value={fun.id}>{fun.id}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
-            </li>
-            <li>
-                <b>Class Specification Version</b>
-                <br/>
-                <div className="mt-2 min-w-12">
-                    <Select onValueChange={v => handleSelectVersion(v)}>
+        <div className="mx-1">
+            <b>Class Specification Id</b>
+            <div className="relative">
+                <Input value={classSpecificationId} className="mt-1 mb-4"
+                       onChange={e => {
+                           setClassSpecificationId(e.target.value);
+                       }}/>
+                <div className="absolute top-0 right-0">
+                    <Select onValueChange={v => handleSelectID(v)}>
                         <SelectTrigger>
-                            <SelectValue placeholder="Select a version" />
+                            <SelectValue placeholder="Select an ID" />
                         </SelectTrigger>
                         <SelectContent>
-                            {listFunctionVersions.map(ver => (
-                                <SelectItem key={ver} value={ver}>{ver}</SelectItem>
+                            {listFunctions.map(fun => (
+                                <SelectItem key={fun.id} value={fun.id}>{fun.id}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                 </div>
-            </li>
-        </ol>
+            </div>
+            <b>Class Specification Version</b>
+            <div className="mt-2">
+                <Select onValueChange={v => handleSelectVersion(v)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select a version" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {listFunctionVersions.map(ver => (
+                            <SelectItem key={ver} value={ver}>{ver}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+        </div>
     );
 }
 

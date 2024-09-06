@@ -27,23 +27,21 @@ const CreateResource:React.FC<props> = ({setIsCorrect, setResourceJson}) => {
     }
 
     return(
-        <ol>
-            <li><b>Class Type</b>
-                <br/>
-                <div className="mx-1 mt-2">
-                    <Select onValueChange={v => handleSelectType(v)}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select a type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {listClassType.map(cT => (
-                                <SelectItem key={cT} value={cT}>{cT}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            </li>
-        </ol>
+        <div>
+            <label><b>Class Type</b></label>
+            <div className="mx-1 mt-2">
+                <Select onValueChange={v => handleSelectType(v)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select a type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {listClassType.map(cT => (
+                            <SelectItem key={cT} value={cT}>{cT}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+        </div>
     );
 }
 

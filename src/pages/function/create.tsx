@@ -55,10 +55,8 @@ const formSchema = z.object({
 )
 .refine(
   (data) => {
-    if (!data.file || data.file.name === "") {
-      return false;
-    }
-    return true;
+    return !(!data.file || data.file.name === "");
+
   },
   {
     message: "Code file is required",
