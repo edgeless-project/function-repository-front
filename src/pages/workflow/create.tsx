@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import {useState} from 'react';
+import React, {useState} from 'react';
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,7 +21,9 @@ import {
 import { hasMiddleSpaces } from '@/utils/general';
 import DialogSave from '@/components/utils/DialogSave';
 import { createWorkflow } from '@/services/workflowServices';
-import { ApiRequestCreateWorkflow } from '@/types/workflows';
+import {ApiRequestCreateWorkflow, JsonFlowComponentState} from '@/types/workflows';
+import Flow from "@/components/workflowUI/WorkflowUI";
+import CreatePanel from "@/components/workflowUI/create/CreatePanel";
 const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
 
 const formSchema = z.object({
@@ -35,10 +37,26 @@ const formSchema = z.object({
     message: "The name must not contain spaces",
     path: ["name"],
   }
-)
+);
+
+const defaultJSON: object = {
+  functions: [],
+  resources: [],
+  annotations: {}
+};
 
 export default function WorkflowCreate() {
   const router = useRouter();
+  const [workflowJSON, setWorkflowJSON] = useState(defaultJSON);
+  const [hasJSONError, setHasJSONError] = useState(false);
+  const [reloadWorkflow, setReloadWorkflow] = useState(false);
+  const [createNode, isCreateNode] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+  const [resultOk, setResultOk] = useState(false);
+  const [createResource, isCreateNodeResource] = useState(false);
+  const [tabIdx, setTabIdx] = useState("json-editor");
 
   const form = useForm<z.infer< typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,25 +65,28 @@ export default function WorkflowCreate() {
     }
   });
 
-  const defaultJSON: object = {
-    functions: [],
-    resources: [],
-    annotations: {}
-  };
-
-  const [workflowJSON, setWorkflowJSON] = useState(defaultJSON);
-  const [hasJSONError, setHasJSONError] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState('');
-  const [resultOk, setResultOk] = useState(false);
-
   const handleJSONChange = (jsonData: object) => {
     setWorkflowJSON(jsonData);
+    setReloadWorkflow(v => !v);
   };
 
   const handleJSONError = (hasJSONError: boolean) => {
     setHasJSONError(hasJSONError);
+  };
+
+  const createNodeFunction = () => {
+    isCreateNodeResource(false);
+    isCreateNode(true);
+
+  };
+
+  const createNodeResource = () => {
+    isCreateNodeResource(true);
+    isCreateNode(true);
+  };
+
+  const closeNewResource = () => {
+    isCreateNode(false);
   };
 
   const handleSubmit = async (data: z.infer< typeof formSchema>) => {
@@ -135,7 +156,15 @@ export default function WorkflowCreate() {
               <CardTitle>Workflow definition</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="json-editor" className="w-full">
+              {tabIdx==="visual-builder" && <div className="float-right">
+                <Button type="button" className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 mr-4 rounded" onClick={createNodeFunction}>
+                  Add Function
+                </Button>
+                <Button type="button" className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-6 rounded" onClick={createNodeResource}>
+                  Add Resource
+                </Button>
+              </div>}
+              <Tabs defaultValue="json-editor" onValueChange={(tabName) => setTabIdx(tabName)} value={tabIdx} className="w-full">
                 <TabsList>
                   <TabsTrigger value="json-editor">JSON Editor</TabsTrigger>
                   <TabsTrigger value="visual-builder">Workflow UI</TabsTrigger>
@@ -146,8 +175,11 @@ export default function WorkflowCreate() {
                 <TabsContent value="visual-builder">
                   <Card>
                     <CardHeader></CardHeader>
-                    <CardContent>
-                      <p>TODO: Workflow UI</p>
+                    <CardContent className="relative">
+                      <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false} onChange={handleJSONChange} reload={reloadWorkflow}/>
+                      {createNode && <div className="absolute top-0 left-6">
+                        <CreatePanel isResource={createResource} value={workflowJSON as JsonFlowComponentState} onChange={handleJSONChange} onClose={closeNewResource} />
+                      </div>}
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -155,9 +187,10 @@ export default function WorkflowCreate() {
             </CardContent>
           </Card>
           <div className="flex justify-between my-8">
-            <Button 
-              variant="outline"
-              onClick={() => { router.back() }}
+            <Button
+                type="button"
+                variant="outline"
+                onClick={() => { router.back() }}
             >Cancel</Button>
             <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Save</Button>
           </div>

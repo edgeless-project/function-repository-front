@@ -141,10 +141,10 @@ export default function WorkflowEdit() {
         </CardHeader>
         <CardContent>
           {tabIdx==="visual-builder" && <div className="float-right">
-            <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 mr-4 rounded" onClick={createNodeFunction}>
+            <Button type="button"className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 mr-4 rounded" onClick={createNodeFunction}>
               Add Function
             </Button>
-            <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-6 rounded" onClick={createNodeResource}>
+            <Button type="button"className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-6 rounded" onClick={createNodeResource}>
               Add Resource
             </Button>
           </div>}
@@ -164,7 +164,7 @@ export default function WorkflowEdit() {
                   <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false} onChange={handleJSONChange} reload={reloadWorkflow}/>
                   {createNode && <div className="absolute top-0 left-6">
                   <CreatePanel isResource={createResource} value={workflowJSON as JsonFlowComponentState} onChange={handleJSONChange} onClose={closeNewResource} />
-                </div>}
+                  </div>}
                 </CardContent>
               </Card>
             </TabsContent>

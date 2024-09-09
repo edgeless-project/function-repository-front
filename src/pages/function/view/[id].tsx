@@ -86,7 +86,7 @@ export default function FunctionView() {
         </CardContent>
       </Card>}
       <div className="flex justify-between my-8">
-        <Button 
+        <Button type="button"
           variant="outline"
           onClick={() => { router.back() }}
         >Go back</Button>

@@ -265,7 +265,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
         });
         setSelNode(null);
         setNodes((els) => els.filter((node) => node.id !== selNode?.name));
-    }
+    };
 
     const handleEdit = () => {
         isLoadPanel(false);
@@ -293,6 +293,20 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
         setSelNode(node);
         isEditNode(false);
         if (node.name === selNode?.name) isLoadPanel(!loadPanel);
+    };
+
+    const handleOnClose = () => {
+        setOpen(false);
+        renderNodeFromData();
+    };
+
+    const handleCloseEditNode = () => {
+        isEditNode(false);
+    };
+
+    const handlePanelClose = () => {
+        isLoadPanel(false);
+        setSelNode(null);
     };
 
     const handleConnect = useCallback(
@@ -332,15 +346,6 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
         },
         [setEdges]
     );
-
-    const handleCloseEditNode = () => {
-        isEditNode(false);
-    }
-
-    const handlePanelClose = () => {
-        isLoadPanel(false);
-        setSelNode(null);
-    }
 
     const handleNodesChange: OnNodesChange = useCallback(
         (changes) => {
@@ -432,10 +437,12 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                                     <div className="flex justify-center">
                                         {!readOnly && <div className="grid grid-cols-1">
                                             <Button
+                                                type="button"
                                                 className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 w-72 rounded"
                                                 onClick={handleEdit}>Edit
                                             </Button>
                                             <Button
+                                                type="button"
                                                 className="bg-red-600 hover:bg-red-500 text-white mt-1 py-2 w-72 rounded"
                                                 onClick={handleDeleteNode}>Delete
                                             </Button>
@@ -460,10 +467,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                 isLoading={!isMounted}
                 options={newBranch?.options}
                 onConfirm={(input: string) => newBranch && addOutputMapping(input, newBranch.source, newBranch.target, newBranch.fromFunction)}
-                onClose={() => {
-                    setOpen(false);
-                    renderNodeFromData();
-                }}
+                onClose={handleOnClose}
             />
         </div>
     ) : null;

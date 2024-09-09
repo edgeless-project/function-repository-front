@@ -33,7 +33,7 @@ export default function DialogSave ({isOpen, title, description, isLoading, onCl
           
         </DialogHeader>
         {!isLoading && <DialogFooter className="flex justify-end">
-          <Button variant="outline" onClick={onClose}>Close</Button>
+          <Button type={"button"} variant="outline" onClick={onClose}>Close</Button>
         </DialogFooter>}
       </DialogContent>
     </Dialog>

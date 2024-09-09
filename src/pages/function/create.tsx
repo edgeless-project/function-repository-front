@@ -237,7 +237,8 @@ export default function FunctionCreate() {
             />
             </CardContent>
             <CardFooter className="flex justify-between max-w-5xl mt-8">
-              <Button 
+              <Button
+                type="button"
                 variant="outline"
                 onClick={() => { router.back() }}
               >Cancel</Button>

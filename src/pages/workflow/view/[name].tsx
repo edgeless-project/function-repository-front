@@ -90,9 +90,10 @@ export default function WorkflowView() {
         </CardContent>
       </Card>}
       <div className="flex justify-between my-8">
-        <Button 
-          variant="outline"
-          onClick={() => { router.back() }}
+        <Button
+            type="button"
+            variant="outline"
+            onClick={() => { router.back() }}
         >Go back</Button>
       </div>
     </Layout>
