@@ -459,7 +459,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                 description={"Define output mapping"}
                 isLoading={!isMounted}
                 options={newBranch?.options}
-                onConfirm={(input: string) => newBranch ? addOutputMapping(input, newBranch.source, newBranch.target, newBranch.fromFunction) : null}
+                onConfirm={(input: string) => newBranch && addOutputMapping(input, newBranch.source, newBranch.target, newBranch.fromFunction)}
                 onClose={() => {
                     setOpen(false);
                     renderNodeFromData();

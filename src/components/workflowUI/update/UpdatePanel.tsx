@@ -90,10 +90,10 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
                         <div className="mx-1">
                             <label><b>NAME</b></label><Input value={name}
                                                     onChange={e => setName(e.target.value)}/>
-                            {!isResource?
+                            {!isResource &&
                                 <UpdateFunction funType={funType} setClassFunType={setClassFunType} classIdV={classIdV}
                                                 classVersionV={classVersionV} setClassVersionV={setClassVersionV}
-                                                listFunctionVersions={listFunctionVersions} complex={!isBasicFunction} />: null}
+                                                listFunctionVersions={listFunctionVersions} complex={!isBasicFunction} />}
                         </div>
                         <div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
                             <Button
