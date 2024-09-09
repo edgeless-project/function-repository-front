@@ -9,6 +9,8 @@ import { buildFetchHeaders, buildFileFetchHeaders } from "@/utils/fetch";
 
 const serverRestApi = process.env.NEXT_PUBLIC_SERVER_REST_API;
 
+
+
 export const fetchFunctions =  async (offset: number): Promise<ApiResponseGetFunctions> => {
   const limit = 10;
   const headers = buildFetchHeaders('');
@@ -154,3 +156,12 @@ export const deleteFunction = async (
   const json = await data.json();
   return json;
 }
+
+export const getFunctionsSimilarId =  async (name_partial: string): Promise<ApiResponseGetFunctions> => {
+  const limit = 10;
+  const headers = buildFetchHeaders('');
+  const url = `${serverRestApi}/function?offset=${0}&limit=${limit}&partial_search=${name_partial}`;
+  const data = await fetch(url, { headers });
+  const json = await data.json();
+  return json;
+};

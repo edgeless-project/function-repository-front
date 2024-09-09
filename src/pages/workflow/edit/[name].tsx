@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -10,13 +10,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Layout from "@/components/layout/Layout";
-import { ApiRequestUpdateWorkflow, ApiResponseWorkflow } from '@/types/workflows';
+import {ApiRequestUpdateWorkflow, ApiResponseWorkflow, JsonFlowComponentState} from '@/types/workflows';
 import { getWorkflow, updateWorkflow } from '@/services/workflowServices';
 import Spinner from '@/components/utils/Spinner';
 import { Button } from '@/components/ui/button';
 import DialogSave from '@/components/utils/DialogSave';
-import Flow from '@/components/workflowUI/workflowUI';
+import Flow from '@/components/workflowUI/WorkflowUI';
 import {date, format} from "@formkit/tempo";
+import CreatePanel from "@/components/workflowUI/create/CreatePanel";
 const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
@@ -32,6 +33,10 @@ export default function WorkflowEdit() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [resultOk, setResultOk] = useState(false);
+  const [tabIdx, setTabIdx] = useState("json-editor");
+  const [createNode, isCreateNode] = useState(false);
+  const [createResource, isCreateNodeResource] = useState(false);
+  const [reloadWorkflow, setReloadWorkflow] = useState(false);
 
 
   useEffect(() => {
@@ -49,6 +54,7 @@ export default function WorkflowEdit() {
 
   const handleJSONChange = (jsonData: object) => {
     setWorkflowJSON(jsonData);
+    setReloadWorkflow(v => !v);
   };
 
   const handleJSONError = (hasJSONError: boolean) => {
@@ -81,6 +87,21 @@ export default function WorkflowEdit() {
     }
     setIsSaving(false);
 
+  };
+
+  const createNodeFunction = () => {
+    isCreateNodeResource(false);
+    isCreateNode(true);
+
+  };
+
+  const createNodeResource = () => {
+    isCreateNodeResource(true);
+    isCreateNode(true);
+  };
+
+  const closeNewResource = () => {
+    isCreateNode(false);
   };
 
   const closeModal = () => {
@@ -119,19 +140,31 @@ export default function WorkflowEdit() {
           <CardTitle>Workflow definition</CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="json-editor" className="w-full">
+          {tabIdx==="visual-builder" && <div className="float-right">
+            <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 mr-4 rounded" onClick={createNodeFunction}>
+              Add Function
+            </Button>
+            <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-6 rounded" onClick={createNodeResource}>
+              Add Resource
+            </Button>
+          </div>}
+          <Tabs defaultValue="json-editor" onValueChange={(tabName) => setTabIdx(tabName)} value={tabIdx} className="w-full">
             <TabsList>
               <TabsTrigger value="json-editor">JSON</TabsTrigger>
               <TabsTrigger value="visual-builder">Workflow UI</TabsTrigger>
             </TabsList>
             <TabsContent value="json-editor">
-              <JSONEditorComponent value={workflowJSON as object} onChange={handleJSONChange} onError={handleJSONError} />
+              <JSONEditorComponent value={workflowJSON as object} onChange={handleJSONChange}
+                                   onError={handleJSONError}/>
             </TabsContent>
             <TabsContent value="visual-builder">
               <Card>
                 <CardHeader></CardHeader>
-                <CardContent>
-                  <p>TODO: Workflow UI</p>
+                <CardContent className="relative">
+                  <Flow value={workflowJSON as JsonFlowComponentState} readOnly={false} onChange={handleJSONChange} reload={reloadWorkflow}/>
+                  {createNode && <div className="absolute top-0 left-6">
+                  <CreatePanel isResource={createResource} value={workflowJSON as JsonFlowComponentState} onChange={handleJSONChange} onClose={closeNewResource} />
+                </div>}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -139,9 +172,11 @@ export default function WorkflowEdit() {
         </CardContent>
       </Card>}
       <div className="flex justify-between my-8">
-        <Button 
-          variant="outline"
-          onClick={() => { router.back() }}
+        <Button
+            variant="outline"
+            onClick={() => {
+              router.back()
+            }}
         >Cancel</Button>
         <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" onClick={handleSubmit}>Save</Button>
       </div>

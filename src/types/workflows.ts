@@ -11,6 +11,17 @@ export interface ApiResponseGetWorkflows {
   offset: number;
 };
 
+export interface FunctionWorkflowBasic {
+  name: string,
+  class_specification_id: string,
+  class_specification_version: string,
+  output_mapping: {
+    //"next-step"?: string
+    [key: string]:  string
+  },
+  annotations: {}
+};
+
 export interface FunctionWorkflow {
   name: string,
   class_specification:{
@@ -64,7 +75,7 @@ export interface ApiResponseDeleteWorkflow {
 
 export interface JsonFlowComponentState {
   name?: string,
-  functions: FunctionWorkflow[],
+  functions: (FunctionWorkflow | FunctionWorkflowBasic)[],
   resources: ResourceWorkflow[],
   annotations: {}
 }
