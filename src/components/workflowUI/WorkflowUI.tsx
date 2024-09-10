@@ -141,8 +141,8 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
     const [selNode, setSelNode] = useState<FunctionWorkflow | ResourceWorkflow | FunctionWorkflowBasic | null>(null);
     const [nodeColor, setNodeColor] = useState<string>(styleFunctionNode.background);
     const [editNode, isEditNode] = useState(false);
-    const [createNode, isCreateNode] = useState(false);
     const [isOpen, setOpen] = useState(false);
+    const [descConnection, setDescConnection] = useState("");
     const [newBranch, setNewBranch] = useState<createBranch>();
 
     const renderNodeFromData = useCallback(() => {
@@ -182,12 +182,13 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                     y: 0
                 },
                 data: {label: r.name},
-                style: styleResourceNodeIn,
+                style: styleResourceNodeOut,
                 width: nodeWidth,
                 height: nodeHeight
             };
 
-            if (r.output_mapping) {
+            if (r.output_mapping && Object.keys(r.output_mapping).length !== 0) {// If element has output keys, color an input resource.
+                newNode.style = styleResourceNodeIn;
                 for (let out in r.output_mapping) {
                     const newEdge: Edge = {
                         id: "e" + edgeNodeSeparator + r.name + edgeNodeSeparator + r.output_mapping[out],
@@ -201,7 +202,6 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                 }
             } else {
                 //  If resource node does not have new request, it's considered an ENDPOINT.
-                newNode.style = styleResourceNodeOut;
                 initialEdges.forEach(e => {
                     const nodes = e.id.split(edgeNodeSeparator).slice(1);
                     if (nodes.includes(r.name)) {
@@ -320,7 +320,12 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                             getFunction(f_b.class_specification_id,f_b.class_specification_version).then(d => {
                                 let options: string[] = [];
                                 d.outputs.forEach((v) =>{if (!f_b.output_mapping[v]) options.push(v)});
-                                setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: options})
+                                setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: options});
+                                options.length>0 ? setDescConnection("Define output mapping"): setDescConnection("There are no output connexions available");
+                                setOpen(true);
+                            }).catch(() => {
+                                setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: []});
+                                setDescConnection("Could not retrieve function data.");
                                 setOpen(true);
                             });
 
@@ -329,6 +334,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                             let options: string[] = [];
                             f_c.class_specification.outputs.forEach((v) =>{if (!f_c.output_mapping[v]) options.push(v)});
                             setNewBranch({source: params.source as string, target: params.target as string, fromFunction:true, options: options});
+                            options.length>0 ? setDescConnection("Define output mapping"): setDescConnection("There are no output connexions available");
                             setOpen(true);
                         }
                     }
@@ -336,10 +342,12 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                 if(!isOpen) value.resources.forEach(r => {
                     if (r.name === params.source && outputResources.includes(r.class_type)) {
                         setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: ["output_"+(params.target as string)]});
+                        setDescConnection("Define output mapping");
                         setOpen(true);
                     }else if (r.name === params.source){
                         setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: []});
                         setOpen(true);
+                        setDescConnection("This resource class does not allow for output connection.");
                     }
                 });
             }
@@ -372,22 +380,16 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                     const e = ch as EdgeRemoveChange;
                     const node = e.id.split(edgeNodeSeparator);
                     value.functions.forEach(f => {
-                        if (node.length > 2 && f.name === node[1]) {
-                            for (let key in f.output_mapping) {
-                                if (f.output_mapping[key] === node[2]) {
+                        if (node.length > 2 && f.name === node[1])
+                            for (let key in f.output_mapping)
+                                if (f.output_mapping[key] === node[2])
                                     delete f.output_mapping[key];
-                                }
-                            }
-                        }
                     });
                     value.resources.forEach(r => {
-                        if (node.length > 2 && r.name === node[1]) {
-                            for (let key in r.output_mapping) {
-                                if (r.output_mapping[key] === node[2]) {
+                        if (node.length > 2 && r.name === node[1])
+                            for (let key in r.output_mapping)
+                                if (r.output_mapping[key] === node[2])
                                     delete r.output_mapping[key];
-                                }
-                            }
-                        }
                     });
                 }
             });
@@ -456,14 +458,14 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                 <Controls showInteractive={false}/>
                 <Background variant={BackgroundVariant.Dots} gap={12} size={1}/>
             </ReactFlow>
-            {!loadPanel && editNode && selNode && !readOnly && !createNode &&
+            {!loadPanel && editNode && selNode && !readOnly &&
                 <UpdatePanel node={getDataFromNode(selNode.name)} value={value} onChange={handleEditJSON}
                              onClose={handleCloseEditNode}/>}
 
             <DialogInput
                 isOpen={isOpen}
                 title={"New Connection"}
-                description={"Define output mapping"}
+                description={descConnection}
                 isLoading={!isMounted}
                 options={newBranch?.options}
                 onConfirm={(input: string) => newBranch && addOutputMapping(input, newBranch.source, newBranch.target, newBranch.fromFunction)}

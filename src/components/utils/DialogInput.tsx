@@ -26,12 +26,12 @@ export default function DialogInput ({isOpen, title, description, isLoading, opt
   const [descText, setDescText] = useState("");
 
   useEffect(() => {
-    setLocalValue("");  //Avoid value residues on open or close dialog
-    if (options?.length === 0)
-      setDescText("There are no possible connexions to be made");
+    setLocalValue("");
+    if (description.length===0)
+      setDescText("There was an error, reload the component.");
     else 
-      setDescText(description+":");
-  }, [options?.length]);
+      setDescText(description);
+  }, [description]);
 
   const handleClose = () => {
     onConfirm(value);
@@ -46,7 +46,7 @@ export default function DialogInput ({isOpen, title, description, isLoading, opt
           {!isLoading && <DialogDescription>
             <label>
               {descText}
-              {options ? (options.length > 0 ?
+              {options ? options.length > 0 &&
                     <Select onValueChange={v => setLocalValue(v)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a type" />
@@ -57,7 +57,6 @@ export default function DialogInput ({isOpen, title, description, isLoading, opt
                         ))}
                       </SelectContent>
                     </Select> :
-                    null):
                 <input
                     className="ml-4"
                     value={value}
