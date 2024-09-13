@@ -7,7 +7,9 @@ import CreateResource from "@/components/workflowUI/create/CreateResource";
 import CreateFunction from "@/components/workflowUI/create/CreateFunction";
 import DialogSave from "@/components/utils/DialogSave";
 import {Button} from "@/components/ui/button";
-const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string);
+const outputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_OUTPUT as string).split(",");
+const inputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string).split(",");
+const resources = outputResources.concat(inputResources);
 
 interface CUPanelProps{
     isResource: boolean,
@@ -21,7 +23,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
     const [isComplete, setIsComplete] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
-    const [listClassType, setListClassType] = useState(stringClassType.split(","));
+    const [listClassType, setListClassType] = useState(resources);
     const [functionJson, setFunctionJson ] = useState<FunctionWorkflowBasic>({
         name: "",
         class_specification_id: "",

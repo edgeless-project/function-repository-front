@@ -1,7 +1,9 @@
 import React, {Dispatch, SetStateAction, useState} from "react";
 import {ResourceWorkflow} from "@/types/workflows";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-const stringClassType: string = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string);
+const outputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_OUTPUT as string).split(",");
+const inputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string).split(",");
+const resources = outputResources.concat(inputResources);
 
 interface props {
     setIsCorrect: Dispatch<SetStateAction<boolean>>,
@@ -9,7 +11,7 @@ interface props {
 }
 
 const CreateResource:React.FC<props> = ({setIsCorrect, setResourceJson}) => {
-    const [listClassType, setListClassType] = useState(stringClassType.split(","));
+    const [listClassType, setListClassType] = useState(resources);
     const [classType, setClassType] = useState("");
 
     const handleSelectType = (type: string) => {

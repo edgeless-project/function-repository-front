@@ -27,6 +27,8 @@ import {getFunction} from "@/services/functionServices";
 import {Button} from "@/components/ui/button";
 
 const outputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_OUTPUT as string).split(",");
+const inputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string).split(",");
+const resources = outputResources.concat(inputResources);
 
 const edgeNodeSeparator = "###";
 //Nodes Style modes
@@ -143,6 +145,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
     const [editNode, isEditNode] = useState(false);
     const [isOpen, setOpen] = useState(false);
     const [descConnection, setDescConnection] = useState("");
+    const [titleConnection, setTitleConnection] = useState("New Connection");
     const [newBranch, setNewBranch] = useState<createBranch>();
 
     const renderNodeFromData = useCallback(() => {
@@ -187,7 +190,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                 height: nodeHeight
             };
 
-            if (r.output_mapping && Object.keys(r.output_mapping).length !== 0) {// If element has output keys, color an input resource.
+            if (r.output_mapping && (Object.keys(r.output_mapping).length !== 0 || outputResources.includes(r.class_type))) {// If element has output keys or is output node, color an input resource.
                 newNode.style = styleResourceNodeIn;
                 for (let out in r.output_mapping) {
                     const newEdge: Edge = {
@@ -200,7 +203,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                     };
                     resourceEdges.push(newEdge);
                 }
-            } else {
+            }else {
                 //  If resource node does not have new request, it's considered an ENDPOINT.
                 initialEdges.forEach(e => {
                     const nodes = e.id.split(edgeNodeSeparator).slice(1);
@@ -313,7 +316,32 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
         (params: Connection | Edge) => {
             setEdges((eds) => addEdge(params, eds));
             if (params.source && params.target) {
-                value.functions.forEach(f => {
+                for(let r of value.resources){
+                    if (r.name === params.source){
+                        if (outputResources.includes(r.class_type)) {
+                            setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: ["output_"+(params.target as string)]});
+                            setTitleConnection("New Connection");
+                            setDescConnection("Define output mapping:");
+                            setOpen(true);
+                        }else{
+                            setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: []});
+                            setTitleConnection("Connexion Error");
+                            setDescConnection("Resource "+r.name+" of type "+r.class_type+" does not allow for output connection.");
+                            setOpen(true);
+                        }
+                        return;
+                    }else if (r.name === params.target){
+                        if(outputResources.includes(r.class_type)){
+                            console.log(r.class_type);
+                            setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: []});
+                            setTitleConnection("Connexion Error");
+                            setDescConnection("Resource "+r.name+" of type "+r.class_type+" does not allow for input connections.");
+                            setOpen(true);
+                            return;
+                        }
+                    }
+                }
+                for (const f of value.functions) {
                     if (f.name === params.source) {
                         if ((f as FunctionWorkflowBasic).class_specification_id){
                             const f_b = f as FunctionWorkflowBasic;
@@ -321,11 +349,18 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                                 let options: string[] = [];
                                 d.outputs.forEach((v) =>{if (!f_b.output_mapping[v]) options.push(v)});
                                 setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: options});
-                                options.length>0 ? setDescConnection("Define output mapping"): setDescConnection("There are no output connexions available");
+                                if(options.length>0){
+                                    setDescConnection("Define output mapping:");
+                                    setTitleConnection("New Connection");
+                                } else {
+                                    setDescConnection("Function "+f.name+" does not have output connexions available");
+                                    setTitleConnection("Connexion Error");
+                                }
                                 setOpen(true);
                             }).catch(() => {
                                 setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: []});
                                 setDescConnection("Could not retrieve function data.");
+                                setTitleConnection("Connexion Error");
                                 setOpen(true);
                             });
 
@@ -334,22 +369,18 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                             let options: string[] = [];
                             f_c.class_specification.outputs.forEach((v) =>{if (!f_c.output_mapping[v]) options.push(v)});
                             setNewBranch({source: params.source as string, target: params.target as string, fromFunction:true, options: options});
-                            options.length>0 ? setDescConnection("Define output mapping"): setDescConnection("There are no output connexions available");
+                            if(options.length>0){
+                                setDescConnection("Define output mapping:");
+                                setTitleConnection("New Connection");
+                            }else {
+                                setDescConnection("Function "+f.name+" does not have output connexions available");
+                                setTitleConnection("Connexion Error");
+                            }
                             setOpen(true);
                         }
+                        return;
                     }
-                });
-                if(!isOpen) value.resources.forEach(r => {
-                    if (r.name === params.source && outputResources.includes(r.class_type)) {
-                        setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: ["output_"+(params.target as string)]});
-                        setDescConnection("Define output mapping");
-                        setOpen(true);
-                    }else if (r.name === params.source){
-                        setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: []});
-                        setOpen(true);
-                        setDescConnection("This resource class does not allow for output connection.");
-                    }
-                });
+                }
             }
         },
         [setEdges]
@@ -464,7 +495,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
 
             <DialogInput
                 isOpen={isOpen}
-                title={"New Connection"}
+                title={titleConnection}
                 description={descConnection}
                 isLoading={!isMounted}
                 options={newBranch?.options}
