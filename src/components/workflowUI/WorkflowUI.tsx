@@ -326,7 +326,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                         }else{
                             setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: []});
                             setTitleConnection("Connexion Error");
-                            setDescConnection("Resource "+r.name+" of type "+r.class_type+" does not allow for output connection.");
+                            setDescConnection("Resource node "+r.name+": Type "+r.class_type+" does not allow output connections.");
                             setOpen(true);
                         }
                         return;
@@ -335,7 +335,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                             console.log(r.class_type);
                             setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: []});
                             setTitleConnection("Connexion Error");
-                            setDescConnection("Resource "+r.name+" of type "+r.class_type+" does not allow for input connections.");
+                            setDescConnection("Resource node "+r.name+": Type "+r.class_type+" does not allow for input connections.");
                             setOpen(true);
                             return;
                         }
@@ -353,13 +353,13 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                                     setDescConnection("Define output mapping:");
                                     setTitleConnection("New Connection");
                                 } else {
-                                    setDescConnection("Function "+f.name+" does not have output connexions available");
+                                    setDescConnection("Function node "+f.name+": Function class specification id "+f_b.class_specification_id+" does not have output connexions available");
                                     setTitleConnection("Connexion Error");
                                 }
                                 setOpen(true);
                             }).catch(() => {
                                 setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: []});
-                                setDescConnection("Could not retrieve function data.");
+                                setDescConnection("Could not retrieve function data from "+f.name+".");
                                 setTitleConnection("Connexion Error");
                                 setOpen(true);
                             });
@@ -373,7 +373,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                                 setDescConnection("Define output mapping:");
                                 setTitleConnection("New Connection");
                             }else {
-                                setDescConnection("Function "+f.name+" does not have output connexions available");
+                                setDescConnection("Function node "+f.name+": Function class specification id "+f_c.class_specification.id+" does not have output connexions available");
                                 setTitleConnection("Connexion Error");
                             }
                             setOpen(true);
