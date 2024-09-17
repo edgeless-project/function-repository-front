@@ -332,7 +332,6 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                         return;
                     }else if (r.name === params.target){
                         if(outputResources.includes(r.class_type)){
-                            console.log(r.class_type);
                             setNewBranch({source: params.source as string, target: params.target as string, fromFunction: false, options: []});
                             setTitleConnection("Connexion Error");
                             setDescConnection("Resource node "+r.name+": Type "+r.class_type+" does not allow for input connections.");
@@ -347,7 +346,11 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                             const f_b = f as FunctionWorkflowBasic;
                             getFunction(f_b.class_specification_id,f_b.class_specification_version).then(d => {
                                 let options: string[] = [];
-                                d.outputs.forEach((v) =>{if (!f_b.output_mapping[v]) options.push(v)});
+                                if (f_b.output_mapping) d.outputs.forEach((v) =>{if (!f_b.output_mapping[v]) options.push(v)});
+                                else {
+                                    f_b.output_mapping = {};
+                                    options = options.concat(d.outputs);
+                                }
                                 setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: options});
                                 if(options.length>0){
                                     setDescConnection("Define output mapping:");
@@ -357,7 +360,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                                     setTitleConnection("Connexion Error");
                                 }
                                 setOpen(true);
-                            }).catch(() => {
+                            }).catch((e) => {
                                 setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: []});
                                 setDescConnection("Could not retrieve function data from "+f.name+".");
                                 setTitleConnection("Connexion Error");

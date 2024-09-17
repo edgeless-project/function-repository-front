@@ -142,7 +142,6 @@ export const deleteFunction = async (
   const headers = buildFetchHeaders('')
   const params = new URLSearchParams({ version: version});
   const url = `${serverRestApi}/function/${id}${version? `?${params.toString()}`:""}`;
-  console.log(url);
   const data = await fetch(url, {
     method: 'DELETE',
     headers

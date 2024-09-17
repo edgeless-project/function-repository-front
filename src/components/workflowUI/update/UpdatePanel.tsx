@@ -5,6 +5,8 @@ import {Input} from "@/components/ui/input";
 import {getFunctionVersions} from "@/services/functionServices";
 import {Button} from "@/components/ui/button";
 import UpdateFunction from "@/components/workflowUI/update/UpdateFunction";
+import {AlertDialog} from "@/components/ui/alert-dialog";
+import DialogSave from "@/components/utils/DialogSave";
 
 interface UpdatePanelProps{
     node: FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic,
@@ -22,6 +24,7 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
     const [listFunctionVersions, setListFunctionVersions] = useState<string[]>([]);
     const [isResource, setIsResource] = useState(false);
     const [isBasicFunction, setIsBasicFunction] = useState(false);
+    const [openAlert, isOpenAlert] = useState(false);
 
 
     useEffect(() => {
@@ -51,31 +54,46 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
     }, [node]);
 
     const handleSave = () => {
-        value.functions.forEach(f => {  //Save data from each function if modified
-            if(f.name === node.name){
-                if("class_specification_version" in f){
-                    if (classVersionV != "")  f.class_specification_version = classVersionV;
-                    if (classIdV != "") f.class_specification_id = classIdV;
-                    f.name = name;
-                }else if("class_specification" in f){
-                    if (classVersionV != "")  f.output_mapping.version = classVersionV;
-                    if (classIdV != "") f.output_mapping.id = classIdV;
-                    if (funType != "") f.output_mapping.type = funType;
-                    f.name = name;
-                }
-            }else{
-                Object.keys(f.output_mapping).forEach(k => {
-                    if(f.output_mapping[k] === node.name) f.output_mapping[k] = name;
-                });
-            }
-        })
+        let nameRep = false;
+        if (name != node.name){
+            value.functions.forEach(f => {
+                if(name === f.name) nameRep = true;
+            });
+            value.resources.forEach(r => {
+                if(name === r.name) nameRep = true;
+            });
+        }
 
-        value.resources.forEach(r => {  //Save data from resource if modified
-           if(r.name === node.name){
-               r.name = name;
-           }
-        });
-        if (onChange !== undefined) onChange(value);
+        if (!nameRep){
+            isOpenAlert(false);
+            value.functions.forEach(f => {  //Save data from each function if modified
+                if(f.name === node.name){
+                    if("class_specification_version" in f){
+                        if (classVersionV != "")  f.class_specification_version = classVersionV;
+                        if (classIdV != "") f.class_specification_id = classIdV;
+                        f.name = name;
+                    }else if("class_specification" in f){
+                        if (classVersionV != "")  f.output_mapping.version = classVersionV;
+                        if (classIdV != "") f.output_mapping.id = classIdV;
+                        if (funType != "") f.output_mapping.type = funType;
+                        f.name = name;
+                    }
+                }else{
+                    if (f.output_mapping)
+                        Object.keys(f.output_mapping).forEach(k => {
+                            if(f.output_mapping[k] === node.name) f.output_mapping[k] = name;
+                        });
+                }
+            });
+            value.resources.forEach(r => {  //Save data from resource if modified
+                if(r.name === node.name){
+                    r.name = name;
+                }
+            });
+            if (onChange !== undefined) onChange(value);
+        }else {
+            isOpenAlert(true);
+        }
     }
 
     return (
@@ -111,6 +129,7 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
                     </div>
                 </CardContent>
             </Card>
+            <DialogSave isOpen={openAlert} title={"Name error"} description={"This name is already in use"} isLoading={false} onClose={()=>isOpenAlert(false)}/>
         </div>
     );
 }
