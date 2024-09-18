@@ -88,6 +88,12 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
             value.resources.forEach(r => {  //Save data from resource if modified
                 if(r.name === node.name){
                     r.name = name;
+                }else{
+                    if (r.output_mapping){
+                        Object.keys(r.output_mapping).forEach(k => {
+                            if(r.output_mapping[k] === node.name) r.output_mapping[k] = name;
+                        });
+                    }
                 }
             });
             if (onChange !== undefined) onChange(value);
