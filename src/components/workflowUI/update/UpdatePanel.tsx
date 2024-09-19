@@ -55,7 +55,8 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
 
     const handleSave = () => {
         let nameRep = false;
-        if (name != node.name){
+        const nameOld = node.name;
+        if (name != nameOld){
             value.functions.forEach(f => {
                 if(name === f.name) nameRep = true;
             });
@@ -67,7 +68,7 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
         if (!nameRep){
             isOpenAlert(false);
             value.functions.forEach(f => {  //Save data from each function if modified
-                if(f.name === node.name){
+                if(f.name === nameOld){
                     if("class_specification_version" in f){
                         if (classVersionV != "")  f.class_specification_version = classVersionV;
                         if (classIdV != "") f.class_specification_id = classIdV;
@@ -81,7 +82,7 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
                 }else{
                     if (f.output_mapping)
                         Object.keys(f.output_mapping).forEach(k => {
-                            if(f.output_mapping[k] === node.name) f.output_mapping[k] = name;
+                            if(f.output_mapping[k] === nameOld) f.output_mapping[k] = name;
                         });
                 }
             });
@@ -91,7 +92,8 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
                 }else{
                     if (r.output_mapping){
                         Object.keys(r.output_mapping).forEach(k => {
-                            if(r.output_mapping[k] === node.name) r.output_mapping[k] = name;
+                            console.log(k, r.output_mapping[k], nameOld);
+                            if(r.output_mapping[k] === nameOld) r.output_mapping[k] = name;
                         });
                     }
                 }
