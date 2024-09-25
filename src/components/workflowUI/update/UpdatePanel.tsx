@@ -5,7 +5,6 @@ import {Input} from "@/components/ui/input";
 import {getFunctionVersions} from "@/services/functionServices";
 import {Button} from "@/components/ui/button";
 import UpdateFunction from "@/components/workflowUI/update/UpdateFunction";
-import {AlertDialog} from "@/components/ui/alert-dialog";
 import DialogSave from "@/components/utils/DialogSave";
 
 interface UpdatePanelProps{

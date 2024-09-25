@@ -29,7 +29,6 @@ import {Button} from "@/components/ui/button";
 const outputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_OUTPUT as string).split(",");
 const inputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string).split(",");
 const resources = outputResources.concat(inputResources);
-
 const edgeNodeSeparator = "###";
 //Nodes Style modes
 const styleFunctionNode = {
@@ -74,7 +73,6 @@ const edgeStartResource = {
 const fitViewOptions: FitViewOptions = {
     padding: 0.5,
 };
-
 const defaultEdgeOptions = {
     style: edgeStyleFunction,
     type: 'step',
@@ -170,6 +168,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                     type: ConnectionLineType.Step,
                     markerEnd: edgeEndFunction,
                     style: edgeStyleFunction,
+                    label: out,
                 };
                 initialEdges.push(newEdge);
             }
@@ -199,7 +198,8 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                         target: r.output_mapping[out],
                         type: ConnectionLineType.Step,
                         markerEnd: edgeStartResource,
-                        style: edgeStyleResourceStart
+                        style: edgeStyleResourceStart,
+                        label: out
                     };
                     resourceEdges.push(newEdge);
                 }
