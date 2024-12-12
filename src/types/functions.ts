@@ -30,10 +30,14 @@ export interface ApiResponseUploadFunctionCode {
   id: string;
 };
 
+export interface function_types {
+  type: string;
+  code_file_id: string;
+}
+
 export interface ApiRequestCreateFunction {
-  id: string, 
-  code_file_id: string,
-  function_type: string,
+  id: string,
+  function_types: function_types[],
   version: string,
   outputs: string[]
 };

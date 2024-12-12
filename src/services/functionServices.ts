@@ -3,13 +3,11 @@ import {
   ApiResponseGetFunctionVersions,
   ApiResponseGetFunctions,
   ApiResponseUploadFunctionCode,
-  FunctionComplete, ApiRequestUpdateFunction, ApiResponseDeleteFunction
+  FunctionComplete, ApiRequestUpdateFunction, ApiResponseDeleteFunction, function_types
 } from "@/types/functions";
 import { buildFetchHeaders, buildFileFetchHeaders } from "@/utils/fetch";
 
 const serverRestApi = process.env.NEXT_PUBLIC_SERVER_REST_API;
-
-
 
 export const fetchFunctions =  async (offset: number): Promise<ApiResponseGetFunctions> => {
   const limit = 10;
@@ -72,19 +70,17 @@ export const uploadCodeFile = async (file: File): Promise<ApiResponseUploadFunct
 };
 
 export const createFunction = async (
-  id: string, 
-  code_file_id: string,
-  function_type: string,
-  version: string,
-  outputs: string[]
+    id: string,
+    function_types: { type: string; code_file_id: string }[],
+    version: string,
+    outputs: string[]
 ): Promise<ApiResponseUploadFunctionCode> => {
 
   const headers = buildFetchHeaders('');
   const url = `${serverRestApi}/function`;
   const payload: ApiRequestCreateFunction = {
-    id, 
-    code_file_id,
-    function_type,
+    id,
+    function_types,
     version,
     outputs
   };
