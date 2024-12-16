@@ -1,7 +1,12 @@
+export interface function_types {
+  type: string;
+  code_file_id: string;
+};
+
 export interface FunctionMinified {
   id: string;
   version: string;
-  function_type: string;
+  function_types: function_types[];
   createdAt?: string;
   updatedAt?: string;
 };
@@ -29,11 +34,6 @@ export interface ApiResponseGetFunctionVersions {
 export interface ApiResponseUploadFunctionCode {
   id: string;
 };
-
-export interface function_types {
-  type: string;
-  code_file_id: string;
-}
 
 export interface ApiRequestCreateFunction {
   id: string,
