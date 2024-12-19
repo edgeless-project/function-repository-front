@@ -33,9 +33,11 @@ import {
 import { createFunction, uploadCodeFile } from "@/services/functionServices";
 import { hasMiddleSpaces, splitOutputs } from "@/utils/general";
 import DialogSave from "@/components/utils/DialogSave";
+import { FunctionTypes } from "@/types/functions"; //TODO: Implement Function enum
 
-const functionTypesOptions = ['RUST_WASM','X86','ARM'];
-type FunctionTypesSchema = z.infer<typeof formSchema>["types"][number];
+const functionTypesOptions = Object.keys(FunctionTypes).filter((item) => {
+  return isNaN(Number(item));
+});
 
 const formSchema = z.object({
   id: z.string().min(3, 'The Id must contain at least 3 characters'),
@@ -242,7 +244,6 @@ export default function FunctionCreate() {
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
-                        {/*<Button className="float-right mb-4 size-6 bg-red-500" type="button" onClick={()=>remove(i)}>-</Button>*/}
                         <FormField
                           control={form.control}
                           name = {`types.${i}.functionType`}
@@ -284,7 +285,6 @@ export default function FunctionCreate() {
                                           onChange={(e) =>{
                                               field.onChange(e.target.files ? e.target.files[0] : field.value);
                                               f.file = e.target.files ? e.target.files[0] : f.file;
-                                              console.log(fields);
                                           }}
                                       />
                                     </FormControl>

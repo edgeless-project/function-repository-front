@@ -101,8 +101,7 @@ export const createFunction = async (
 
 export const updateFunction = async (
     id: string,
-    code_file_id: string,
-    function_type: string,
+    function_types: function_types[],
     version: string,
     outputs: string[]
 ): Promise<ApiResponseUploadFunctionCode> => {
@@ -111,8 +110,7 @@ export const updateFunction = async (
   const params = new URLSearchParams({ version: version});
   const url = `${serverRestApi}/function/${id}?${params.toString()}`;
   const payload: ApiRequestUpdateFunction = {
-    code_file_id,
-    function_type,
+    function_types,
     outputs
   };
 

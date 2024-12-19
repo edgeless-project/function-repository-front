@@ -12,11 +12,12 @@ export interface FunctionMinified {
 };
 
 export enum FunctionTypes {
-  RUST_WASM = 'RUST_WASM'
+  RUST_WASM = 'RUST_WASM',
+  X86 = 'X86',
+  ARM = 'ARM',
 };
 
 export interface FunctionComplete extends FunctionMinified {
-  code_file_id: string;
   outputs: string[];
 };
 
@@ -43,8 +44,7 @@ export interface ApiRequestCreateFunction {
 };
 
 export interface ApiRequestUpdateFunction {
-  code_file_id: string,
-  function_type: string,
+  function_types: function_types[],
   outputs: string[]
 };
 
