@@ -105,7 +105,7 @@ export default function FunctionEdit() {
     getFunction(id as string)
         .then(fun => {
           //Set form default values from Docker response and save to global var
-          const newFunTypes = fun.function_types.map(t => {return {functionType: t.type, file: new File([], "")}});
+          const newFunTypes = fun.function_types.map(t => {return {functionType: t.type, file: new File([], t.code_file_id)}});
           form.setValue('types',newFunTypes);
           form.setValue('outputs',fun.outputs? fun.outputs.join(', ') : "");
           setFunctions(fun);
@@ -234,7 +234,9 @@ export default function FunctionEdit() {
                                                   f.functionType = v;
                                                 }} defaultValue={field.value}>
                                                   <FormControl>
-                                                    <SelectTrigger>
+                                                    <SelectTrigger
+                                                        disabled={f.file?f.file.name!="":false}
+                                                    >
                                                       <SelectValue placeholder="Select a type" />
                                                     </SelectTrigger>
                                                   </FormControl>
@@ -260,6 +262,7 @@ export default function FunctionEdit() {
                                                 <FormControl>
                                                   <Input
                                                       type="file"
+                                                      disabled={f.file?f.file.name!="":false}
                                                       onChange={(e) =>{
                                                         field.onChange(e.target.files ? e.target.files[0] : field.value);
                                                         f.file = e.target.files ? e.target.files[0] : f.file;
