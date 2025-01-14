@@ -1,18 +1,18 @@
 import { useRouter } from 'next/router';
 
 import Layout from "@/components/layout/Layout";
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {
     getFunction,
     updateFunction,
     uploadCodeFile
 } from "@/services/functionServices";
-import {function_types, FunctionComplete, FunctionTypes} from "@/types/functions";
+import {FunctionType, FunctionComplete, FunctionTypes} from "@/types/functions";
 import Spinner from "@/components/utils/Spinner";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {z} from "zod";
 import {hasMiddleSpaces, splitOutputs} from "@/utils/general";
-import {useFieldArray, useForm} from "react-hook-form";
+import {ControllerRenderProps, FieldArrayWithId, FieldValues, useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
@@ -120,22 +120,17 @@ export default function FunctionEdit() {
     setModalOpen(true);
 
     // Upload the code file
-    let function_types: function_types[] = [];
+    let function_types: FunctionType[] = [];
     const oldFunctionTypes = fun.function_types.map(f => f.type);
 
     try {
       for (const type of data.types) {
-        if (type.file && type.file.name !== ""){ //Update New file
+        const find = fun.function_types.find((f) => f.type === type.functionType && f.code_file_id === type.file?.name);
+        if (find){ //Load old code
+          function_types.push({type: find.type, code_file_id: find.code_file_id});
+        }else { //Create new
           const response = await uploadCodeFile(type.file as File);
           function_types.push({type: type.functionType, code_file_id: response.id})
-        }else if (oldFunctionTypes.includes(type.functionType)) {  //Use old file_code_id
-          const code = fun.function_types.find(value => {
-            return value.type === type.functionType; });
-          if (code) {
-            function_types.push({type: type.functionType, code_file_id: code.code_file_id});
-          }else {
-            throw Error('Code Type Error');
-          }
         }
       }
     } catch (err: any) {
@@ -166,6 +161,16 @@ export default function FunctionEdit() {
       }
       setModalOpen(false);
     };
+
+  const onTypeFileChange = (e:  ChangeEvent<HTMLInputElement>,
+                            field: ControllerRenderProps<any, string>,
+                            f:  FieldArrayWithId<{   types: {    functionType: string
+                                file?: File | undefined   }[]
+                              outputs: string }, "types", "id">) => {
+
+    field.onChange(e.target.files ? e.target.files[0] : field.value);
+    f.file = e.target.files ? e.target.files[0] : f.file;
+  }
   
   return (
 
@@ -263,10 +268,7 @@ export default function FunctionEdit() {
                                                   <Input
                                                       type="file"
                                                       disabled={f.file?f.file.name!="":false}
-                                                      onChange={(e) =>{
-                                                        field.onChange(e.target.files ? e.target.files[0] : field.value);
-                                                        f.file = e.target.files ? e.target.files[0] : f.file;
-                                                      }}
+                                                      onChange={(e) => onTypeFileChange(e, field, f)}
                                                   />
                                                 </FormControl>
                                                 <FormMessage />

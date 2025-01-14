@@ -3,7 +3,7 @@ import {
   ApiResponseGetFunctionVersions,
   ApiResponseGetFunctions,
   ApiResponseUploadFunctionCode,
-  FunctionComplete, ApiRequestUpdateFunction, ApiResponseDeleteFunction, function_types
+  FunctionComplete, ApiRequestUpdateFunction, ApiResponseDeleteFunction, FunctionType
 } from "@/types/functions";
 import { buildFetchHeaders, buildFileFetchHeaders } from "@/utils/fetch";
 
@@ -101,7 +101,7 @@ export const createFunction = async (
 
 export const updateFunction = async (
     id: string,
-    function_types: function_types[],
+    function_types: FunctionType[],
     version: string,
     outputs: string[]
 ): Promise<ApiResponseUploadFunctionCode> => {

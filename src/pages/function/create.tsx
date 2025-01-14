@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import {ChangeEvent, useState} from "react";
 import { z } from "zod";
-import {useFieldArray, useForm} from "react-hook-form";
+import {ControllerRenderProps, FieldArrayWithId, useFieldArray, useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
 
@@ -179,6 +179,26 @@ export default function FunctionCreate() {
     setModalOpen(false);
   };
 
+  const onTypeFileChange = (e:  ChangeEvent<HTMLInputElement>,
+                            field: ControllerRenderProps<any, string>,
+                            f:  FieldArrayWithId<{   types: {    functionType: string
+                                file?: File | undefined   }[]
+                              outputs: string }, "types", "id">) => {
+
+    field.onChange(e.target.files ? e.target.files[0] : field.value);
+    f.file = e.target.files ? e.target.files[0] : f.file;
+  }
+
+  const onChangeFunctionType = (type: string,
+                                field: ControllerRenderProps<any, string>,
+                                f:  FieldArrayWithId<{   types: {    functionType: string
+                                    file?: File | undefined   }[]
+                                  outputs: string }, "types", "id">) => {
+    field.onChange(type);
+    f.functionType = type;
+
+  }
+
   return (
     <Layout title="Create function">
       <Card>
@@ -251,10 +271,9 @@ export default function FunctionCreate() {
                             return (
                                 <FormItem className="">
                                   <FormLabel>Function type</FormLabel>
-                                  <Select onValueChange={(v) => {
-                                    field.onChange(v);
-                                    f.functionType = v;
-                                  }} defaultValue={field.value}>
+                                  <Select onValueChange={
+                                    (v) => onChangeFunctionType(v, field, f)}
+                                          defaultValue={field.value}>
                                     <FormControl>
                                       <SelectTrigger>
                                         <SelectValue placeholder="Select a type" />
@@ -282,10 +301,7 @@ export default function FunctionCreate() {
                                     <FormControl>
                                       <Input
                                           type="file"
-                                          onChange={(e) =>{
-                                              field.onChange(e.target.files ? e.target.files[0] : field.value);
-                                              f.file = e.target.files ? e.target.files[0] : f.file;
-                                          }}
+                                          onChange={(e) => onTypeFileChange(e, field, f)}
                                       />
                                     </FormControl>
                                     <FormMessage />
