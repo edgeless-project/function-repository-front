@@ -76,7 +76,7 @@ export default function FunctionList() {
           <CardTitle>List of functions</CardTitle>
           {!functionsLoading && <CardDescription>{total} functions found</CardDescription>}
           <div className="flex justify-end">
-            <Button type="button"asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+            <Button type="button" asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
               <Link href={'/function/create'}>Create new function</Link>
             </Button>
           </div>
@@ -89,7 +89,7 @@ export default function FunctionList() {
             <TableHeader>
               <TableRow>
                 <TableHead>Id</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Types</TableHead>
                 <TableHead>Latest version</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Updated At</TableHead>
@@ -100,7 +100,10 @@ export default function FunctionList() {
               {functions.map(fun => (
                 <TableRow key={fun.id}>
                   <TableCell className="font-medium">{fun.id}</TableCell>
-                  <TableCell>{fun.function_type}</TableCell>
+                  <TableCell>{fun.function_types.flatMap(ft => {
+                    return ft.type
+                  }).join(", ")}
+                  </TableCell>
                   <TableCell>{fun.version}</TableCell>
                   <TableCell>{format(date(fun.createdAt), timeFormatGeneral,"en")}</TableCell>
                   <TableCell>{format(date(fun.updatedAt), timeFormatGeneral,"en")}</TableCell>

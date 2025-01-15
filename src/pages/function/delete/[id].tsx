@@ -111,7 +111,9 @@ export default function FunctionDelete() {
               {functions.map(v => (
                   <TableRow key={v.version}>
                     <TableCell>{v.version}</TableCell>
-                    <TableCell>{v.function_type}</TableCell>
+                    <TableCell>{v.function_types.flatMap(ft => {
+                      return ft.type
+                    }).join(", ")}</TableCell>
                     <TableCell>{v.outputs.join(', ')}</TableCell>
                     <TableCell>{format(date(v.createdAt), timeFormatGeneral,"en")}</TableCell>
                     <TableCell>{format(date(v.updatedAt), timeFormatGeneral,"en")}</TableCell>

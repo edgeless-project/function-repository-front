@@ -1,44 +1,35 @@
 import { useRouter } from 'next/router';
 
 import Layout from "@/components/layout/Layout";
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {
     getFunction,
     updateFunction,
     uploadCodeFile
 } from "@/services/functionServices";
-import {FunctionComplete, FunctionTypes} from "@/types/functions";
+import {FunctionType, FunctionComplete, FunctionTypes} from "@/types/functions";
 import Spinner from "@/components/utils/Spinner";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {z} from "zod";
 import {hasMiddleSpaces, splitOutputs} from "@/utils/general";
-import {useForm} from "react-hook-form";
+import {ControllerRenderProps, FieldArrayWithId, FieldValues, useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Button} from "@/components/ui/button";
 import DialogSave from "@/components/utils/DialogSave";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 
-const TypesEnum = z.nativeEnum(FunctionTypes);
-type TypesEnum = z.infer<typeof TypesEnum>;
+const TypesOptions = Object.keys(FunctionTypes).filter((item) => {
+  return isNaN(Number(item));
+});
 
 //Form Schema verification
 const formSchema = z.object({
-    functionType: TypesEnum,
-    file: z.instanceof(File).optional(),
+    types: z.array(z.object({functionType: z.string(), file: z.instanceof(File).optional(),})),
     outputs: z.string()
 })
-    .refine(
-        (data) => {
-            return !(!data.file || data.file.name === "");
-
-        },
-        {
-            message: "Code file is required",
-            path: ["file"],
-        }
-    )
     .refine(
         (data) => {
             let hasSpaces = false;
@@ -53,6 +44,32 @@ const formSchema = z.object({
             path: ["outputs"],
         }
     )
+    .superRefine(
+    (data,ctx) => {
+      let usedTypes : string[] = [];
+      for (let type of data.types) {
+        if (!type.functionType){
+          ctx.addIssue({
+            code: "invalid_type",
+            expected: "string",
+            received: typeof z.string(),
+            message: "File type is required",
+            path: [`types.${data.types.indexOf(type)}.functionType`],
+          });
+        }else if(!(type.functionType in FunctionTypes) || usedTypes.includes(type.functionType)){
+          ctx.addIssue({
+            code: "invalid_type",
+            expected: "string",
+            received: typeof z.string(),
+            message: "Selection of an available file type is required",
+            path: [`types.${data.types.indexOf(type)}.functionType`],
+          });
+        }else{
+          usedTypes.push(type.functionType);
+        }
+      }
+    }
+);
 
 export default function FunctionEdit() {
   const router = useRouter();
@@ -69,10 +86,17 @@ export default function FunctionEdit() {
   const form = useForm<z.infer< typeof formSchema>>({
   resolver: zodResolver(formSchema),
   defaultValues: {
-      functionType: FunctionTypes[fun.function_type as keyof typeof FunctionTypes],
-      file: new File([], ""),
+      types:[{
+        functionType: "",
+        file: new File([], ""),
+      }],
       outputs: fun.outputs? fun.outputs.join(', ') : "",
     }
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "types",
   });
 
   //Controls for an id to be loaded from API and loading
@@ -80,44 +104,55 @@ export default function FunctionEdit() {
     setLoading(true);
     getFunction(id as string)
         .then(fun => {
-            //Set form default values from Docker response and save to global var
-            form.setValue('functionType',FunctionTypes[fun.function_type as keyof typeof FunctionTypes]);
-            form.setValue('outputs',fun.outputs? fun.outputs.join(', ') : "");
-            setFunctions(fun);
-            setLoading(false);
+          //Set form default values from Docker response and save to global var
+          const newFunTypes = fun.function_types.map(t => {return {functionType: t.type, file: new File([], t.code_file_id)}});
+          form.setValue('types',newFunTypes);
+          form.setValue('outputs',fun.outputs? fun.outputs.join(', ') : "");
+          setFunctions(fun);
+          setLoading(false);
         })
         .catch(error => console.error(error)); //TODO: Error threw
   }, []);
 
-  const handleSubmit = async (data: z.infer< typeof formSchema>) => {
-      setSaveMessage('');
-      setIsSaving(true);
-      setModalOpen(true);
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    setSaveMessage('');
+    setIsSaving(true);
+    setModalOpen(true);
 
-      // Upload the code file
-      let codeId = '';
-      try {
-          const response = await uploadCodeFile(data.file as File);
-          codeId = response.id;
-      } catch (err: any) {
-          const text = `ERROR: ${err.message as string}`;
-          setSaveMessage(text);
-          setIsSaving(false);
-          return;
+    // Upload the code file
+    let function_types: FunctionType[] = [];
+    const oldFunctionTypes = fun.function_types.map(f => f.type);
+
+    try {
+      for (const type of data.types) {
+        const find = fun.function_types.find((f) => f.type === type.functionType && f.code_file_id === type.file?.name);
+        if (find){ //Load old code
+          function_types.push({type: find.type, code_file_id: find.code_file_id});
+        }else { //Create new
+          const response = await uploadCodeFile(type.file as File);
+          function_types.push({type: type.functionType, code_file_id: response.id})
+        }
       }
-
-      // Create the function with an API call
-      try {
-          const outputs = splitOutputs(data.outputs);
-          await updateFunction(id, codeId, data.functionType, fun.version, outputs);
-
-          setSaveMessage('The function has been updated successfully');
-          setResultOk(true);
-      } catch (err: any) {
-          const text = `ERROR: ${err.message as string}`;
-          setSaveMessage(text);
-      }
+    } catch (err: any) {
+      const text = `ERROR: ${err.message as string}`;
+      setSaveMessage(text);
       setIsSaving(false);
+      return;
+    }
+
+    // Create the function with an API call
+    try {
+        const outputs = splitOutputs(data.outputs);
+
+        await updateFunction(id, function_types, fun.version, outputs);
+
+        setSaveMessage('The function has been updated successfully');
+        setResultOk(true);
+    } catch (err: any) {
+        const text = `ERROR: ${err.message as string}`;
+        setSaveMessage(text);
+    }
+    setIsSaving(false);
   };
 
   const closeModal = () => {
@@ -126,6 +161,16 @@ export default function FunctionEdit() {
       }
       setModalOpen(false);
     };
+
+  const onTypeFileChange = (e:  ChangeEvent<HTMLInputElement>,
+                            field: ControllerRenderProps<any, string>,
+                            f:  FieldArrayWithId<{   types: {    functionType: string
+                                file?: File | undefined   }[]
+                              outputs: string }, "types", "id">) => {
+
+    field.onChange(e.target.files ? e.target.files[0] : field.value);
+    f.file = e.target.files ? e.target.files[0] : f.file;
+  }
   
   return (
 
@@ -157,48 +202,85 @@ export default function FunctionEdit() {
                 <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)}>
                     <CardContent className="max-w-5xl">
-                        <FormField
-                            control={form.control}
-                            name="functionType"
-                            render={({field}) => {
-                                return (
-                                    <FormItem className="mt-5">
-                                        <FormLabel>Function type</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a type" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="RUST_WASM">RUST_WASM</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                );
-                            }}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="file"
-                            render={({field}) => {
-                                return (
-                                    <FormItem className="mt-5">
-                                        <FormLabel>Code file</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                type="file"
-                                                onChange={(e) =>
-                                                    field.onChange(e.target.files ? e.target.files[0] : null)
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                );
-                            }}
-                        />
+                        <FormItem className={"mt-5"} >
+                          <FormLabel>Function types</FormLabel>
+                          <Button className="ml-16 bg-edgeless-primary-color" type="button" onClick={()=>{append(
+                              {functionType: TypesOptions[0], file: new File([],"")})}
+                          }>+ Add Type</Button>
+                        </FormItem>
+                        <FormMessage />
+                        <CardContent style={{ margin: 10 }}>
+                          {fields.map((f, i) => {
+                            return (
+                                <Card key={f.id} className="my-6 pt-4 border-2">
+                                  <CardContent className="">
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger
+                                            className="float-right mb-4 size-6 rounded bg-red-500 text-white"
+                                            type="button"
+                                            onClick={()=>remove(i)}>
+                                          -
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Delete Type</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                    <FormField
+                                        control={form.control}
+                                        name = {`types.${i}.functionType`}
+                                        render={({field}) => {
+                                          return (
+                                              <FormItem className="">
+                                                <FormLabel>Function type</FormLabel>
+                                                <Select onValueChange={(v) => {
+                                                  field.onChange(v);
+                                                  f.functionType = v;
+                                                }} defaultValue={field.value}>
+                                                  <FormControl>
+                                                    <SelectTrigger
+                                                        disabled={f.file?f.file.name!="":false}
+                                                    >
+                                                      <SelectValue placeholder="Select a type" />
+                                                    </SelectTrigger>
+                                                  </FormControl>
+                                                  <SelectContent>
+                                                    {TypesOptions.map((v)=> {
+                                                      return(
+                                                          <SelectItem key={v} value = {v}>{v}</SelectItem>
+                                                      )})}
+                                                  </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                              </FormItem>
+                                          );
+                                        }}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name= {`types.${i}.file`}
+                                        render={({field}) => {
+                                          return (
+                                              <FormItem className="mt-5">
+                                                <FormLabel>Code file</FormLabel>
+                                                <FormControl>
+                                                  <Input
+                                                      type="file"
+                                                      disabled={f.file?f.file.name!="":false}
+                                                      onChange={(e) => onTypeFileChange(e, field, f)}
+                                                  />
+                                                </FormControl>
+                                                <FormMessage />
+                                              </FormItem>
+                                          );}
+                                        }
+                                    />
+                                  </CardContent>
+                                </Card>
+                            );
+                          })}
+                        </CardContent>
                         <FormField
                             control={form.control}
                             name="outputs"

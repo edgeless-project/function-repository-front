@@ -65,7 +65,7 @@ export default function FunctionView() {
             <TableHeader>
               <TableRow>
                 <TableHead>Version</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Types</TableHead>
                 <TableHead>Outputs</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Updated At</TableHead>
@@ -75,7 +75,9 @@ export default function FunctionView() {
               {functions.map(fun => (
                 <TableRow key={fun.version}>
                   <TableCell>{fun.version}</TableCell>
-                  <TableCell>{fun.function_type}</TableCell>
+                  <TableCell>{fun.function_types.flatMap(ft => {
+                    return ft.type
+                  }).join(", ")}</TableCell>
                   <TableCell>{fun.outputs.join(', ')}</TableCell>
                   <TableCell>{format(date(fun.createdAt), timeFormatGeneral,"en")}</TableCell>
                   <TableCell>{format(date(fun.updatedAt), timeFormatGeneral,"en")}</TableCell>
