@@ -32,9 +32,13 @@ import Layout from "@/components/layout/Layout";
 import { FunctionMinified } from "@/types/functions";
 import Spinner from "@/components/utils/Spinner";
 import {date, format} from "@formkit/tempo";
+import {useSelector} from "react-redux";
+import type {AppState} from "@/app/store";
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 
 export default function FunctionList() {
+  const tokenValue = useSelector((state: AppState) => state.session.accessToken);
+  console.log("Function, tokenValue",tokenValue)
 
   const limit = 10;
   

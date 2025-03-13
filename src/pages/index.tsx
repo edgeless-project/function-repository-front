@@ -1,8 +1,15 @@
 import Layout from '../components/layout/Layout';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import type {AppState, AppDispatch} from "@/app/store";
 import Link from "next/link";
+import {useDispatch, useSelector} from "react-redux";
+import {setSessionAccessToken} from "@/features/account/sessionSlice";
 
 export default function Page() {
+    const tokenValue = useSelector((state: AppState) => state.session.accessToken);
+    const dispatch = useDispatch();
+    console.log("Index",tokenValue)
+    dispatch(setSessionAccessToken("thisIsATest"))
     return (
         <Layout title='Dashboard'>
             <div id='home' className="grid grid-cols-3 gap-4">
