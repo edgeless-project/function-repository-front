@@ -14,8 +14,8 @@ const AuthSession = ({children}: Props) => {
 
 	const { data: session, status } = useSession();
 	console.log("session", session);
-	if(session?.user?.name) {
-		dispatch(setSessionAccessToken(session.user.name as string));
+	if(session?.user?.email) {
+		dispatch(setSessionAccessToken(session.accessToken as string));
 		// @ts-ignore
 		dispatch(getUser());
 	}
