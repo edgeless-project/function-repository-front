@@ -34,30 +34,35 @@ import Spinner from "@/components/utils/Spinner";
 import {date, format} from "@formkit/tempo";
 import {useSelector} from "react-redux";
 import type {AppState} from "@/app/store";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
+import {selectRole} from "@/features/account/accountSlice";
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
+const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN", "FUNC_DEVELOPER"];
 
 export default function FunctionList() {
-  const tokenValue = useSelector((state: AppState) => state.session.accessToken);
-  console.log("Function, tokenValue",tokenValue)
-
   const limit = 10;
   
   const [functions, setFunctions] = useState<FunctionMinified[] | []>([]);
   const [total, setTotal] = useState(0);
   const [functionsLoading, setFunctionsLoading] = useState(true);
   const [page, setPage] = useState(1);
+
+  const tokenValue = useSelector(selectSessionAccessToken);
+  const role = useSelector(selectRole);
+  const hasRole = roleAllowed.includes(role);
   
   useEffect(() => {
     const offset = limit * (page - 1);
     setFunctionsLoading(true);
-    fetchFunctions(offset)
-      .then(functions => {
-        setFunctions(functions.items);
-        setTotal(functions.total);
-        setFunctionsLoading(false);
-      })
-      .catch(error => console.error(error));
-  }, [page]);
+    if (tokenValue && hasRole)
+      fetchFunctions(offset, tokenValue)
+        .then(functions => {
+          setFunctions(functions.items);
+          setTotal(functions.total);
+          setFunctionsLoading(false);
+        })
+        .catch(error => console.error(error));
+  }, [hasRole, page, tokenValue]);
 
   const selectPrevPage = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
@@ -75,6 +80,7 @@ export default function FunctionList() {
 
   return (
     <Layout title="Functions">
+      {hasRole &&
       <Card>
         <CardHeader>
           <CardTitle>List of functions</CardTitle>
@@ -142,7 +148,24 @@ export default function FunctionList() {
             </PaginationContent>
           </Pagination>}
         </CardFooter>
-      </Card>
+      </Card>}
+      {!hasRole  &&
+          <div className="flex items-center justify-center py-20">
+            <Card className="w-1/3">
+              <CardHeader>
+                <CardTitle className="text-center">Access Denied</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center">
+                  <svg className="w-32 h-32 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z"></path>
+                  </svg>
+                  <p className="text-center">You do not have the necessary permissions to view this page.</p>
+                  <p className="text-center">You are currently logged in as {role.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>}
     </Layout>
   );
 }

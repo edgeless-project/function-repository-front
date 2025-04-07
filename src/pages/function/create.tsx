@@ -33,7 +33,10 @@ import {
 import { createFunction, uploadCodeFile } from "@/services/functionServices";
 import { hasMiddleSpaces, splitOutputs } from "@/utils/general";
 import DialogSave from "@/components/utils/DialogSave";
-import { FunctionTypes } from "@/types/functions"; //TODO: Implement Function enum
+import { FunctionTypes } from "@/types/functions";
+import {useSelector} from "react-redux";
+import {selectRole} from "@/features/account/accountSlice";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 
 const functionTypesOptions = Object.keys(FunctionTypes).filter((item) => {
   return isNaN(Number(item));
@@ -113,9 +116,13 @@ const formSchema = z.object({
     }
 );
 
-export default function FunctionCreate() {
+const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN", "FUNC_DEVELOPER"];
 
+export default function FunctionCreate() {
   const router = useRouter();
+  const accessToken = useSelector(selectSessionAccessToken);
+  const role = useSelector(selectRole);
+  const hasRole = roleAllowed.includes(role);
   const [modalOpen, setModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
@@ -149,7 +156,7 @@ export default function FunctionCreate() {
       // Upload the code file
       let codeId = '';
       try {
-        const response = await uploadCodeFile(t.file as File);
+        const response = await uploadCodeFile(t.file as File, accessToken);
         codeId = response.id;
         storeTypes.push({type: t.functionType, code_file_id: codeId});
       } catch (err: any) {
@@ -162,7 +169,7 @@ export default function FunctionCreate() {
     // Create the function in the API
     try {
       const outputs = splitOutputs(data.outputs);
-      await createFunction(data.id.trim(), storeTypes, data.version.trim(), outputs);
+      await createFunction(data.id.trim(), storeTypes, data.version.trim(), outputs, accessToken);
       setSaveMessage('The function has been created successfully');
       setResultOk(true);
     } catch (err: any) {
@@ -201,11 +208,11 @@ export default function FunctionCreate() {
 
   return (
     <Layout title="Create function">
+      {hasRole &&
       <Card>
         <CardHeader>
           <CardTitle>Function class specification</CardTitle>
         </CardHeader>
-        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
           <CardContent className="max-w-5xl">
@@ -341,16 +348,31 @@ export default function FunctionCreate() {
             </CardFooter>
           </form>
         </Form>
-
         <DialogSave
           isOpen={modalOpen}
           title="Saving function"
           description={saveMessage}
           isLoading={isSaving}
-          onClose={closeModal}
-        />
-        
-      </Card>
+          onClose={closeModal}/>
+      </Card>}
+      {!hasRole &&
+          <div className="flex items-center justify-center py-20">
+            <Card className="w-1/3">
+              <CardHeader>
+                <CardTitle className="text-center">Access Denied</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center">
+                  <svg className="w-32 h-32 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z"></path>
+                  </svg>
+                  <p className="text-center">You do not have the necessary permissions to view this page.</p>
+                  <p className="text-center">You are currently logged in as {role.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+      }
     </Layout>
   );
 }

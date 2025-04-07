@@ -3,9 +3,9 @@ import { buildFetchHeaders } from "@/utils/fetch";
 
 const serverRestApi = process.env.NEXT_PUBLIC_SERVER_REST_API;
 
-export const fetchWorkflows =  async (offset: number): Promise<ApiResponseGetWorkflows> => {
+export const fetchWorkflows =  async (offset: number, token: string): Promise<ApiResponseGetWorkflows> => {
   const limit = 10;
-  const headers = buildFetchHeaders('');
+  const headers = buildFetchHeaders(token);
   const url = `${serverRestApi}/workflow?offset=${offset}&limit=${limit}`;
   const data = await fetch(url, { headers });
 
@@ -18,8 +18,8 @@ export const fetchWorkflows =  async (offset: number): Promise<ApiResponseGetWor
   return json;
 };
 
-export const getWorkflow = async (name: string, excludeClassSpecification: boolean): Promise<ApiResponseWorkflow> => {
-  const headers = buildFetchHeaders('');
+export const getWorkflow = async (name: string, excludeClassSpecification: boolean, token: string): Promise<ApiResponseWorkflow> => {
+  const headers = buildFetchHeaders(token);
   const url = `${serverRestApi}/workflow/${name}${excludeClassSpecification ? '?exclude_class_specification=true' : ''}`;
   const data = await fetch(url, { headers });
 
@@ -32,8 +32,8 @@ export const getWorkflow = async (name: string, excludeClassSpecification: boole
   return json;
 };
 
-export const createWorkflow = async (workflowData: ApiRequestCreateWorkflow): Promise<ApiResponseWorkflow> => {
-  const headers = buildFetchHeaders('');
+export const createWorkflow = async (workflowData: ApiRequestCreateWorkflow, token: string): Promise<ApiResponseWorkflow> => {
+  const headers = buildFetchHeaders(token);
   const url = `${serverRestApi}/workflow`;
   const data = await fetch(url, { 
     method: 'POST',
@@ -50,8 +50,8 @@ export const createWorkflow = async (workflowData: ApiRequestCreateWorkflow): Pr
   return json;
 };
 
-export const updateWorkflow = async (name: string, workflowData: ApiRequestUpdateWorkflow): Promise<ApiResponseWorkflow> => {
-  const headers = buildFetchHeaders('');
+export const updateWorkflow = async (name: string, workflowData: ApiRequestUpdateWorkflow, token: string): Promise<ApiResponseWorkflow> => {
+  const headers = buildFetchHeaders(token);
   const url = `${serverRestApi}/workflow/${name}`;
   const data = await fetch(url, { 
     method: 'PUT',
@@ -68,8 +68,8 @@ export const updateWorkflow = async (name: string, workflowData: ApiRequestUpdat
   return json;
 };
 
-export const deleteWorkflow = async (name: string): Promise<ApiResponseDeleteWorkflow> => {
-  const headers = buildFetchHeaders('');
+export const deleteWorkflow = async (name: string, token: string): Promise<ApiResponseDeleteWorkflow> => {
+  const headers = buildFetchHeaders(token);
   const url = `${serverRestApi}/workflow/${name}`;
   const data = await fetch(url, { 
     method: 'DELETE',

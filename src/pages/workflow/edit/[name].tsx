@@ -18,8 +18,12 @@ import DialogSave from '@/components/utils/DialogSave';
 import Flow from '@/components/workflowUI/WorkflowUI';
 import {date, format} from "@formkit/tempo";
 import CreatePanel from "@/components/workflowUI/create/CreatePanel";
+import {useSelector} from "react-redux";
+import {selectRole} from "@/features/account/accountSlice";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
+const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN"];
 
 export default function WorkflowEdit() {
   const router = useRouter();
@@ -37,19 +41,23 @@ export default function WorkflowEdit() {
   const [createNode, isCreateNode] = useState(false);
   const [createResource, isCreateNodeResource] = useState(false);
   const [reloadWorkflow, setReloadWorkflow] = useState(false);
+  const role = useSelector(selectRole);
+  const hasRole = roleAllowed.includes(role);
+  const accessToken = useSelector(selectSessionAccessToken);
 
 
   useEffect(() => {
     setLoading(true);
-    getWorkflow(name as string, true)
-      .then(workflow => {
-        setWorkflow(workflow);
-        // We do not want to show name, createdAt and updatedAt in the workflow definition
-        const {name, createdAt, updatedAt, ...JSON} = workflow;
-        setWorkflowJSON(JSON);
-        setLoading(false);
-      })
-      .catch(error => console.error(error));
+    if(hasRole && accessToken)
+      getWorkflow(name as string, true, accessToken)
+        .then(workflow => {
+          setWorkflow(workflow);
+          // We do not want to show name, createdAt and updatedAt in the workflow definition
+          const {name, createdAt, updatedAt, ...JSON} = workflow;
+          setWorkflowJSON(JSON);
+          setLoading(false);
+        })
+        .catch(error => console.error(error));
   }, []);
 
   const handleJSONChange = (jsonData: object) => {
@@ -78,7 +86,7 @@ export default function WorkflowEdit() {
       const workflowData: ApiRequestUpdateWorkflow = {
         ...workflowJSON as ApiRequestUpdateWorkflow
       };
-      await updateWorkflow(name as string, workflowData);
+      await updateWorkflow(name as string, workflowData, accessToken);
       setSaveMessage('The workflow has been updated successfully');
       setResultOk(true);
     } catch (err: any) {
@@ -113,6 +121,7 @@ export default function WorkflowEdit() {
 
   return (
     <Layout title={`Edit workflow: ${name}`}>
+      {hasRole && <div>
       {loading && <div className="flex items-center justify-center py-20">
         <Spinner />
       </div>}
@@ -187,6 +196,25 @@ export default function WorkflowEdit() {
         isLoading={isSaving}
         onClose={closeModal}
       />
+      </div>}
+      {!hasRole &&
+          <div className="flex items-center justify-center py-20">
+            <Card className="w-1/3">
+              <CardHeader>
+                <CardTitle className="text-center">Access Denied</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center">
+                  <svg className="w-32 h-32 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z"></path>
+                  </svg>
+                  <p className="text-center">You do not have the necessary permissions to view this page.</p>
+                  <p className="text-center">You are currently logged in as {role.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+      }
     </Layout>
   );
 }

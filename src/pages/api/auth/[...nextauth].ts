@@ -1,31 +1,25 @@
 import { fetchRefreshToken, fetchUserLogged, login } from "@/features/account/accountServices";
 import NextAuth, {User} from "next-auth";
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { signOut } from 'next-auth/react';
 
 const jwtRefreshWindow = Number(process.env.NEXT_PUBLIC_JWT_REFRESH_WINDOW);
 const sessionMaxAge = Number(process.env.SESSION_MAX_AGE);
 
 interface CustomUser extends User {
+	role?: string;
 	expiresAt?: string;
 	accessToken?: string;
-	refreshToken?: string;
-  }
+}
 
-/*const refreshAccessToken = async (accessToken: string, refreshToken: string) => {
+const refreshAccessToken = async (accessToken: string) => {
 
-	const refreshData = await fetchRefreshToken(accessToken, refreshToken);
-
-	if(refreshData.error) {
-		return null;
-	}
-
-	if(refreshData.accessToken || refreshData.refreshToken) {
+	const refreshData = await fetchRefreshToken(accessToken);
+	if(refreshData?.access_token?.token) {
 		return refreshData;
 	}
-
 	return null;
-
-};*/
+};
 
 export default NextAuth({
 	// Configure one or more authentication providers
@@ -38,73 +32,58 @@ export default NextAuth({
 					type: 'email',
 					placeholder: 'email',
 				},
-				password: { label: 'Password', type: 'password' },
+				password: { label: 'Password', type: 'password', placeholder: 'password' },
 			},
 			async authorize(credentials, req) {
 
 				const loginData = await login(credentials?.email as string, credentials?.password as string);
 
-				if (!loginData.access_token) {
-					return null;
-				}
-
-				const userData = await fetchUserLogged(loginData.access_token);
-
-				if(!userData.email) {
-					throw new Error('User not found');
+				if (!loginData.access_token.token) {
+					throw new Error('Login failed. Email or password incorrect.');
 				}
 
 				const user: CustomUser = {
-					id: userData.email,
-					email: userData.email,
-					image: '',
-					//expiresAt: loginData.accessToken.expiresAt,
-					accessToken: loginData.access_token,
-					//refreshToken: loginData.refreshToken.token
+					id:credentials? credentials.email : "",
+					email: credentials? credentials.email : "",
+					expiresAt: loginData.access_token.expiresAt as string,
+					accessToken: loginData.access_token.token
 				};
-
 				return user;
 			},
 		}),
 		// ...add more providers here
 	],
 	session: {
-		maxAge: sessionMaxAge
+		maxAge: sessionMaxAge,
 	},
 	callbacks: {
-		async jwt({ token, user, account }: { token: any, user?: CustomUser, account?: any }) {
-
+		async jwt({ token, user, account }: { token: any, user?: any, account?: any }) {
 			// Persist the OAuth access_token to the token right after signin
-
 			if(account && user) {
-				token.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // TODO: Change this
+				token.expiresAt = user.expiresAt;
 				token.accessToken = user.accessToken;
-				//token.refreshToken = user.refreshToken;
 			}
-
-			/*if(token?.accessToken) {
-				const accessTokenDate = new Date(token.expiresAt as string);
-				if( accessTokenDate.getTime() - Date.now() < jwtRefreshWindow ) {
-					const newToken = await refreshAccessToken(token.accessToken as string, token.refreshToken as string);
-					if(newToken) {
-						if(newToken.accessToken) {
-							token.accessToken = newToken.accessToken;
-							token.expiresAt = newToken.accessToken.expiresAt;
-						}
-						if(newToken.refreshToken) {
-							token.refreshToken = newToken.refreshToken.token;
-						}
-					} else {
+			if(token?.accessToken) {
+				const accessTokenDate = new Date(Number(token.expiresAt));
+				const remainingTime = (accessTokenDate.getTime() - Date.now())
+				if (remainingTime < 0) {
+					await signOut({redirect: false});
+					return null;
+				}else if( remainingTime < jwtRefreshWindow ) {
+					const newToken = await refreshAccessToken(token.accessToken as string);
+					if(newToken?.access_token?.token) {
+						token.accessToken = newToken.access_token.token;
+						token.expiresAt = newToken.access_token.expiresAt? newToken.access_token.expiresAt : 0;
 						return token;
 					}
 				}
-			}*/
+			}
 			return token;
 		},
-		async session({ session, token, user }) {
+		async session({ session, token, user} :{ session: any, token: any, user: any }) {
 			// Send properties to the client, like an access_token from a provider.
 			if(!token) {
-				return { ...session, expiresAt: null, accessToken: null, firstName: null, lastName: null };
+				return { ...session, expiresAt: null, accessToken: null};
 			}
 			session.expires = token.expiresAt as string;
 			session.accessToken = token.accessToken as string;
@@ -115,7 +94,7 @@ export default NextAuth({
 		signIn: "/auth/signin",
 	},
 	theme: {
-		logo: "/assets/logo/***.jpeg", // TODO: Configure the logo
+		logo: "/assets/images/logo_edgeless_colorless.svg",
 		colorScheme: "auto"
 	}
 });

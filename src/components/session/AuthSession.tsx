@@ -3,6 +3,9 @@ import {useSession, getSession} from "next-auth/react";
 import {setSessionAccessToken} from "@/features/account/sessionSlice";
 import {getUser} from "@/features/account/accountSlice";
 import React, {useEffect} from "react";
+import { useRouter } from 'next/router';
+
+const jwtRefreshWindow = Number(process.env.NEXT_PUBLIC_JWT_REFRESH_WINDOW);
 
 type Props = {
 	children?: React.ReactNode;
@@ -10,20 +13,21 @@ type Props = {
 
 const AuthSession = ({children}: Props) => {
 
-	const dispatch = useDispatch();
-
 	const { data: session, status } = useSession();
-	console.log("session", session);
-	if(session?.user?.email) {
+	const dispatch = useDispatch();
+	const router = useRouter();
+
+	if(session?.accessToken) {
 		dispatch(setSessionAccessToken(session.accessToken as string));
-		// @ts-ignore
-		dispatch(getUser());
+		dispatch(getUser() as any);
 	}
 
 	useEffect(() => {
-		if(session) {
-			const expDate = new Date(session.expires as string);
-			const refreshTimeout = expDate.getTime() - Date.now();
+		if (!session && status !== "loading") {
+			router.push("/auth/signin");
+		} else if(session) {
+			const expDate = new Date(Number(session.expires));
+			const refreshTimeout = expDate.getTime() - Date.now() - jwtRefreshWindow;
 			const tokenRefresher = setTimeout(() => {
 				getSession();
 			}, refreshTimeout);
@@ -31,7 +35,7 @@ const AuthSession = ({children}: Props) => {
 				clearTimeout(tokenRefresher);
 			};
 		}
-	}, [session, status]);
+	}, [router, session, status]);
 
 	return children;
 

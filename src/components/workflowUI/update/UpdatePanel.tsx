@@ -91,7 +91,6 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
                 }else{
                     if (r.output_mapping){
                         Object.keys(r.output_mapping).forEach(k => {
-                            console.log(k, r.output_mapping[k], nameOld);
                             if(r.output_mapping[k] === nameOld) r.output_mapping[k] = name;
                         });
                     }
