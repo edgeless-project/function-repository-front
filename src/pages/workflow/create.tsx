@@ -24,7 +24,11 @@ import { createWorkflow } from '@/services/workflowServices';
 import {ApiRequestCreateWorkflow, JsonFlowComponentState} from '@/types/workflows';
 import Flow from "@/components/workflowUI/WorkflowUI";
 import CreatePanel from "@/components/workflowUI/create/CreatePanel";
+import {useSelector} from "react-redux";
+import {selectRole} from "@/features/account/accountSlice";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 const JSONEditorComponent = dynamic(() => import('@/components/JSONEditor/JSONEditorComponent'), { ssr: false });
+const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN"];
 
 const formSchema = z.object({
   name: z.string().min(3, 'The Id must contain at least 3 characters')
@@ -57,6 +61,11 @@ export default function WorkflowCreate() {
   const [resultOk, setResultOk] = useState(false);
   const [createResource, isCreateNodeResource] = useState(false);
   const [tabIdx, setTabIdx] = useState("json-editor");
+
+
+  const role = useSelector(selectRole);
+  const hasRole = roleAllowed.includes(role);
+  const accessToken = useSelector(selectSessionAccessToken);
 
   const form = useForm<z.infer< typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -107,7 +116,7 @@ export default function WorkflowCreate() {
         ...workflowJSON as ApiRequestCreateWorkflow, 
         name: data.name
       };
-      await createWorkflow(workflowData);
+      await createWorkflow(workflowData, accessToken);
       setSaveMessage('The workflow has been created successfully');
       setResultOk(true);
     } catch (err: any) {
@@ -127,6 +136,7 @@ export default function WorkflowCreate() {
 
   return (
     <Layout title="Create workflow">
+      {hasRole &&
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           <Card>
@@ -195,15 +205,32 @@ export default function WorkflowCreate() {
             <Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Save</Button>
           </div>
         </form>
-      </Form>
+      </Form>}
 
       <DialogSave
         isOpen={modalOpen}
         title="Saving workflow"
         description={saveMessage}
         isLoading={isSaving}
-        onClose={closeModal}
-      />
+        onClose={closeModal}/>
+      {!hasRole &&
+          <div className="flex items-center justify-center py-20">
+            <Card className="w-1/3">
+              <CardHeader>
+                <CardTitle className="text-center">Access Denied</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center">
+                  <svg className="w-32 h-32 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z"></path>
+                  </svg>
+                  <p className="text-center">You do not have the necessary permissions to view this page.</p>
+                  <p className="text-center">You are currently logged in as {role.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+      }
     </Layout>
   );
 }

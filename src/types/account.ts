@@ -4,11 +4,7 @@ interface ApiToken {
 };
   
 export interface ApiTokensData {
-	access_token: string;
-	/*refreshToken: ApiToken;
-	statusCode?: number;
-	error?: string;
-	message?: string*/
+	access_token: ApiToken;
 };
 export interface User {
 	email: string;

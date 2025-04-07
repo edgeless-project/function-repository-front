@@ -12,18 +12,28 @@ export const login =  async (email: string, password: string): Promise<ApiTokens
     body: JSON.stringify({email, password}),
   });
   const json = await data.json();
-  return json;
+  return {
+    access_token: {
+      expiresAt: json?.expires_at,
+      token: json?.access_token,
+    },
+  };
 };
 
-export const fetchRefreshToken =  async (accessToken: string, refreshToken: string): Promise<ApiTokensData> => {
+export const fetchRefreshToken =  async (accessToken: string): Promise<ApiTokensData> => {
   const headers = buildFetchHeaders(accessToken);
-  const data = await fetch(`${serverRestApi}/auth/token/refresh`, {
+  const data = await fetch(`${serverRestApi}/auth/refresh`, {
     method: 'POST',
-    body: JSON.stringify({accessToken, refreshToken}),
+    body: JSON.stringify({accessToken}),
     headers
   });
   const json = await data.json();
-  return json;
+  return {
+    access_token: {
+      expiresAt: json?.expires_at,
+      token: json?.access_token,
+    },
+  };
 };
 
 export const fetchUserLogged =  async (accessToken: string): Promise<User> => {

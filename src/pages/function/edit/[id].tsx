@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 
 import Layout from "@/components/layout/Layout";
-import {ChangeEvent, useEffect, useState} from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import {
     getFunction,
     updateFunction,
@@ -20,6 +20,10 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Button} from "@/components/ui/button";
 import DialogSave from "@/components/utils/DialogSave";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {useSelector} from "react-redux";
+import {selectRole} from "@/features/account/accountSlice";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
+const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN", "FUNC_DEVELOPER"];
 
 const TypesOptions = Object.keys(FunctionTypes).filter((item) => {
   return isNaN(Number(item));
@@ -74,6 +78,9 @@ const formSchema = z.object({
 export default function FunctionEdit() {
   const router = useRouter();
   const id = router.query.id as string;
+  const role = useSelector(selectRole);
+  const accessToken = useSelector(selectSessionAccessToken);
+  const hasRole = roleAllowed.includes(role);
 
   const [fun, setFunctions] = useState<FunctionComplete>({} as unknown as FunctionComplete);
   const [loading, setLoading] = useState(true);
@@ -102,16 +109,17 @@ export default function FunctionEdit() {
   //Controls for an id to be loaded from API and loading
   useEffect(() => {
     setLoading(true);
-    getFunction(id as string)
-        .then(fun => {
-          //Set form default values from Docker response and save to global var
-          const newFunTypes = fun.function_types.map(t => {return {functionType: t.type, file: new File([], t.code_file_id)}});
-          form.setValue('types',newFunTypes);
-          form.setValue('outputs',fun.outputs? fun.outputs.join(', ') : "");
-          setFunctions(fun);
-          setLoading(false);
-        })
-        .catch(error => console.error(error)); //TODO: Error threw
+    if (hasRole && accessToken)
+      getFunction(id as string, '', accessToken)
+          .then(fun => {
+            //Set form default values from Docker response and save to global var
+            const newFunTypes = fun.function_types.map(t => {return {functionType: t.type, file: new File([], t.code_file_id)}});
+            form.setValue('types',newFunTypes);
+            form.setValue('outputs',fun.outputs? fun.outputs.join(', ') : "");
+            setFunctions(fun);
+            setLoading(false);
+          })
+          .catch(error => console.error(error));
   }, []);
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -129,7 +137,7 @@ export default function FunctionEdit() {
         if (find){ //Load old code
           function_types.push({type: find.type, code_file_id: find.code_file_id});
         }else { //Create new
-          const response = await uploadCodeFile(type.file as File);
+          const response = await uploadCodeFile(type.file as File, accessToken);
           function_types.push({type: type.functionType, code_file_id: response.id})
         }
       }
@@ -144,7 +152,7 @@ export default function FunctionEdit() {
     try {
         const outputs = splitOutputs(data.outputs);
 
-        await updateFunction(id, function_types, fun.version, outputs);
+        await updateFunction(id, function_types, fun.version, outputs, accessToken);
 
         setSaveMessage('The function has been updated successfully');
         setResultOk(true);
@@ -175,6 +183,7 @@ export default function FunctionEdit() {
   return (
 
     <Layout title={`Edit function: ${id}`}>
+      {hasRole && <div>
         {loading && <div className="flex items-center justify-center py-20">
         <Spinner />
         </div>}
@@ -317,6 +326,24 @@ export default function FunctionEdit() {
             />
             </Card>
         </div>}
+      </div>}
+      {!hasRole &&
+          <div className="flex items-center justify-center py-20">
+            <Card className="w-1/3">
+              <CardHeader>
+                <CardTitle className="text-center">Access Denied</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center">
+                  <svg className="w-32 h-32 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z"></path>
+                  </svg>
+                  <p className="text-center">You do not have the necessary permissions to view this page.</p>
+                  <p className="text-center">You are currently logged in as {role.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}.</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>}
     </Layout>
   );
 }
