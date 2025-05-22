@@ -33,6 +33,7 @@ import { fetchWorkflows } from "@/services/workflowServices";
 import {useSelector} from "react-redux";
 import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import {selectRole} from "@/features/account/accountSlice";
+import AccessWarning from "@/components/utils/AccessWarning";
 
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN"];
@@ -79,9 +80,17 @@ export default function WorkflowList() {
       setPage(prevPage => prevPage + 1);
   };
 
+  if (!hasRole)
+    return (
+      <Layout title="Workflows">
+        <div className="flex items-center justify-center py-20">
+          <AccessWarning role={role}/>
+        </div>
+      </Layout>
+    )
+
   return (
     <Layout title="Workflows">
-      {hasRole &&
       <Card>
         <CardHeader>
           <CardTitle>List of workflows</CardTitle>
@@ -143,25 +152,6 @@ export default function WorkflowList() {
           </Pagination>}
         </CardFooter>
       </Card>
-      }
-      {!hasRole  &&
-        <div className="flex items-center justify-center py-20">
-          <Card className="w-1/3">
-            <CardHeader>
-              <CardTitle className="text-center">Access Denied</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center">
-                <svg className="w-32 h-32 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M12 5a7 7 0 100 14 7 7 0 000-14z"></path>
-                </svg>
-                <p className="text-center">You do not have the necessary permissions to view this page.</p>
-                <p className="text-center">You are currently { role?"logged in as a " +role.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase()):
-                "without any role."}.</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>}
     </Layout>
   );
 }

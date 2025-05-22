@@ -6,38 +6,46 @@ import {selectRole} from "@/features/account/accountSlice";
 
 export default function Page() {
   const role = useSelector(selectRole)
+  const roleAllowed = [ "FUNC_DEVELOPER", "APP_DEVELOPER", "CLUSTER_ADMIN"];
+
+  const cardsData = {
+    "FUNC_DEVELOPER": {
+      title: "Functions Management",
+      description: "Click on this card to access and manage your functions.",
+      link: "/function"
+    },
+    "APP_DEVELOPER": {
+      title: "Workflow Management",
+      description: "Click on this card to access and manage your workflows.",
+      link: "/workflow"
+    },
+    "CLUSTER_ADMIN": {
+      title: "Users Management",
+      description: "Click on this card to access and manage users.",
+      link: "/users"
+    }
+  }
+
 
   return (
       <Layout title='Dashboard'>
           <div id='home' className="grid grid-cols-3 gap-4">
-              {role &&
-                  <div id="1">
-                      <Link href="/function">
-                          <Card>
-                              <CardHeader>
-                                  <CardTitle className="text-center">Functions Management</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                  <p>Click on this card to access and manage your functions.</p>
-                              </CardContent>
-                          </Card>
-                      </Link>
-                  </div>
-              }
-              {(role==="APP_DEVELOPER" || role==="CLUSTER_ADMIN") &&
-                  <div id="2">
-                      <Link href="/workflow">
-                          <Card>
-                              <CardHeader>
-                                  <CardTitle className="text-center">Workflow Management</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                  <p>Click on this card to access and manage your workflows.</p>
-                              </CardContent>
-                          </Card>
-                      </Link>
-                  </div>
-              }
+            {Object.entries(cardsData)
+            .filter(([],idx) => roleAllowed.indexOf(role) >= idx)
+            .map(([key, card], idx) => (
+              <div key={key} id={idx.toString()}>
+                <Link href={card.link}>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-center">{card.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p>{card.description}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </div>
+            ))}
           </div>
       </Layout>
   );

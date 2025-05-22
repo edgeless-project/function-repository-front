@@ -6,6 +6,7 @@ interface ApiToken {
 export interface ApiTokensData {
 	access_token: ApiToken;
 };
+
 export interface User {
 	email: string;
 	role: string;

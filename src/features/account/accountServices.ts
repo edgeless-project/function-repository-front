@@ -1,5 +1,5 @@
-import { ApiTokensData, User } from "../../types/account";
-import { buildFetchHeaders } from "../../utils/fetch";
+import { ApiTokensData, User } from "@/types/account";
+import { buildFetchHeaders } from "@/utils/fetch";
 
 
 const serverRestApi = process.env.NEXT_PUBLIC_SERVER_REST_API;

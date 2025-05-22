@@ -11,7 +11,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
-import {useRouter} from "next/router";
+import {useRouter} from 'next/router';
 
 const formSchema = z.object({
     email: z.string().email("The email must be a valid email address"),
@@ -20,6 +20,11 @@ const formSchema = z.object({
   return data.password.length>0
 },{
   message: "Password is required",
+  path: ["password"]
+}).refine((data) => {
+  return data.password.length>=8
+},{
+  message: "Password must be longer than 8 characters",
   path: ["password"]
 });
 
@@ -43,11 +48,10 @@ const Signin: React.FC = () => {
           password: data.password,
           callbackUrl: '/',
       });
-
-      if (res?.ok) {
+      if (res?.ok && res.url) {
           const session = await getSession();
           dispatch(setSessionAccessToken(session?.accessToken as string));
-          await router.push("/");
+          await router.push(res.url);
         }else {
           form.setError("email", {
             type: "custom",

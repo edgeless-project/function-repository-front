@@ -29,9 +29,11 @@ export default function DialogDelete ({isOpen, title, description, isLoading, re
           {!isLoading && <DialogDescription>
             {description}
           </DialogDescription>}
-          {isLoading && <div className="flex items-center justify-center py-5">
-            <Spinner />
-          </div>}
+          {isLoading &&
+            <div className="flex items-center justify-center py-5">
+              <Spinner />
+            </div>
+          }
           
         </DialogHeader>
         {!isLoading && <DialogFooter className="flex justify-end">

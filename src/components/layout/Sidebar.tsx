@@ -5,6 +5,7 @@ import FunctionIcon from "@/components/icons/FunctionIcon";
 import {useSession} from "next-auth/react";
 import {useSelector} from "react-redux";
 import {selectRole} from "@/features/account/accountSlice";
+import UsersIcon from "@/components/icons/UsersIcon";
 
 export default function Sidebar() {
 
@@ -38,6 +39,13 @@ export default function Sidebar() {
                     <WorkflowIcon className="h-6 w-6 mr-2"/>
                     Workflows
                   </Link>
+              }
+              {(role==="CLUSTER_ADMIN") &&
+                <Link href="/users"
+                      className="flex items-center px-4 py-2 mt-2 text-edgeless-secondary-color hover:bg-gray-300">
+                  <UsersIcon className="h-6 w-6 mr-2"/>
+                  Users
+                </Link>
               }
             </nav>
         </div>
