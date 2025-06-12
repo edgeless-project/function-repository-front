@@ -2,10 +2,10 @@ import Link from 'next/link';
 
 import WorkflowIcon from "@/components/icons/WorkflowIcon";
 import FunctionIcon from "@/components/icons/FunctionIcon";
-import {useSession} from "next-auth/react";
 import {useSelector} from "react-redux";
 import {selectRole} from "@/features/account/accountSlice";
 import UsersIcon from "@/components/icons/UsersIcon";
+import APIKeyIcon from "@/components/icons/APIKeyIcon";
 
 export default function Sidebar() {
 
@@ -45,6 +45,13 @@ export default function Sidebar() {
                       className="flex items-center px-4 py-2 mt-2 text-edgeless-secondary-color hover:bg-gray-300">
                   <UsersIcon className="h-6 w-6 mr-2"/>
                   Users
+                </Link>
+              }
+              {(role==="CLUSTER_ADMIN") &&
+                <Link href="/apikey"
+                className="flex items-center px-4 py-2 mt-2 text-edgeless-secondary-color hover:bg-gray-300">
+                <APIKeyIcon className="h-6 w-6 mr-2"/>
+                API Keys
                 </Link>
               }
             </nav>
