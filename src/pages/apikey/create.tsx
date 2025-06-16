@@ -19,6 +19,7 @@ export default function CreateAPIKey() {
 	const role = useSelector(selectRole);
 	const hasRole = roleAllowed.includes(role);
 
+	const [name, setName] = useState(""); // State for input value
 	const [modalOpen, setModalOpen] = React.useState(false);
 	const [isSaving, setIsSaving] = React.useState(false);
 	const [saveMessage, setSaveMessage] = React.useState('');
@@ -37,7 +38,7 @@ export default function CreateAPIKey() {
 		setModalOpen(true);
 
 		try {
-			const res = await createAPIKey(tokenValue);
+			const res = await createAPIKey(tokenValue, name);
 			setSaveMessage(`New API key ${res.key} has been created successfully`);
 			setResultOk(true);
 		} catch (err: any) {
@@ -59,8 +60,19 @@ export default function CreateAPIKey() {
 	return (
 		<Layout title="Create API Key">
 			<Card>
-				<CardHeader className={"text-center font-bold"}>Are you sure you want to create a new API Key</CardHeader>
+				<CardHeader className={"text-center font-bold"}>Are you sure you want to create a new API Key?</CardHeader>
 				<CardContent>
+					<div className="flex flex-col items-center my-8 gap-4">
+						<label htmlFor="name" className="font-medium">Name</label>
+						<input
+							id="name"
+							type="text"
+							placeholder="Enter name"
+							value={name} // Bind state to input
+							onChange={(e) => setName(e.target.value)}
+							className="w-1/4 px-3 py-2 border rounded-md"
+						/>
+					</div>
 					<div className="flex justify-center my-8 gap-16">
 						<Button
 							type="button"

@@ -21,7 +21,7 @@ import {getAPIKeysByAdmin} from "@/services/apikeyServices";
 import {ResponseApikeyDto} from "@/types/apikeys";
 
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
-const roleAllowed = ["CLUSTER_ADMIN"];
+const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN", "FUNC_DEVELOPER"];
 
 export default function Apikey() {
 
@@ -90,16 +90,20 @@ export default function Apikey() {
 					{!APIKeysLoading && <Table>
               <TableHeader>
                   <TableRow>
+		                  <TableHead className="">Name</TableHead>
 		                  <TableHead className="w-[300px]">API Key</TableHead>
 		                  <TableHead>Owner</TableHead>
+                      <TableHead>Role</TableHead>
                       <TableHead>Created At</TableHead>
                   </TableRow>
               </TableHeader>
               <TableBody>
 								 { APIKeys && APIKeys.map(u => (
 									<TableRow key={u.key}>
+										<TableCell className="font-medium">{u.name}</TableCell>
 										<TableCell className="font-medium">{u.key}</TableCell>
 										<TableCell className="font-medium">{u.owner}</TableCell>
+										<TableCell className="font-medium">{u.role}</TableCell>
 										<TableCell>{format(date(u.createdAt), timeFormatGeneral,"en")}</TableCell>
 										<TableCell className="text-right">
 											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">

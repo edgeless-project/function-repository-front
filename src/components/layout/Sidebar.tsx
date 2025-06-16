@@ -47,7 +47,7 @@ export default function Sidebar() {
                   Users
                 </Link>
               }
-              {(role==="CLUSTER_ADMIN") &&
+              {role &&
                 <Link href="/apikey"
                 className="flex items-center px-4 py-2 mt-2 text-edgeless-secondary-color hover:bg-gray-300">
                 <APIKeyIcon className="h-6 w-6 mr-2"/>

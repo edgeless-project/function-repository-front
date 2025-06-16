@@ -15,16 +15,16 @@ export const getAPIKeysByAdmin = async (accessToken: string, offset: number, lim
 		limit: json.limit,
 		offset: json.offset,
 	}
-
 	return response;
 }
 
-export const createAPIKey = async (accessToken: string): Promise<ResponseApikeyDto> => {
+
+export const createAPIKey = async (accessToken: string, name: string): Promise<ResponseApikeyDto> => {
 	const headers = buildFetchHeaders(accessToken);
 	const url = `${serverRestApi}/auth/apikey`;
 	const data = await fetch(url, {
 		method: 'POST',
-		body: JSON.stringify({}),
+		body: JSON.stringify({name: name}),
 		headers
 	});
 
@@ -33,11 +33,12 @@ export const createAPIKey = async (accessToken: string): Promise<ResponseApikeyD
 		id: json.id,
 		key: json.key,
 		createdAt: json.createdAt,
-		owner: json.owner,
+		owner: json.owner
 	}
 
 	return resp;
 }
+
 
 export const deleteAPIKey = async (accessToken: string, id: string): Promise<ResponseDeleteKeyDto> => {
 	const headers = buildFetchHeaders(accessToken);
