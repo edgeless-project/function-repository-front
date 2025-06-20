@@ -1,8 +1,6 @@
 import { buildFetchHeaders } from "@/utils/fetch";
 import {ApiResponseGetUsers, ApiResponseUser, ResponseDeleteUserDto, UserDTO} from "@/types/users";
 import {User} from "@/types/account";
-import {ApiResponseDeleteWorkflow} from "@/types/workflows";
-
 
 const serverRestApi = process.env.NEXT_PUBLIC_SERVER_REST_API;
 

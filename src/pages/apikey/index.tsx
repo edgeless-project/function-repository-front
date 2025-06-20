@@ -17,8 +17,9 @@ import {
 	PaginationPrevious
 } from "@/components/ui/pagination";
 import AccessWarning from "@/components/utils/AccessWarning";
-import {getAPIKeysByAdmin} from "@/services/apikeyServices";
+import {getAPIKey, getAPIKeysByAdmin} from "@/services/apikeyServices";
 import {ResponseApikeyDto} from "@/types/apikeys";
+import DialogSave from "@/components/utils/DialogSave";
 
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);
 const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN", "FUNC_DEVELOPER"];
@@ -35,6 +36,8 @@ export default function Apikey() {
 	const [total, setTotal] = useState(0);
 	const [APIKeysLoading, isAPIKeysLoading] = useState(true);
 	const [page, setPage] = useState(1);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [saveMessage, setSaveMessage] = useState('');
 
 	const selectPrevPage = (e: React.MouseEvent<HTMLElement>) => {
 		e.preventDefault();
@@ -59,6 +62,18 @@ export default function Apikey() {
 				isAPIKeysLoading(false);
 			})
 	},[hasRole, page, tokenValue, user])
+
+	const handleShow = (id: string) => {
+		getAPIKey(tokenValue, id).then((r) => {
+			setSaveMessage(`${r.key}`);
+			setModalOpen(true);
+		})
+	}
+
+	const closeModal = () => {
+		setModalOpen(false);
+		setSaveMessage('');
+	}
 
 	if (!hasRole)
 		return (
@@ -106,6 +121,10 @@ export default function Apikey() {
 										<TableCell className="font-medium">{u.role}</TableCell>
 										<TableCell>{format(date(u.createdAt), timeFormatGeneral,"en")}</TableCell>
 										<TableCell className="text-right">
+											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color"
+											onClick={() => handleShow(u.id || u.key)}>
+												<Link href={``}>Show</Link>
+											</Button>
 											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 												<Link href={`/apikey/delete/${u.id}`}>Delete</Link>
 											</Button>
@@ -131,6 +150,12 @@ export default function Apikey() {
           </Pagination>}
 				</CardFooter>
 			</Card>
+			<DialogSave
+				isOpen={modalOpen}
+				title="API KEY"
+				description={saveMessage}
+				isLoading={false}
+				onClose={closeModal}/>
 		</Layout>
 	);
 }

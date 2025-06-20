@@ -8,7 +8,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import Layout from "@/components/layout/Layout";
-import Spinner from '@/components/utils/Spinner';
 import { Button } from '@/components/ui/button';
 import DialogSave from '@/components/utils/DialogSave';
 import {useSelector} from "react-redux";
@@ -17,7 +16,8 @@ import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import AccessWarning from "@/components/utils/AccessWarning";
 import { deleteAPIKey } from '@/services/apikeyServices';
 
-const roleAllowed = ["CLUSTER_ADMIN"];
+
+const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN", "FUNC_DEVELOPER"];
 
 export default function WorkflowDelete() {
 	const router = useRouter();

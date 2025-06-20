@@ -19,7 +19,7 @@ interface DialogSaveProps {
 
 export default function DialogSave ({isOpen, title, description, isLoading, onClose}: DialogSaveProps) {
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

@@ -10,7 +10,7 @@ import {router} from "next/client";
 import DialogSave from "@/components/utils/DialogSave";
 import {createAPIKey} from "@/services/apikeyServices";
 
-const roleAllowed = ["CLUSTER_ADMIN"];
+const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN", "FUNC_DEVELOPER"];
 
 
 export default function CreateAPIKey() {
@@ -38,6 +38,7 @@ export default function CreateAPIKey() {
 		setModalOpen(true);
 
 		try {
+			if (!name) throw new Error("Name is required");
 			const res = await createAPIKey(tokenValue, name);
 			setSaveMessage(`New API key ${res.key} has been created successfully`);
 			setResultOk(true);
