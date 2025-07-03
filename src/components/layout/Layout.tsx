@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -14,7 +14,9 @@ import {
 import {useRouter} from "next/router";
 import {useSelector} from "react-redux";
 import {selectUser} from "@/features/account/accountSlice";
-
+import Link from "next/link";
+import {fetchUserLogged} from "@/features/account/accountServices";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 
 interface LayoutProps {
 	children: React.ReactNode;
@@ -24,6 +26,12 @@ interface LayoutProps {
 export default function Layout({ children, title='' }: LayoutProps) {
 	const router = useRouter();
 	const email = useSelector(selectUser);
+	const tokenValue = useSelector(selectSessionAccessToken);
+	const [id, setId] = React.useState<string>('');
+
+	useEffect(() => {
+		fetchUserLogged(tokenValue).then((user) => {if(user.id)setId(user.id);});
+	}, []);
 
 	const handleSingOut = async () => {
 		const data = await signOut({redirect: false, callbackUrl: '/auth/signin'});
@@ -52,6 +60,14 @@ export default function Layout({ children, title='' }: LayoutProps) {
 									<DropdownMenuContent>
 										<DropdownMenuLabel>{email}</DropdownMenuLabel>
 										<DropdownMenuSeparator/>
+										<DropdownMenuItem>
+											{id.length > 0 ? <Link href={`/password/change/${id}`}>
+												Change Password
+											</Link> :
+											<span className={"text-gray-400 cursor-not-allowed"}>
+												Change Password
+											</span>}
+										</DropdownMenuItem>
 										<DropdownMenuItem onClick={handleSingOut}>Log Out</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>

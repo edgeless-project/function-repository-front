@@ -4,7 +4,6 @@ import React, {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import {selectRole, selectUser} from "@/features/account/accountSlice";
-import {User} from "@/types/account";
 import {getUsersByAdmin} from "@/services/userServices";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";

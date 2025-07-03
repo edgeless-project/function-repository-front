@@ -68,6 +68,25 @@ export const updateUser = async (accessToken: string, userId: string, userData: 
 	return json;
 }
 
+export const changePassword = async (accessToken: string, password: string): Promise<ApiResponseUser> => {
+	const headers = buildFetchHeaders(accessToken);
+	const url = `${serverRestApi}/user/change_password`;
+	const data = await fetch(url, {
+		method: 'PUT',
+		body: JSON.stringify({password: password}),
+		headers
+	});
+
+	if(!data.ok) {
+		const json = await data.json();
+		throw new Error(json.message);
+	}
+
+	const json: ApiResponseUser = await data.json() as ApiResponseUser;
+
+	return json;
+}
+
 export const changeUserPassword = async (accessToken: string, userId: string, password: string): Promise<ApiResponseUser> => {
 	const headers = buildFetchHeaders(accessToken);
 	const url = `${serverRestApi}/user/password/${userId}`;

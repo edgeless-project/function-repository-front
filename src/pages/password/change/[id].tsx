@@ -4,7 +4,7 @@ import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import {selectRole} from "@/features/account/accountSlice";
 import {z} from "zod";
 import {hasMiddleSpaces} from "@/utils/general";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import DialogSave from "@/components/utils/DialogSave";
@@ -14,12 +14,8 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {changeUserPassword, getUserById} from "@/services/userServices";
-import Spinner from "@/components/utils/Spinner";
-
-
-const roleOptions = ['APP_DEVELOPER', 'CLUSTER_ADMIN', 'FUNC_DEVELOPER'] as const;
-const roleAllowed = ['CLUSTER_ADMIN'];
+import {changePassword} from "@/services/userServices";
+const roleAllowed = ['APP_DEVELOPER', 'CLUSTER_ADMIN', 'FUNC_DEVELOPER'];
 
 
 const formSchema = z.object({
@@ -49,28 +45,14 @@ export default function EditUser() {
 	const [isSaving, setIsSaving] = React.useState(false);
 	const [saveMessage, setSaveMessage] = React.useState('');
 	const [resultOk, setResultOk] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
 
 
 	const form = useForm<z.infer< typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			email: '',
-			password: '',
-			role: 'FUNC_DEVELOPER',
+			password: ''
 		}
 	});
-
-	useEffect(() => {
-		if (tokenValue && hasRole) {
-			setIsLoading(true);
-			getUserById(tokenValue, id).then(r => {
-				form.setValue('email', r.email);
-				form.setValue('role', roleOptions.includes(r.role as any) ? r.role : 'FUNC_DEVELOPER' as any);
-				setIsLoading(false);
-			})
-		}
-	},[id, form, hasRole, tokenValue]);
 
 	const closeModal = () => {
 		if (resultOk) {
@@ -87,7 +69,7 @@ export default function EditUser() {
 		//Create user
 		try {
 			if (!id) throw new Error('Id not found');
-			const res = await changeUserPassword(tokenValue, id, data.password);
+			const res = await changePassword(tokenValue, data.password);
 			setSaveMessage(`The user ${res.email} has been updated successfully`);
 			setResultOk(true);
 		} catch (err: any) {
@@ -95,16 +77,6 @@ export default function EditUser() {
 			setSaveMessage(text);
 		}
 		setIsSaving(false);
-	}
-
-	if (isLoading){
-		return (
-			<Layout title="Update User">
-				<div className="flex items-center justify-center py-20">
-					<Spinner />
-				</div>
-			</Layout>
-		);
 	}
 
 	if (!hasRole)
@@ -127,22 +99,6 @@ export default function EditUser() {
 						<CardContent className="max-w-5xl">
 							<FormField
 								control={form.control}
-								name="email"
-								disabled={true}
-								render={({field}) => {
-									return (
-										<FormItem>
-											<FormLabel>Email</FormLabel>
-											<FormControl>
-												<Input type="text" placeholder="email@email.com" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									);
-								}}
-							/>
-							<FormField
-								control={form.control}
 								name="password"
 								render={({field}) =>{
 									return (
@@ -150,26 +106,6 @@ export default function EditUser() {
 											<FormLabel>Password</FormLabel>
 											<FormControl>
 												<Input type="password" placeholder="Password" {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									);
-								}}
-							/>
-							<FormField
-								control={form.control}
-								name="role"
-								disabled={true}
-								render={({field}) =>{
-									return (
-										<FormItem>
-											<FormLabel>Role</FormLabel>
-											<FormControl>
-												<select {...field} className="border rounded px-3 py-2 w-full">
-													{roleOptions.map((r) => (
-														<option key={r} value={r}>{r.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</option>
-													))}
-												</select>
 											</FormControl>
 											<FormMessage />
 										</FormItem>
