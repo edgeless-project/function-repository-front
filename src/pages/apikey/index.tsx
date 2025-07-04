@@ -92,7 +92,7 @@ export default function Apikey() {
 					{!APIKeysLoading && <CardDescription>{total} API Keys found</CardDescription>}
 					<div className="flex justify-end">
 						<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
-							<Link href={'/apikey/create'}>Create API Key</Link>
+							<Link href={'/apikey/create'}>Create new API Key</Link>
 						</Button>
 					</div>
 				</CardHeader>
