@@ -22,7 +22,7 @@ const roleAllowed = ["CLUSTER_ADMIN"];
 
 const formSchema = z.object({
 	email: z.string().email('The email must be a valid email address'),
-	password: z.string().min(8, 'The password must contain at least 3 characters'),
+	password: z.string().min(8, 'The password must contain at least 8 characters'),
 	role: z.enum(roleOptions)
 })
 	.refine((data) => {
@@ -117,7 +117,7 @@ export default function CreateUser() {
 										<FormItem>
 											<FormLabel>Email</FormLabel>
 											<FormControl>
-												<Input type="text" placeholder="email@email.com" {...field} />
+												<Input type="text" placeholder="email" {...field} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
@@ -166,7 +166,7 @@ export default function CreateUser() {
 							variant="outline"
 							onClick={() => { router.back() }}
 						>Cancel</Button>
-						<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Save</Button>
+						<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Create</Button>
 					</div>
 				</form>
 			</Form>

@@ -150,7 +150,7 @@ export default function EditUser() {
 										<FormItem>
 											<FormLabel>Email</FormLabel>
 											<FormControl>
-												<Input type="text" placeholder="email@email.com" {...field} />
+												<Input type="text" placeholder="email" {...field} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>

@@ -123,7 +123,7 @@ export default function Apikey() {
 										<TableCell className="text-right">
 											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color"
 											onClick={() => handleShow(u.id || u.key)}>
-												<Link href={``}>Show</Link>
+												<Link href={``}>Show Key</Link>
 											</Button>
 											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 												<Link href={`/apikey/delete/${u.id}`}>Delete</Link>

@@ -1,6 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import AccessWarning from "@/components/utils/AccessWarning";
-import {Card, CardContent, CardHeader} from "@/components/ui/card";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import React, {useState} from "react";
 import {useSelector} from "react-redux";
@@ -61,9 +61,11 @@ export default function CreateAPIKey() {
 	return (
 		<Layout title="Create API Key">
 			<Card>
-				<CardHeader className={"text-center font-bold"}>Are you sure you want to create a new API Key?</CardHeader>
+				<CardHeader>
+					<CardTitle>Basic information</CardTitle>
+				</CardHeader>
 				<CardContent>
-					<div className="flex flex-col items-center my-8 gap-4">
+					<div className="flex flex-col items-start my-8 gap-4">
 						<label htmlFor="name" className="font-medium">Name</label>
 						<input
 							id="name"
@@ -74,16 +76,16 @@ export default function CreateAPIKey() {
 							className="w-1/4 px-3 py-2 border rounded-md"
 						/>
 					</div>
-					<div className="flex justify-center my-8 gap-16">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => { router.back() }}
-						>Cancel</Button>
-						<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit" onClick={handleSubmit}>Confirm</Button>
-					</div>
 				</CardContent>
 			</Card>
+			<div className="flex justify-between my-8">
+				<Button
+					type="button"
+					variant="outline"
+					onClick={() => { router.back() }}
+				>Cancel</Button>
+				<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit" onClick={handleSubmit}>Create</Button>
+			</div>
 			<DialogSave
 				isOpen={modalOpen}
 				title="Creating API Key"
