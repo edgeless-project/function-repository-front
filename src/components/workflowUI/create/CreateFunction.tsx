@@ -4,6 +4,8 @@ import {FunctionMinified} from "@/types/functions";
 import {getFunctionsSimilarId, getFunctionVersions} from "@/services/functionServices";
 import {FunctionWorkflowBasic} from "@/types/workflows";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {useSelector} from "react-redux";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 
 
 interface Props {
@@ -16,12 +18,13 @@ const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
     const [listFunctionVersions, setListFunctionVersions] = useState<string[]>([]);
     const [classSpecificationVersion, setClassSpecificationVersion] = useState("");
     const [listFunctions, setListFunctions] = useState<FunctionMinified[] | []>([]);
+    const tokenValue = useSelector(selectSessionAccessToken);
 
     useEffect(() => {
         if(classSpecificationId.length>3){  // Get IDs from functions
             setListFunctionVersions([]);
             setClassSpecificationVersion("");
-            getFunctionsSimilarId(classSpecificationId)
+            getFunctionsSimilarId(classSpecificationId, tokenValue)
                 .then(functions => {
                     setListFunctions(functions.items);
                 })
@@ -50,7 +53,7 @@ const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
     const setVersions = (id: string) => {   // Gets possible versions from function
         listFunctions.forEach(f => {
             if (f.id === id){
-                getFunctionVersions(id).then(versions => {
+                getFunctionVersions(id, tokenValue).then(versions => {
                     setListFunctionVersions(versions.versions);
                 });
             }

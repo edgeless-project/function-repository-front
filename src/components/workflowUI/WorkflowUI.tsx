@@ -25,6 +25,8 @@ import {EdgeRemoveChange, NodeRemoveChange} from "@reactflow/core";
 import DialogInput from '@/components/utils/DialogInput';
 import {getFunction} from "@/services/functionServices";
 import {Button} from "@/components/ui/button";
+import {useSelector} from "react-redux";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 
 const outputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_OUTPUT as string).split(",");
 const inputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string).split(",");
@@ -134,6 +136,7 @@ const getLayoutedElements = (nodes: any[], edges: any[], direction = 'TB') => {
 
 
 const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, reload}) => {
+    const tokenValue = useSelector(selectSessionAccessToken);
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
     const [isMounted, setIsMounted] = useState(false);
@@ -344,7 +347,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
                     if (f.name === params.source) {
                         if ((f as FunctionWorkflowBasic).class_specification_id){
                             const f_b = f as FunctionWorkflowBasic;
-                            getFunction(f_b.class_specification_id,f_b.class_specification_version).then(d => {
+                            getFunction(f_b.class_specification_id,f_b.class_specification_version, tokenValue).then(d => {
                                 let options: string[] = [];
                                 if (f_b.output_mapping) d.outputs.forEach((v) =>{if (!f_b.output_mapping[v]) options.push(v)});
                                 else {

@@ -4,7 +4,7 @@ import { setSessionAccessToken } from '@/features/account/sessionSlice';
 import { getSession, signIn } from 'next-auth/react';
 import React, {  } from 'react';
 import { useDispatch } from "react-redux";
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {z} from "zod";

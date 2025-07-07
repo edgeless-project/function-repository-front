@@ -6,7 +6,6 @@ import {
   FunctionComplete, ApiRequestUpdateFunction, ApiResponseDeleteFunction, FunctionType
 } from "@/types/functions";
 import { buildFetchHeaders, buildFileFetchHeaders } from "@/utils/fetch";
-import {useSession} from "next-auth/react";
 
 const serverRestApi = process.env.NEXT_PUBLIC_SERVER_REST_API;
 

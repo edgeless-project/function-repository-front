@@ -33,7 +33,6 @@ import { FunctionMinified } from "@/types/functions";
 import Spinner from "@/components/utils/Spinner";
 import {date, format} from "@formkit/tempo";
 import {useSelector} from "react-redux";
-import type {AppState} from "@/app/store";
 import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import {selectRole} from "@/features/account/accountSlice";
 const timeFormatGeneral: string = (process.env.NEXT_PUBLIC_GENERIC_DATA_FORMAT as string);

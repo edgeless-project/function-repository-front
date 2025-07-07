@@ -7,6 +7,8 @@ import CreateResource from "@/components/workflowUI/create/CreateResource";
 import CreateFunction from "@/components/workflowUI/create/CreateFunction";
 import DialogSave from "@/components/utils/DialogSave";
 import {Button} from "@/components/ui/button";
+import {useSelector} from "react-redux";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 const outputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_OUTPUT as string).split(",");
 const inputResources: string[] = (process.env.NEXT_PUBLIC_GENERIC_RESOURCES_INPUT as string).split(",");
 const resources = outputResources.concat(inputResources);
@@ -19,6 +21,7 @@ interface CUPanelProps{
 }
 
 const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClose}) => {
+    const tokenValue = useSelector(selectSessionAccessToken);
     const [name ,setName] = useState("");
     const [isComplete, setIsComplete] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
@@ -31,7 +34,6 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
         output_mapping: {},
         annotations: {}
     });
-
     const [resourceJson, setResourceJson ] = useState<ResourceWorkflow>({
         name: "",
         class_type: "",
@@ -99,7 +101,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
             if (!correctData) setModalMessage("Class type in resources not correct");
         } else {
             // Verifies Id and version match
-            await getFunctionVersions(functionJson.class_specification_id).then(resp => {
+            await getFunctionVersions(functionJson.class_specification_id, tokenValue).then(resp => {
                 resp.versions.forEach(v => {
                     if (v === functionJson.class_specification_version) {
                         correctData = true;

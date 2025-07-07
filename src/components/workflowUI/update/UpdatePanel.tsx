@@ -6,6 +6,8 @@ import {getFunctionVersions} from "@/services/functionServices";
 import {Button} from "@/components/ui/button";
 import UpdateFunction from "@/components/workflowUI/update/UpdateFunction";
 import DialogSave from "@/components/utils/DialogSave";
+import {useSelector} from "react-redux";
+import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 
 interface UpdatePanelProps{
     node: FunctionWorkflow|ResourceWorkflow|FunctionWorkflowBasic,
@@ -15,7 +17,7 @@ interface UpdatePanelProps{
 }
 
 const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}) => {
-
+    const tokenValue = useSelector(selectSessionAccessToken);
     const [name, setName] = useState(node.name);
     const [funType, setClassFunType] = useState("");
     const [classIdV, setClassIdV] = useState("");
@@ -37,13 +39,13 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
             setClassFunType(nodeFun.class_specification.function_type);
             setClassVersionV(nodeFun.class_specification.version);
             setClassIdV(nodeFun.class_specification.id);
-            getFunctionVersions(nodeFun.class_specification.id).then(versions => {setListFunctionVersions(versions.versions);});
+            getFunctionVersions(nodeFun.class_specification.id, tokenValue).then(versions => {setListFunctionVersions(versions.versions);});
         } else if (nodeFunBasic.class_specification_id !== undefined){
             setIsResource(false);
             setIsBasicFunction(true);
             setClassVersionV(nodeFunBasic.class_specification_version);
             setClassIdV(nodeFunBasic.class_specification_id);
-            getFunctionVersions(nodeFunBasic.class_specification_id).then(versions => {setListFunctionVersions(versions.versions);});
+            getFunctionVersions(nodeFunBasic.class_specification_id, tokenValue).then(versions => {setListFunctionVersions(versions.versions);});
         }else {
             setIsResource(true);
             setIsBasicFunction(false);

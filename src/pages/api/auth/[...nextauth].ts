@@ -1,4 +1,4 @@
-import { fetchRefreshToken, fetchUserLogged, login } from "@/features/account/accountServices";
+import { fetchRefreshToken, login } from "@/features/account/accountServices";
 import NextAuth, {User} from "next-auth";
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { signOut } from 'next-auth/react';

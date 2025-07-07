@@ -12,7 +12,7 @@ import Spinner from "@/components/utils/Spinner";
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {z} from "zod";
 import {hasMiddleSpaces, splitOutputs} from "@/utils/general";
-import {ControllerRenderProps, FieldArrayWithId, FieldValues, useFieldArray, useForm} from "react-hook-form";
+import {ControllerRenderProps, FieldArrayWithId, useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
