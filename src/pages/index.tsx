@@ -36,7 +36,6 @@ export default function Page() {
     }
   }
 
-
   return (
       <Layout title='Dashboard'>
           <div id='home' className="grid grid-cols-3 gap-4">
