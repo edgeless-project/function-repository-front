@@ -36,6 +36,7 @@ This APP is intended for:
 - **Function Developers (funcdev)**: To manage functions.
 - **Application Developers (appdev)**: To manage workflows and functions.
 - **Cluster Administrators (clusteradmin)**: To manage workflows, functions, users, and API keys.
+- **API Keys**: Creation of API keys for users to access the API repository, a key has the same role permissions as the user that creates the key.
 
 ## Technology Stack
 
@@ -47,6 +48,7 @@ This APP is intended for:
 - **React Flow**
 - **Dagre**
 - **ESLint**
+- **JWTAuth**
 
 ## Development
 
@@ -67,11 +69,14 @@ This APP is intended for:
  ```sh
  npm run dev
  ```
+3. If the application is running for the first time, you need to access the app using the default user admin. You can do this using the default user admin@admin.com with password admin123. This user has all permissions as cloud administrator and can manage users, API keys, functions, and workflows.
+
+
+4. Once logged in, we recommend creating new users with the desired roles, and change the default admin password.
 
 ## UI Components
 
-Components open source from [Shadcn UI](https://ui.shadcn.com/docs).
-
+Components open source used and imported manually from [Shadcn UI](https://ui.shadcn.com/docs).
 
 ----------
 
