@@ -6,18 +6,18 @@ import React from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EDGELESS Function Repository",
-  description: "Front-end app for the EDGELESS Function Repository",
+	title: "EDGELESS Function Repository",
+	description: "Front-end app for the EDGELESS Function Repository",
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
+	                                   children,
+                                   }: Readonly<{
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  );
+	return (
+		<html lang="en">
+		<body className={inter.className}>{children}</body>
+		</html>
+	);
 }
