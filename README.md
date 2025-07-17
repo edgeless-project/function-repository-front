@@ -21,6 +21,12 @@ The **Function Repository Front-end** is a  component of [EDGELESS](https://edge
     - Create, update, delete, and retrieve workflows.
     - Define workflows using JSON, referencing existing functions in the repository.
 
+- **Workflow UI**:
+    - Visualization of workflows using React Flow.
+    - Drag, drop, and connect functions to create workflows.
+    - Edit functions properties as input or output to connect with other functions.
+    - Edit workflow properties as types and.
+
 - **User Management**:
     - Create, update, delete, and retrieve users.
     - Change user passwords.
@@ -69,14 +75,8 @@ This APP is intended for:
  ```sh
  npm run dev
  ```
-3. If the application is running for the first time, you need to access the app using the default user admin. You can do this using the default user admin@admin.com with password admin123. This user has all permissions as cloud administrator and can manage users, API keys, functions, and workflows.
 
-
-4. Once logged in, we recommend creating new users with the desired roles, and change the default admin password.
-
-## UI Components
-
-Components open source used and imported manually from [Shadcn UI](https://ui.shadcn.com/docs).
+3. Access the application with the default user, by default is email is **admin@admin.com** but the credentials can be specified as explained in the [API](https://github.com/edgeless-project/function-repository-api?tab=readme-ov-file#security).
 
 ----------
 
