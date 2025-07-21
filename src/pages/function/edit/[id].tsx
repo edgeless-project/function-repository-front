@@ -129,7 +129,6 @@ export default function FunctionEdit() {
 
 		// Upload the code file
 		let function_types: FunctionType[] = [];
-		const oldFunctionTypes = fun.function_types.map(f => f.type);
 
 		try {
 			for (const type of data.types) {

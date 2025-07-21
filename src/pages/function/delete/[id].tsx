@@ -27,7 +27,7 @@ export default function FunctionDelete() {
 	const [functions, setFunctions] = useState<FunctionComplete[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [modalOpen, setModalOpen] = useState(false);
-	const [isSaving, setIsSaving] = useState(false);
+	const [isSaving] = useState(false);
 	const [delMsg, setDelMessage] = useState('');
 	const [version, setVersion] = useState('');
 	const [resultOk, setResultOk] = useState(false);

@@ -2,14 +2,14 @@ export interface WorkflowMinified {
 	name: string;
 	createdAt?: string;
 	updatedAt?: string;
-};
+}
 
 export interface ApiResponseGetWorkflows {
 	items: WorkflowMinified[];
 	total: number;
 	limit: number;
 	offset: number;
-};
+}
 
 export interface FunctionWorkflowBasic {
 	name: string,
@@ -20,7 +20,7 @@ export interface FunctionWorkflowBasic {
 		[key: string]:  string
 	},
 	annotations: {}
-};
+}
 
 export interface FunctionWorkflow {
 	name: string,
@@ -36,7 +36,7 @@ export interface FunctionWorkflow {
 		[key: string]:  string
 	},
 	annotations: {}
-};
+}
 
 export interface ResourceWorkflow {
 	name: string,
@@ -48,7 +48,7 @@ export interface ResourceWorkflow {
 		host?: string,
 		methods?: string
 	}
-};
+}
 
 export interface ApiResponseWorkflow {
 	createdAt: string;
@@ -57,21 +57,21 @@ export interface ApiResponseWorkflow {
 	functions: FunctionWorkflow[];
 	resources: ResourceWorkflow[];
 	annotations: any; // TODO
-};
+}
 
 export interface ApiRequestUpdateWorkflow {
 	functions: FunctionWorkflow[];
 	resources: ResourceWorkflow[];
 	annotations: any; // TODO
-};
+}
 
 export interface ApiRequestCreateWorkflow extends ApiRequestUpdateWorkflow {
 	name: string;
-};
+}
 
 export interface ApiResponseDeleteWorkflow {
 	deletedCount: number;
-};
+}
 
 export interface JsonFlowComponentState {
 	name?: string,

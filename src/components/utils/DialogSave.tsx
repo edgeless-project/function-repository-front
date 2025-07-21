@@ -15,7 +15,7 @@ interface DialogSaveProps {
 	description: string;
 	isLoading: boolean;
 	onClose: () => void;
-};
+}
 
 export default function DialogSave ({isOpen, title, description, isLoading, onClose}: DialogSaveProps) {
 	return (

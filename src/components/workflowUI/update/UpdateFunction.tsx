@@ -10,7 +10,7 @@ interface UpdateFunctionProps {
 	setClassVersionV: (arg0: string) => void,
 	listFunctionVersions: string[],
 	complex: boolean
-};
+}
 
 const UpdateFunction:React.FC<UpdateFunctionProps> = ({funType,setClassFunType,classIdV,classVersionV,setClassVersionV, listFunctionVersions, complex}) => {
 

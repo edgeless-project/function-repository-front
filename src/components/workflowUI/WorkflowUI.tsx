@@ -363,7 +363,7 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
 									setTitleConnection("Connexion Error");
 								}
 								setOpen(true);
-							}).catch((e) => {
+							}).catch(() => {
 								setNewBranch({source: params.source as string, target: params.target as string, fromFunction: true,options: []});
 								setDescConnection("Could not retrieve function data from "+f.name+".");
 								setTitleConnection("Connexion Error");

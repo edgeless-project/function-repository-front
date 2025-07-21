@@ -6,7 +6,6 @@ import {selectRole} from "@/features/account/accountSlice";
 
 export default function Page() {
 	const role = useSelector(selectRole)
-	const roleAllowed = [ "FUNC_DEVELOPER", "APP_DEVELOPER", "CLUSTER_ADMIN"];
 
 	const cardsData = {
 

@@ -26,7 +26,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
 	const [isComplete, setIsComplete] = useState(false);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [modalMessage, setModalMessage] = useState("");
-	const [listClassType, setListClassType] = useState(resources);
+	const [listClassType] = useState(resources);
 	const [functionJson, setFunctionJson ] = useState<FunctionWorkflowBasic>({
 		name: "",
 		class_specification_id: "",

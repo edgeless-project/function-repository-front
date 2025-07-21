@@ -24,7 +24,7 @@ const AuthSession = ({children}: Props) => {
 
 	useEffect(() => {
 		if (!session && status !== "loading") {
-			router.push("/auth/signin");
+			router.push("/auth/signin").then();
 		} else if(session) {
 			const expDate = new Date(Number(session.expires));
 			const refreshTimeout = expDate.getTime() - Date.now() - jwtRefreshWindow;

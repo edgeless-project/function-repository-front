@@ -7,7 +7,7 @@ import { fetchUserLogged } from "./accountServices";
 export interface AccountSlice {
 	user: string;
 	role: string;
-};
+}
 
 const initialState: AccountSlice = {
 	user: "",
@@ -39,12 +39,13 @@ export const AccountSlice = createSlice({
 		}
 	},
 	extraReducers: (builder) => {
-		builder.addCase(getUser.pending, (state: AccountSlice) => {}),
-		builder.addCase(getUser.fulfilled, (state: AccountSlice, action: PayloadAction<User>) => {
-			state.user = action.payload.email;
-			state.role = action.payload.role;
-		}),
-		builder.addCase(getUser.rejected, (state: AccountSlice) => {})
+		builder
+			.addCase(getUser.pending, (state: AccountSlice) => {})
+			.addCase(getUser.fulfilled, (state: AccountSlice, action: PayloadAction<User>) => {
+				state.user = action.payload.email;
+				state.role = action.payload.role;
+			})
+			.addCase(getUser.rejected, (state: AccountSlice) => {})
 	}
 });
 

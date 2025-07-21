@@ -11,7 +11,7 @@ interface props {
 }
 
 const CreateResource:React.FC<props> = ({setIsCorrect, setResourceJson}) => {
-	const [listClassType, setListClassType] = useState(resources);
+	const [listClassType] = useState(resources);
 	const [classType, setClassType] = useState("");
 
 	const handleSelectType = (type: string) => {
