@@ -12,6 +12,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
+import {createContext} from "react";
 
 const Form = FormProvider
 
@@ -22,7 +23,7 @@ type FormFieldContextValue<
 	name: TName
 }
 
-const FormFieldContext = React.createContext<FormFieldContextValue>(
+const FormFieldContext = createContext<FormFieldContextValue>(
 	{} as FormFieldContextValue
 )
 

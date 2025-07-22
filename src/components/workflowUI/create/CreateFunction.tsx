@@ -14,7 +14,7 @@ interface Props {
 }
 
 const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
-	const [classSpecificationId, setClassSpecificationId] = React.useState("");
+	const [classSpecificationId, setClassSpecificationId] = useState("");
 	const [listFunctionVersions, setListFunctionVersions] = useState<string[]>([]);
 	const [classSpecificationVersion, setClassSpecificationVersion] = useState("");
 	const [listFunctions, setListFunctions] = useState<FunctionMinified[] | []>([]);

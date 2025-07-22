@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 
 import Layout from "@/components/layout/Layout";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {FunctionComplete} from "@/types/functions";
 import {deleteFunction, getFunctionVersionsComplete} from "@/services/functionServices";
 import Spinner from "@/components/utils/Spinner";

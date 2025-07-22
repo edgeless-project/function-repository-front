@@ -4,7 +4,7 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import React, {useState} from "react";
+import {useState} from "react";
 import {useSelector} from "react-redux";
 import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import {selectRole} from "@/features/account/accountSlice";
@@ -46,9 +46,9 @@ export default function CreateUser() {
 	const role = useSelector(selectRole);
 	const hasRole = roleAllowed.includes(role);
 
-	const [modalOpen, setModalOpen] = React.useState(false);
-	const [isSaving, setIsSaving] = React.useState(false);
-	const [saveMessage, setSaveMessage] = React.useState('');
+	const [modalOpen, setModalOpen] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
+	const [saveMessage, setSaveMessage] = useState('');
 	const [resultOk, setResultOk] = useState(false);
 
 	const form = useForm<z.infer< typeof formSchema>>({

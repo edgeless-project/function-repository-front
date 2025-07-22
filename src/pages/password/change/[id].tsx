@@ -33,7 +33,7 @@ const formSchema = z.object({
 	);
 
 
-export default function EditUser() {
+export default function ChangeUserPassword() {
 
 	const router = useRouter();
 	const id = router.query.id as string;
@@ -41,9 +41,9 @@ export default function EditUser() {
 	const role = useSelector(selectRole);
 	const hasRole = roleAllowed.includes(role);
 
-	const [modalOpen, setModalOpen] = React.useState(false);
-	const [isSaving, setIsSaving] = React.useState(false);
-	const [saveMessage, setSaveMessage] = React.useState('');
+	const [modalOpen, setModalOpen] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
+	const [saveMessage, setSaveMessage] = useState('');
 	const [resultOk, setResultOk] = useState(false);
 
 
@@ -70,7 +70,7 @@ export default function EditUser() {
 		try {
 			if (!id) throw new Error('Id not found');
 			const res = await changePassword(tokenValue, data.password);
-			setSaveMessage(`The user ${res.email} has been updated successfully`);
+			setSaveMessage(`The user ${res.email} password has been changed successfully`);
 			setResultOk(true);
 		} catch (err: any) {
 			const text = `Can't change password. ${err.message}`;
@@ -81,7 +81,7 @@ export default function EditUser() {
 
 	if (!hasRole)
 		return (
-			<Layout title="Update User">
+			<Layout title="Change password">
 				<div className="flex items-center justify-center py-20">
 					<AccessWarning role={role}/>
 				</div>
@@ -89,7 +89,7 @@ export default function EditUser() {
 		)
 
 	return (
-		<Layout title="Update User">
+		<Layout title="Change Password">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)}>
 					<Card>

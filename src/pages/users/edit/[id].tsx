@@ -4,7 +4,7 @@ import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import {selectRole} from "@/features/account/accountSlice";
 import {z} from "zod";
 import {hasMiddleSpaces} from "@/utils/general";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {UserDTO} from "@/types/users";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -52,9 +52,9 @@ export default function EditUser() {
 	const hasRole = roleAllowed.includes(role);
 
 	const [user, setUser] = useState<UserDTO>({} as UserDTO);
-	const [modalOpen, setModalOpen] = React.useState(false);
-	const [isSaving, setIsSaving] = React.useState(false);
-	const [saveMessage, setSaveMessage] = React.useState('');
+	const [modalOpen, setModalOpen] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
+	const [saveMessage, setSaveMessage] = useState('');
 	const [resultOk, setResultOk] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import {ReactNode, useEffect, useState} from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -19,7 +19,7 @@ import {fetchUserLogged} from "@/features/account/accountServices";
 import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 
 interface LayoutProps {
-	children: React.ReactNode;
+	children: ReactNode;
 	title?: string;
 }
 
@@ -27,7 +27,7 @@ export default function Layout({ children, title='' }: LayoutProps) {
 	const router = useRouter();
 	const email = useSelector(selectUser);
 	const tokenValue = useSelector(selectSessionAccessToken);
-	const [id, setId] = React.useState<string>('');
+	const [id, setId] = useState<string>('');
 
 	useEffect(() => {
 		fetchUserLogged(tokenValue).then((user) => {if(user.id)setId(user.id);});
@@ -35,7 +35,7 @@ export default function Layout({ children, title='' }: LayoutProps) {
 
 	const handleSingOut = async () => {
 		const data = await signOut({redirect: false, callbackUrl: '/auth/signin'});
-		await router.push(data.url);
+		router.push(data.url);
 	}
 
 	return (

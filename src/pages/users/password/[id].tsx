@@ -4,7 +4,7 @@ import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import {selectRole} from "@/features/account/accountSlice";
 import {z} from "zod";
 import {hasMiddleSpaces} from "@/utils/general";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import DialogSave from "@/components/utils/DialogSave";
@@ -37,7 +37,7 @@ const formSchema = z.object({
 	);
 
 
-export default function EditUser() {
+export default function SetUserPassword() {
 
 	const router = useRouter();
 	const id = router.query.id as string;
@@ -45,9 +45,9 @@ export default function EditUser() {
 	const role = useSelector(selectRole);
 	const hasRole = roleAllowed.includes(role);
 
-	const [modalOpen, setModalOpen] = React.useState(false);
-	const [isSaving, setIsSaving] = React.useState(false);
-	const [saveMessage, setSaveMessage] = React.useState('');
+	const [modalOpen, setModalOpen] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
+	const [saveMessage, setSaveMessage] = useState('');
 	const [resultOk, setResultOk] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -88,7 +88,7 @@ export default function EditUser() {
 		try {
 			if (!id) throw new Error('Id not found');
 			const res = await changeUserPassword(tokenValue, id, data.password);
-			setSaveMessage(`The user ${res.email} has been updated successfully`);
+			setSaveMessage(`The user ${res.email} password has been updated successfully`);
 			setResultOk(true);
 		} catch (err: any) {
 			const text = `Can't change password. ${err.message}`;
@@ -99,7 +99,7 @@ export default function EditUser() {
 
 	if (isLoading){
 		return (
-			<Layout title="Update User">
+			<Layout title="Update user password">
 				<div className="flex items-center justify-center py-20">
 					<Spinner />
 				</div>
@@ -109,7 +109,7 @@ export default function EditUser() {
 
 	if (!hasRole)
 		return (
-			<Layout title="Update User">
+			<Layout title="Update user password">
 				<div className="flex items-center justify-center py-20">
 					<AccessWarning role={role}/>
 				</div>
@@ -117,7 +117,7 @@ export default function EditUser() {
 		)
 
 	return (
-		<Layout title="Update User">
+		<Layout title="Update user password">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)}>
 					<Card>

@@ -2,7 +2,7 @@ import Layout from "@/components/layout/Layout";
 import AccessWarning from "@/components/utils/AccessWarning";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import React, {useState} from "react";
+import {useState} from "react";
 import {useSelector} from "react-redux";
 import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import {selectRole} from "@/features/account/accountSlice";
@@ -20,9 +20,9 @@ export default function CreateAPIKey() {
 	const hasRole = roleAllowed.includes(role);
 
 	const [name, setName] = useState(""); // State for input value
-	const [modalOpen, setModalOpen] = React.useState(false);
-	const [isSaving, setIsSaving] = React.useState(false);
-	const [saveMessage, setSaveMessage] = React.useState('');
+	const [modalOpen, setModalOpen] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
+	const [saveMessage, setSaveMessage] = useState('');
 	const [resultOk, setResultOk] = useState(false);
 
 	const closeModal = () => {

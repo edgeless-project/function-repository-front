@@ -2,13 +2,13 @@ import {useDispatch} from "react-redux";
 import {useSession, getSession} from "next-auth/react";
 import {setSessionAccessToken} from "@/features/account/sessionSlice";
 import {getUser} from "@/features/account/accountSlice";
-import React, {useEffect} from "react";
+import {ReactNode, useEffect} from "react";
 import { useRouter } from 'next/router';
 
 const jwtRefreshWindow = Number(process.env.NEXT_PUBLIC_JWT_REFRESH_WINDOW);
 
 type Props = {
-	children?: React.ReactNode;
+	children?: ReactNode;
 };
 
 const AuthSession = ({children}: Props) => {

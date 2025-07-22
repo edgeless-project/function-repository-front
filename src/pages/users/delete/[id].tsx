@@ -54,7 +54,6 @@ export default function WorkflowDelete() {
 		setIsSaving(true);
 		setModalOpen(true);
 
-		// Delete the workflow in the API
 		try {
 			const resp = await deleteUser(accessToken,id);
 			if (resp.count === 0)
