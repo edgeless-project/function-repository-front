@@ -43,7 +43,7 @@ export default function Page() {
 					.map(([key, card], idx) => (
 						<div key={key} id={idx.toString()}>
 							<Link href={card.link}>
-								<Card>
+								<Card data-id={card.title}>
 									<CardHeader>
 										<CardTitle className="text-center">{card.title}</CardTitle>
 									</CardHeader>

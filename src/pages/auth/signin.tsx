@@ -77,7 +77,7 @@ const Signin: React.FC = () => {
 				<CardContent>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(handleSubmit)}>
-							<CardContent className="max-w-2xl">
+							<CardContent className="max-w-2xl" data-id="form-login">
 								<FormField
 									control={form.control}
 									name="email"
@@ -110,7 +110,7 @@ const Signin: React.FC = () => {
 								/>
 							</CardContent>
 							<CardFooter className="flex-col max-w-5xl mt-8">
-								<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color w-1/2" type="submit">Log In</Button>
+								<Button data-id={"btn-login"} className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color w-1/2" type="submit">Log In</Button>
 							</CardFooter>
 						</form>
 					</Form>

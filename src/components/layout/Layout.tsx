@@ -49,7 +49,7 @@ export default function Layout({ children, title='' }: LayoutProps) {
               <div className="flex items-center px-4">
                 <div className="mx-4 w-full px-4 py-2">{title}</div>
               </div>
-              <div className="flex items-center pr-4">
+              <div className="flex items-center pr-4" data-id='avatar-menu'>
 								<DropdownMenu>
 									<DropdownMenuTrigger>
 										<Avatar>
