@@ -17,13 +17,17 @@ const AuthSession = ({children}: Props) => {
 	const dispatch = useDispatch();
 	const router = useRouter();
 
+	const currentPath = router.pathname;
+
 	if(session?.accessToken) {
 		dispatch(setSessionAccessToken(session.accessToken as string));
 		dispatch(getUser() as any);
 	}
 
 	useEffect(() => {
-		if (!session && status !== "loading") {
+		const currentPath = router.pathname;
+
+		if (!session && status !== "loading" && currentPath !== "/auth/signin") {
 			router.push("/auth/signin").then();
 		} else if(session) {
 			const expDate = new Date(Number(session.expires));
