@@ -76,7 +76,7 @@ export default function Users() {
 					<CardTitle>List of users</CardTitle>
 					{!usersLoading && <CardDescription>{total} users found</CardDescription>}
 					<div className="flex justify-end">
-						<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+						<Button asChild data-id="btn-create-user" className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 							<Link href={'/users/create'}>Create new user</Link>
 						</Button>
 					</div>
@@ -98,19 +98,19 @@ export default function Users() {
               </TableHeader>
               <TableBody>
 								{users.map(u => (
-									<TableRow key={u.id}>
-										<TableCell className="font-medium">{u.email}</TableCell>
-										<TableCell className="font-medium">{u.role}</TableCell>
-										<TableCell>{format(date(u.createdAt), timeFormatGeneral,"en")}</TableCell>
-										<TableCell>{format(date(u.updatedAt), timeFormatGeneral,"en")}</TableCell>
+									<TableRow data-id={u.email} key={u.id}>
+										<TableCell data-id="email" className="font-medium">{u.email}</TableCell>
+										<TableCell data-id="role" className="font-medium">{u.role}</TableCell>
+										<TableCell data-id="createdAt" >{format(date(u.createdAt), timeFormatGeneral,"en")}</TableCell>
+										<TableCell data-id="updatedAt" >{format(date(u.updatedAt), timeFormatGeneral,"en")}</TableCell>
 										<TableCell className="text-right">
-											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+											<Button data-id="btn-change-password" asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 												<Link href={`/users/password/${u.id}`}>Change Password</Link>
 											</Button>
-											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+											<Button data-id="btn-edit" asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 												<Link href={`/users/edit/${u.id}`}>Edit</Link>
 											</Button>
-											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+											<Button data-id="btn-delete" asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 												<Link href={`/users/delete/${u.id}`}>Delete</Link>
 											</Button>
 										</TableCell>

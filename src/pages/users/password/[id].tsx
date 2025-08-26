@@ -184,7 +184,7 @@ export default function SetUserPassword() {
 							variant="outline"
 							onClick={() => { router.back() }}
 						>Cancel</Button>
-						<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Change password</Button>
+						<Button data-id="btn-change" className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Change password</Button>
 					</div>
 				</form>
 			</Form>

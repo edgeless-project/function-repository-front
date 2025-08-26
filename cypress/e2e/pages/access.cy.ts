@@ -1,16 +1,16 @@
-
-const credentials = {
-	default:{
-		username: 'admin@admin.com',
-		password: 'admin123',
-	},
-	clusterAdmin1: {
-		username: 'email@email.com',
-		password: 'password'
-	}
-}
-
 describe('Login page', () => {
+
+	const credentials = {
+		default:{
+			username: 'admin@admin.com',
+			password: 'admin123',
+		},
+		clusterAdmin1: {
+			username: 'email@email.com',
+			password: 'password'
+		}
+	}
+
 	beforeEach(() => {
 		cy.visit('/')
 	})

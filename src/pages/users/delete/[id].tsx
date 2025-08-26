@@ -130,7 +130,7 @@ export default function WorkflowDelete() {
 					        variant="outline"
 					        onClick={() => { router.back() }}
 					>Cancel</Button>
-					<Button type="button" onClick={handleDelete} className="bg-red-500">Confirm deletion</Button>
+					<Button data-id="btn-confirm" type="button" onClick={handleDelete} className="bg-red-500">Confirm deletion</Button>
 				</div>
 				<DialogSave
 					isOpen={modalOpen}

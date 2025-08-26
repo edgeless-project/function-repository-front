@@ -162,11 +162,12 @@ export default function CreateUser() {
 					</Card>
 					<div className="flex justify-between my-8">
 						<Button
+							data-id="btn-cancel"
 							type="button"
 							variant="outline"
 							onClick={() => { router.back() }}
 						>Cancel</Button>
-						<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Create</Button>
+						<Button data-id="btn-create-user" className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Create</Button>
 					</div>
 				</form>
 			</Form>
