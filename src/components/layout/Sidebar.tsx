@@ -13,7 +13,7 @@ export default function Sidebar() {
 
 	return (
 		<div className="hidden md:flex flex-col w-64 bg-white border-r border-gray-200">
-			<Link href="/">
+			<Link data-id="home-logo" href="/">
 				<div className="flex justify-items-center h-16 border-b border-gray-200 bg-white">
 					<div className="basis-1/2 flex justify-center items-center">
 						<img className="h-14" src="/assets/images/logo_edgeless_alpha_light.png" alt={"Edgeless logo"}/>
@@ -27,28 +27,28 @@ export default function Sidebar() {
 			<div className="flex flex-col flex-1 overflow-y-auto">
 				<nav className="flex-1 px-2 py-4 bg-white">
 					{role &&
-						<Link href="/function"
+						<Link data-id="navbar-functions" href="/function"
 						      className="flex items-center px-4 py-2 text-edgeless-secondary-color hover:bg-gray-300 ">
 							<FunctionIcon className="h-6 w-6 mr-2"/>
 							Functions
 						</Link>
 					}
 					{(role==="APP_DEVELOPER" || role==="CLUSTER_ADMIN") &&
-						<Link href="/workflow"
+						<Link data-id="navbar-workflows" href="/workflow"
 						      className="flex items-center px-4 py-2 mt-2 text-edgeless-secondary-color hover:bg-gray-300">
 							<WorkflowIcon className="h-6 w-6 mr-2"/>
 							Workflows
 						</Link>
 					}
 					{(role==="CLUSTER_ADMIN") &&
-						<Link href="/users"
+						<Link data-id="navbar-users" href="/users"
 						      className="flex items-center px-4 py-2 mt-2 text-edgeless-secondary-color hover:bg-gray-300">
 							<UsersIcon className="h-6 w-6 mr-2"/>
 							Users
 						</Link>
 					}
 					{role &&
-						<Link href="/apikey"
+						<Link data-id="navbar-apikey" href="/apikey"
 						      className="flex items-center px-4 py-2 mt-2 text-edgeless-secondary-color hover:bg-gray-300">
 							<APIKeyIcon className="h-6 w-6 mr-2"/>
 							API Keys

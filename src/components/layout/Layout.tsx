@@ -58,7 +58,7 @@ export default function Layout({ children, title='' }: LayoutProps) {
 										</Avatar>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent>
-										<DropdownMenuLabel>{email}</DropdownMenuLabel>
+										<DropdownMenuLabel data-id="ddmenu-email">{email}</DropdownMenuLabel>
 										<DropdownMenuSeparator/>
 										<DropdownMenuItem>
 											{id.length > 0 ? <Link href={`/password/change/${id}`}>
@@ -68,7 +68,7 @@ export default function Layout({ children, title='' }: LayoutProps) {
 												Change Password
 											</span>}
 										</DropdownMenuItem>
-										<DropdownMenuItem onClick={handleSingOut}>Log Out</DropdownMenuItem>
+										<DropdownMenuItem data-id="btn-logout" onClick={handleSingOut}>Log Out</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
               </div>

@@ -15,7 +15,7 @@ describe('Login', () => {
 		cy.visit('/')
 	})
 
-	describe('Login OK', () => {
+	describe('Login', () => {
 		it('Displays login page', () => {
 			cy.get('.text-2xl').should('contain', 'Access your account');
 		})
@@ -54,14 +54,33 @@ describe('Login', () => {
 		});
 	})
 
-	describe('Login KO', () =>{
-		it('Should not allow for login with wrong credentials', () => {
+	describe('Login error handling', () =>{
+		it('Handling login with wrong credentials', () => {
 			cy.get('[name="email"]').type(credentials.default.username);
 			cy.get('[name="password"]').type('invalid-password');
 			cy.get('[data-id="btn-login"]').click();
 			cy.wait(1000); // Wait for credentials to validate
-			cy.get('[data-id="form-login"]').get('p').should('exist');
-			cy.get('[data-id="form-login"] p').should('contain.text', 'Login failed. Email or password incorrect.');
+			cy.get('#\\:R2cm\\:-form-item-message').should('contain.text', 'Login failed. Email or password incorrect.');
+		});
+
+		it('Handling incorrect email format', () => {
+			cy.get('[name="email"]').type('no email');
+			cy.get('[name="password"]').type('invalid-password');
+			cy.get('[data-id="btn-login"]').click();
+			cy.get('#\\:R1cm\\:-form-item-message').should('contain.text', 'The email must be a valid email address');
+		});
+
+		it('Handling incorrect password format', () => {
+			cy.get('[name="email"]').type('email@email.com');
+			cy.get('[data-id="btn-login"]').click();
+			cy.get('#\\:R2cm\\:-form-item-message').should('contain.text', 'Password is required');
+		});
+
+		it('Handling incorrect password format (length)', () => {
+			cy.get('[name="email"]').type('email@email.com');
+			cy.get('[name="password"]').type('1234');
+			cy.get('[data-id="btn-login"]').click();
+			cy.get('#\\:R2cm\\:-form-item-message').should('contain.text', 'Password must be longer than 8 characters');
 		});
 	})
 
