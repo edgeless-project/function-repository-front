@@ -205,6 +205,17 @@ describe('Users access and navigation',() => {
 			}
 		});
 	});
+	it('Logo home page redirection', ()=>{
+		//Log in default to create users
+		cy.get('[name="email"]').type(credentials.default.username);
+		cy.get('[name="password"]').type(credentials.default.password);
+		cy.get('[data-id="btn-login"]').click();
+
+		cy.url().should('eq', Cypress.config().baseUrl + '/');
+		cy.visit('/function')
+		cy.get('[data-id="home-logo"]').should('exist').click();
+		cy.url().should('eq', Cypress.config().baseUrl + '/');
+	});
 
 	describe('Cluster Admin type user', () => {
 		it('Log in, correct navigation options and access', () => {
@@ -281,6 +292,17 @@ describe('Users access and navigation',() => {
 			cy.contains('div', 'Access Denied').should('not.exist');
 			cy.visit('/')
 		});
+		it('Logo home page redirection', ()=>{
+			//Log in default to create users
+			cy.get('[name="email"]').type(credentials.clusterAdmin.username);
+			cy.get('[name="password"]').type(credentials.clusterAdmin.password);
+			cy.get('[data-id="btn-login"]').click();
+
+			cy.url().should('eq', Cypress.config().baseUrl + '/');
+			cy.visit('/function')
+			cy.get('[data-id="home-logo"]').should('exist').click();
+			cy.url().should('eq', Cypress.config().baseUrl + '/');
+		});
 	})
 
 	describe('Function Developer type user', () => {
@@ -353,6 +375,17 @@ describe('Users access and navigation',() => {
 			cy.url().should('eq', Cypress.config().baseUrl + '/apikey');
 			cy.contains('div', 'Access Denied').should('not.exist');
 			cy.visit('/')
+		});
+		it('Logo home page redirection', ()=>{
+			//Log in default to create users
+			cy.get('[name="email"]').type(credentials.functionDev.username);
+			cy.get('[name="password"]').type(credentials.functionDev.password);
+			cy.get('[data-id="btn-login"]').click();
+
+			cy.url().should('eq', Cypress.config().baseUrl + '/');
+			cy.visit('/function')
+			cy.get('[data-id="home-logo"]').should('exist').click();
+			cy.url().should('eq', Cypress.config().baseUrl + '/');
 		});
 	})
 
@@ -432,6 +465,17 @@ describe('Users access and navigation',() => {
 			cy.url().should('eq', Cypress.config().baseUrl + '/workflow');
 			cy.contains('div', 'Access Denied').should('not.exist');
 			cy.visit('/')
+		});
+		it('Logo home page redirection', ()=>{
+			//Log in default to create users
+			cy.get('[name="email"]').type(credentials.appDev.username);
+			cy.get('[name="password"]').type(credentials.appDev.password);
+			cy.get('[data-id="btn-login"]').click();
+
+			cy.url().should('eq', Cypress.config().baseUrl + '/');
+			cy.visit('/function')
+			cy.get('[data-id="home-logo"]').should('exist').click();
+			cy.url().should('eq', Cypress.config().baseUrl + '/');
 		});
 	})
 

@@ -25,7 +25,7 @@ export default function Sidebar() {
 			</Link>
 
 			<div className="flex flex-col flex-1 overflow-y-auto">
-				<nav className="flex-1 px-2 py-4 bg-white">
+				<nav className="flex-1 px-2 py-4 bg-white" data-id="navbar">
 					{role &&
 						<Link data-id="navbar-functions" href="/function"
 						      className="flex items-center px-4 py-2 text-edgeless-secondary-color hover:bg-gray-300 ">
