@@ -80,12 +80,12 @@ export default function FunctionList() {
 	return (
 		<Layout title="Functions">
 			{hasRole &&
-				<Card>
+				<Card data-id="functions-panel">
 					<CardHeader>
 						<CardTitle>List of functions</CardTitle>
 						{!functionsLoading && <CardDescription>{total} functions found</CardDescription>}
 						<div className="flex justify-end">
-							<Button type="button" asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+							<Button data-id="btn-create" type="button" asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 								<Link href={'/function/create'}>Create new function</Link>
 							</Button>
 						</div>
@@ -94,7 +94,7 @@ export default function FunctionList() {
 						{functionsLoading && <div className="flex items-center justify-center py-20">
 							<Spinner />
 						</div>}
-						{!functionsLoading && <Table>
+						{!functionsLoading && <Table data-id="functions-table">
 							<TableHeader>
 								<TableRow>
 									<TableHead>Id</TableHead>
@@ -107,7 +107,7 @@ export default function FunctionList() {
 							</TableHeader>
 							<TableBody>
 								{functions.map(fun => (
-									<TableRow key={fun.id}>
+									<TableRow data-id={`row-${fun.id}`} key={fun.id}>
 										<TableCell className="font-medium">{fun.id}</TableCell>
 										<TableCell>{fun.function_types.flatMap(ft => {
 											return ft.type
@@ -117,13 +117,13 @@ export default function FunctionList() {
 										<TableCell>{format(date(fun.createdAt), timeFormatGeneral,"en")}</TableCell>
 										<TableCell>{format(date(fun.updatedAt), timeFormatGeneral,"en")}</TableCell>
 										<TableCell className="text-right">
-											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+											<Button data-id="btn-view" asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 												<Link href={`/function/view/${fun.id}`}>View</Link>
 											</Button>
-											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+											<Button data-id="btn-edit" asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 												<Link href={`/function/edit/${fun.id}`}>Edit</Link>
 											</Button>
-											<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+											<Button data-id="btn-delete" asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 												<Link href={`/function/delete/${fun.id}`}>Delete</Link>
 											</Button>
 										</TableCell>

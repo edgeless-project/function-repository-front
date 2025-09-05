@@ -63,7 +63,7 @@ export default function FunctionView() {
 					<CardContent className="max-w-5xl">
 						<div className="flex my-3">
 							<div className="w-48 font-bold">Id:</div>
-							<div className="w-96">{functions[0].id}</div>
+							<div data-id="function-id" className="w-96">{functions[0].id}</div>
 						</div>
 					</CardContent>
 				</Card>}
@@ -84,14 +84,14 @@ export default function FunctionView() {
 							</TableHeader>
 							<TableBody>
 								{functions.map(fun => (
-									<TableRow key={fun.version}>
-										<TableCell>{fun.version}</TableCell>
-										<TableCell>{fun.function_types.flatMap(ft => {
+									<TableRow data-id={`v_${fun.version}`} key={fun.version}>
+										<TableCell data-id={`v_${fun.version}-version`}>{fun.version}</TableCell>
+										<TableCell data-id={`v_${fun.version}-types`}>{fun.function_types.flatMap(ft => {
 											return ft.type
 										}).join(", ")}</TableCell>
-										<TableCell>{fun.outputs.join(', ')}</TableCell>
-										<TableCell>{format(date(fun.createdAt), timeFormatGeneral,"en")}</TableCell>
-										<TableCell>{format(date(fun.updatedAt), timeFormatGeneral,"en")}</TableCell>
+										<TableCell data-id={`v_${fun.version}-outputs`}>{fun.outputs.join(', ')}</TableCell>
+										<TableCell data-id={`v_${fun.version}-createdAt`}>{format(date(fun.createdAt), timeFormatGeneral,"en")}</TableCell>
+										<TableCell data-id={`v_${fun.version}-updatedAt`}>{format(date(fun.updatedAt), timeFormatGeneral,"en")}</TableCell>
 									</TableRow>
 								))}
 							</TableBody>
@@ -99,9 +99,11 @@ export default function FunctionView() {
 					</CardContent>
 				</Card>}
 				<div className="flex justify-between my-8">
-					<Button type="button"
-					        variant="outline"
-					        onClick={() => { router.back() }}
+					<Button
+						type="button"
+					  data-id="btn-back"
+						variant="outline"
+						onClick={() => { router.back() }}
 					>Go back</Button>
 				</div>
 			</div>}

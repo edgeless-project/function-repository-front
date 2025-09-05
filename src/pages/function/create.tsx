@@ -203,7 +203,6 @@ export default function FunctionCreate() {
 		                              outputs: string }, "types", "id">) => {
 		field.onChange(type);
 		f.functionType = type;
-
 	}
 
 	return (
@@ -211,7 +210,7 @@ export default function FunctionCreate() {
 			{hasRole &&
 				<Card>
 					<CardHeader>
-						<CardTitle>Function class specification</CardTitle>
+						<CardTitle data-id={"create-title"}>Function class specification</CardTitle>
 					</CardHeader>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -221,7 +220,7 @@ export default function FunctionCreate() {
 									name="id"
 									render={({field}) => {
 										return (
-											<FormItem>
+											<FormItem data-id="field-id">
 												<FormLabel>Id</FormLabel>
 												<FormControl>
 													<Input type="text" placeholder="Id" {...field} />
@@ -236,7 +235,10 @@ export default function FunctionCreate() {
 									name="version"
 									render={({field}) => {
 										return (
-											<FormItem className="mt-5">
+											<FormItem
+												className="mt-5"
+												data-id="field-version"
+											>
 												<FormLabel>Version</FormLabel>
 												<FormControl>
 													<Input type="text" placeholder="version" {...field} />
@@ -246,9 +248,9 @@ export default function FunctionCreate() {
 										);
 									}}
 								/>
-								<FormItem className={"mt-5"} >
+								<FormItem className={"mt-5"}>
 									<FormLabel>Function types</FormLabel>
-									<Button className="ml-16 bg-edgeless-primary-color" type="button" onClick={()=>{append(
+									<Button data-id="btn-field-types-add" className="ml-16 bg-edgeless-primary-color" type="button" onClick={()=>{append(
 										{functionType: functionTypesOptions[0], file: new File([],"")})}
 									}>+ Add Type</Button>
 								</FormItem>
@@ -257,7 +259,7 @@ export default function FunctionCreate() {
 									{fields.map((f, i) => {
 										return (
 											<Card key={f.id} className="my-6 pt-4 border-2">
-												<CardContent className="">
+												<CardContent data-id={`card-content-type`}>
 													<TooltipProvider>
 														<Tooltip>
 															<TooltipTrigger
@@ -273,14 +275,17 @@ export default function FunctionCreate() {
 													</TooltipProvider>
 													<FormField
 														control={form.control}
-														name = {`types.${i}.functionType`}
+														name={`types.${i}.functionType`}
 														render={({field}) => {
 															return (
-																<FormItem className="">
+																<FormItem
+																	data-id="selector-function-type"
+																>
 																	<FormLabel>Function type</FormLabel>
-																	<Select onValueChange={
-																		(v) => onChangeFunctionType(v, field, f)}
-																	        defaultValue={field.value}>
+																	<Select
+																		onValueChange={(v) => onChangeFunctionType(v, field, f)}
+																		defaultValue={field.value}
+																	>
 																		<FormControl>
 																			<SelectTrigger>
 																				<SelectValue placeholder="Select a type" />
@@ -300,10 +305,10 @@ export default function FunctionCreate() {
 													/>
 													<FormField
 														control={form.control}
-														name= {`types.${i}.file`}
+														name={`types.${i}.file`}
 														render={({field}) => {
 															return (
-																<FormItem className="mt-5">
+																<FormItem data-id="file-function-type" className="mt-5">
 																	<FormLabel>Code file</FormLabel>
 																	<FormControl>
 																		<Input
@@ -326,7 +331,9 @@ export default function FunctionCreate() {
 									name="outputs"
 									render={({field}) => {
 										return (
-											<FormItem className="mt-1">
+											<FormItem
+												data-id="field-outputs"
+												className="mt-1">
 												<FormLabel>Outputs</FormLabel>
 												<FormControl>
 													<Input type="text" placeholder="Outputs" {...field} />
@@ -340,11 +347,12 @@ export default function FunctionCreate() {
 							</CardContent>
 							<CardFooter className="flex justify-between max-w-5xl mt-8">
 								<Button
+									data-id="btn-cancel"
 									type="button"
 									variant="outline"
 									onClick={() => { router.back() }}
 								>Cancel</Button>
-								<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Create</Button>
+								<Button data-id="btn-create" className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Create</Button>
 							</CardFooter>
 						</form>
 					</Form>
