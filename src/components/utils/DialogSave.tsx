@@ -24,7 +24,7 @@ export default function DialogSave ({isOpen, title, description, isLoading, onCl
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
 
-					{!isLoading && <DialogDescription>
+					{!isLoading && <DialogDescription data-id="modal-description">
 						{description}
 					</DialogDescription>}
 					{isLoading && <div className="flex items-center justify-center py-5">
@@ -33,7 +33,7 @@ export default function DialogSave ({isOpen, title, description, isLoading, onCl
 
 				</DialogHeader>
 				{!isLoading && <DialogFooter className="flex justify-end">
-					<Button type={"button"} variant="outline" onClick={onClose}>Close</Button>
+					<Button type={"button"} variant="outline" data-id="btn-modal-close" onClick={onClose}>Close</Button>
 				</DialogFooter>}
 			</DialogContent>
 		</Dialog>

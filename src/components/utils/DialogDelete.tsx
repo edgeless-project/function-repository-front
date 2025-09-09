@@ -26,7 +26,7 @@ export default function DialogDelete ({isOpen, title, description, isLoading, re
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
 
-					{!isLoading && <DialogDescription>
+					{!isLoading && <DialogDescription data-id="modal-description">
 						{description}
 					</DialogDescription>}
 					{isLoading &&
@@ -37,8 +37,8 @@ export default function DialogDelete ({isOpen, title, description, isLoading, re
 
 				</DialogHeader>
 				{!isLoading && <DialogFooter className="flex justify-end">
-					<Button type={"button"} variant="outline" onClick={onClose}>Close</Button>
-					{!resultOK && <Button type={"button"} variant="destructive" onClick={onConfirm}>Confirm</Button>}
+					<Button data-id="btn-close-delete" type={"button"} variant="outline" onClick={onClose}>Close</Button>
+					{!resultOK && <Button data-id="btn-confirm-delete" type={"button"} variant="destructive" onClick={onConfirm}>Confirm</Button>}
 				</DialogFooter>}
 			</DialogContent>
 		</Dialog>

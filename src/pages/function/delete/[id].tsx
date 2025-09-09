@@ -93,6 +93,7 @@ export default function FunctionDelete() {
 							<div className="w-96">{id}</div>
 							<div className="flex justify-end">
 								<Button
+									data-id="btn-delete-function"
 									className="ml-6"
 									variant="destructive"
 									onClick={() => handleDeleteModal('')}
@@ -128,6 +129,7 @@ export default function FunctionDelete() {
 										<TableCell>{format(date(v.updatedAt), timeFormatGeneral,"en")}</TableCell>
 										<TableCell className="text-right">
 											<Button
+												data-id="btn-delete-version"
 												className="ml-2 red"
 												variant="destructive"
 												onClick={() => handleDeleteModal(v.version)}

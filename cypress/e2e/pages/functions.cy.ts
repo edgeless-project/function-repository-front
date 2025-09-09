@@ -4,21 +4,6 @@ describe('Functions management and functionalities', () => {
 			username: 'admin@admin.com',
 			password: 'admin123',
 			role: 'CLUSTER_ADMIN'
-		},
-		clusterAdmin: {
-			username: 'clusterAdmin@email.com',
-			password: 'password',
-			role: 'CLUSTER_ADMIN'
-		},
-		functionDev: {
-			username: 'fundev@email.com',
-			password: 'password1',
-			role: 'FUNC_DEVELOPER'
-		},
-		appDev: {
-			username: 'appdev@email.com',
-			password: 'password2',
-			role: 'APP_DEVELOPER'
 		}
 	}
 	const name: string = `test-${new Date().valueOf()}`;
@@ -69,7 +54,6 @@ describe('Functions management and functionalities', () => {
 		cy.get('[data-id="navbar-users"]').should('exist');
 	});
 
-
 	describe('Create function form validation', () => {
 		beforeEach(() => {
 			cy.get('[data-id="btn-create"]').should('exist').click();
@@ -92,16 +76,16 @@ describe('Functions management and functionalities', () => {
 				.should('exist')
 				.should('have.value', '0.1')
 				.clear()
-				.type('0.2')
-				.should('have.value', '0.2');
+				.type(function_multi_type.version)
+				.should('have.value', function_multi_type.version);
 
 			cy.get('[data-id="field-outputs"]')
 				.should('exist');
 			cy.get('[name="outputs"]')
 				.should('exist')
 				.clear()
-				.type('test-out')
-				.should('have.value', 'test-out');
+				.type(function_multi_type.outputs)
+				.should('have.value', function_multi_type.outputs);
 
 			cy.get('[data-id="selector-function-type"]')
 				.should('exist')
@@ -416,7 +400,6 @@ describe('Functions management and functionalities', () => {
 			cy.get('#\\:r8\\:-form-item-message').should('not.exist');
 		});
 	});
-
 	describe('View function', () => {
 
 		beforeEach(() => {
@@ -448,16 +431,135 @@ describe('Functions management and functionalities', () => {
 		});
 	});
 	describe('Edit function', () => {
-		const name_mono = 'test-1756999662893-mono_type';
 		beforeEach(() => {
-			cy.get(`[data-id="row-${name_mono}"]`)
+			cy.get(`[data-id="row-${functions_created[0]}"]`)
 				.should('exist')
 				.find('[data-id="btn-edit"]')
 				.click();
 		})
-		it.only('Edit function', () => {
-			cy.url().should('include', `/function/edit/${name_mono}`);
+		it('Edit function output', () => {
+			cy.url().should('include', `/function/edit/${functions_created[0]}`);
+
+			cy.get('[data-id="function-id"]').should('contain.text', functions_created[0]);
+			cy.get('[data-id="function-version"]').should('contain.text', function_multi_type.version);
+
+			cy.get('[name="outputs"]')
+				.should('have.value', function_multi_type.outputs)
+				.clear()
+				.type(function_multi_type.outputs.split(', ')[1])
+				.should('have.value', function_multi_type.outputs.split(', ')[1]);
+
+			cy.get('[data-id="btn-update"]').should('exist').click();
+			cy.get('[data-id="modal-description"]').should('contain.text', 'The function has been updated successfully');
+
+			cy.get('[data-id="btn-modal-close"]').should('exist').click();
+			cy.get(`[data-id="row-${functions_created[0]}"]`)
+				.should('exist')
+				.find('[data-id="btn-edit"]')
+				.click();
+			cy.get('[name="outputs"]')
+				.should('have.value', function_multi_type.outputs.split(', ')[1])
+		})
+		it('Edit function add type', () => {
+			cy.url().should('include', `/function/edit/${functions_created[0]}`);
+
+			cy.get('[data-id="function-id"]').should('contain.text', functions_created[0]);
+			cy.get('[data-id="function-version"]').should('contain.text', function_multi_type.version);
+
+			cy.get('[data-id="btn-field-types-add"]').should('exist').click();
+			cy.get('[data-id="file-function-type"] > input')
+				.eq(1)
+				.selectFile('cypress/fixtures/testfile.txt', { force: true })
+				.should('have.value', 'C:\\fakepath\\testfile.txt');
+
+			cy.get('[data-id="btn-update"]').should('exist').click();
+			cy.get('[data-id="modal-description"]').should('contain.text', 'The function has been updated successfully');
+
+			cy.get('[data-id="btn-modal-close"]').should('exist').click();
+			cy.get(`[data-id="row-${functions_created[0]}"]`)
+				.should('exist')
+				.find('[data-id="btn-edit"]')
+				.click();
+			cy.get('[data-id="file-function-type"] > input')
+				.should('have.length',2);
+		})
+		it('Edit function type and output', () => {
+			cy.url().should('include', `/function/edit/${functions_created[0]}`);
+
+			cy.get('[data-id="function-id"]').should('contain.text', functions_created[0]);
+			cy.get('[data-id="function-version"]').should('contain.text', function_multi_type.version);
+
+			cy.get('[data-id="card-content-type"] > button')
+				.should('have.length', 2)
+				.eq(0)
+				.should('contain.text', '-')
+				.click();
+
+			cy.get('[name="outputs"]')
+				.should('have.value', function_multi_type.outputs.split(', ')[1])
+				.clear()
+				.type(function_multi_type.outputs)
+				.should('have.value', function_multi_type.outputs);
+
+			cy.get('[data-id="btn-update"]').should('exist').click();
+			cy.get('[data-id="modal-description"]').should('contain.text', 'The function has been updated successfully');
+
+			cy.get('[data-id="btn-modal-close"]').should('exist').click();
+			cy.get(`[data-id="row-${functions_created[0]}"]`)
+				.should('exist')
+				.find('[data-id="btn-edit"]')
+				.click();
+			cy.get('[data-id="file-function-type"] > input')
+				.should('have.length',1);
+			cy.get('[name="outputs"]').should('have.value', function_multi_type.outputs);
+		})
+		it('Empty type error handling', () => {
+			cy.url().should('include', `/function/edit/${functions_created[0]}`);
+
+			cy.get('[data-id="function-id"]').should('contain.text', functions_created[0]);
+			cy.get('[data-id="function-version"]').should('contain.text', function_multi_type.version);
+
+			cy.get('[data-id="btn-field-types-add"]').should('exist').click();
+			cy.get('[data-id="btn-update"]').should('exist').click({force: true});
+
+			cy.get('[data-id="modal-description"]').should('contain.text', 'ERROR: File not provided');
 		})
 	});
+	describe('Delete function', () => {
+		it('Delete function', () => {
+			cy.get(`[data-id="row-${functions_created[0]}"]`)
+				.should('exist')
+				.find('[data-id="btn-delete"]')
+				.click();
+			cy.get('[data-id="btn-delete-function"]')
+				.should('exist')
+				.click();
+			cy.get('[data-id="modal-description"]')
+				.should('contain.text', `Confirm to delete function id ${functions_created[0]}.`);
+			cy.get('[data-id="btn-confirm-delete"').should('exist').click();
+
+			cy.get(`[data-id="row-${functions_created[0]}"]`)
+				.should('not.exist');
+		});
+		it('Delete specific version of a function', () => {
+			cy.get(`[data-id="row-${functions_created[1]}"]`)
+				.should('exist')
+				.find('[data-id="btn-delete"]')
+				.click();
+			cy.get('[data-id="btn-delete-version"]')
+				.should('exist')
+				.click();
+			cy.get('[data-id="modal-description"]')
+				.should('contain.text', `Confirm to delete function id ${functions_created[1]} version ${function_multi_type.version}.`);
+			cy.get('[data-id="btn-confirm-delete"').should('exist').click();
+
+			cy.get('[data-id="modal-description"]')
+				.should('contain.text', `Function deleted!`);
+			cy.get('[data-id="btn-close-delete"').should('exist').click();
+
+			cy.get(`[data-id="row-${functions_created[1]}"]`)
+				.should('not.exist');
+		});
+	})
 
 });

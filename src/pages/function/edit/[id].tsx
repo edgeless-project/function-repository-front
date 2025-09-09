@@ -194,11 +194,11 @@ export default function FunctionEdit() {
 						<CardContent className="max-w-5xl">
 							<div className="flex my-3">
 								<div className="w-48 font-bold">Id:</div>
-								<div className="w-96">{fun.id}</div>
+								<div className="w-96" data-id={"function-id"}>{fun.id}</div>
 							</div>
 							<div className="flex my-3">
 								<div className="w-48 font-bold">Version:</div>
-								<div className="w-96">{fun.version}</div>
+								<div className="w-96" data-id={"function-version"}>{fun.version}</div>
 							</div>
 						</CardContent>
 					</Card>
@@ -212,16 +212,20 @@ export default function FunctionEdit() {
 								<CardContent className="max-w-5xl">
 									<FormItem className={"mt-5"} >
 										<FormLabel>Function types</FormLabel>
-										<Button className="ml-16 bg-edgeless-primary-color" type="button" onClick={()=>{append(
-											{functionType: TypesOptions[0], file: new File([],"")})}
-										}>+ Add Type</Button>
+										<Button
+											data-id="btn-field-types-add"
+											className="ml-16 bg-edgeless-primary-color"
+											type="button"
+											onClick={()=>{append(
+												{functionType: TypesOptions[0], file: new File([],"")})}}
+										>+ Add Type</Button>
 									</FormItem>
 									<FormMessage />
 									<CardContent style={{ margin: 10 }}>
 										{fields.map((f, i) => {
 											return (
 												<Card key={f.id} className="my-6 pt-4 border-2">
-													<CardContent className="">
+													<CardContent data-id="card-content-type">
 														<TooltipProvider>
 															<Tooltip>
 																<TooltipTrigger
@@ -240,7 +244,7 @@ export default function FunctionEdit() {
 															name = {`types.${i}.functionType`}
 															render={({field}) => {
 																return (
-																	<FormItem className="">
+																	<FormItem data-id="selector-function-type">
 																		<FormLabel>Function type</FormLabel>
 																		<Select onValueChange={(v) => {
 																			field.onChange(v);
@@ -270,7 +274,7 @@ export default function FunctionEdit() {
 															name= {`types.${i}.file`}
 															render={({field}) => {
 																return (
-																	<FormItem className="mt-5">
+																	<FormItem className="mt-5" data-id="file-function-type">
 																		<FormLabel>Code file</FormLabel>
 																		<FormControl>
 																			<Input
@@ -312,7 +316,10 @@ export default function FunctionEdit() {
 										variant="outline"
 										onClick={() => { router.back() }}
 									>Cancel</Button>
-									<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Update</Button>
+									<Button
+										data-id="btn-update"
+										className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color"
+										type="submit">Update</Button>
 								</CardFooter>
 							</form>
 						</Form>
