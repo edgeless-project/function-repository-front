@@ -92,11 +92,11 @@ export default function WorkflowList() {
 	return (
 		<Layout title="Workflows">
 			<Card>
-				<CardHeader>
+				<CardHeader data-id={`workflows-panel`} >
 					<CardTitle>List of workflows</CardTitle>
 					{!workflowsLoading && <CardDescription>{total} workflows found</CardDescription>}
 					<div className="flex justify-end">
-						<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+						<Button data-id={`btn-create`} asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 							<Link href={'/workflow/create'}>Create new workflow</Link>
 						</Button>
 					</div>
@@ -105,7 +105,7 @@ export default function WorkflowList() {
 					{workflowsLoading && <div className="flex items-center justify-center py-20">
 						<Spinner />
 					</div>}
-					{!workflowsLoading && <Table>
+					{!workflowsLoading && <Table  data-id={`workflows-table`}>
 						<TableHeader>
 							<TableRow>
 								<TableHead className="w-[300px]">Name</TableHead>
@@ -116,18 +116,18 @@ export default function WorkflowList() {
 						</TableHeader>
 						<TableBody>
 							{workflows.map(w => (
-								<TableRow key={w.name}>
-									<TableCell className="font-medium">{w.name}</TableCell>
-									<TableCell>{format(date(w.createdAt), timeFormatGeneral,"en")}</TableCell>
-									<TableCell>{format(date(w.updatedAt), timeFormatGeneral,"en")}</TableCell>
+								<TableRow data-id={`workflow-row`} key={w.name}>
+									<TableCell className="font-medium" data-id={`name`}>{w.name}</TableCell>
+									<TableCell data-id={`created`}>{format(date(w.createdAt), timeFormatGeneral,"en")}</TableCell>
+									<TableCell data-id={`updated`}>{format(date(w.updatedAt), timeFormatGeneral,"en")}</TableCell>
 									<TableCell className="text-right">
-										<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+										<Button data-id={`btn-view`} asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 											<Link href={`/workflow/view/${w.name}`}>View</Link>
 										</Button>
-										<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+										<Button data-id={`btn-edit`} asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 											<Link href={`/workflow/edit/${w.name}`}>Edit</Link>
 										</Button>
-										<Button asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
+										<Button data-id={`btn-delete`} asChild className="ml-2 bg-edgeless-primary-color hover:bg-edgeless-secondary-color">
 											<Link href={`/workflow/delete/${w.name}`}>Delete</Link>
 										</Button>
 									</TableCell>

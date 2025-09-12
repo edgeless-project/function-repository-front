@@ -187,7 +187,7 @@ export default function WorkflowEdit() {
 							router.back()
 						}}
 					>Cancel</Button>
-					<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" onClick={handleSubmit}>Save</Button>
+					<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" data-id={`btn-save`} onClick={handleSubmit}>Save</Button>
 				</div>
 				<DialogSave
 					isOpen={modalOpen}

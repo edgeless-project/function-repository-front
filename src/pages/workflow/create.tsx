@@ -205,11 +205,12 @@ export default function WorkflowCreate() {
 					</Card>
 					<div className="flex justify-between my-8">
 						<Button
+							data-id={`btn-cancel`}
 							type="button"
 							variant="outline"
 							onClick={() => { router.back() }}
 						>Cancel</Button>
-						<Button className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Save</Button>
+						<Button data-id={`btn-save`} className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" type="submit">Save</Button>
 					</div>
 				</form>
 			</Form>
