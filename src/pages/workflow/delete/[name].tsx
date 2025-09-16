@@ -86,15 +86,15 @@ export default function WorkflowDelete() {
 					<CardContent className="max-w-5xl">
 						<div className="flex my-3">
 							<div className="w-48 font-bold">Name:</div>
-							<div className="w-96">{workflow.name}</div>
+							<div className="w-96" data-id={"wf_name"}>{workflow.name}</div>
 						</div>
 						<div className="flex my-3">
 							<div className="w-48 font-bold">Created at:</div>
-							<div className="w-96">{format(date(workflow.createdAt), timeFormatGeneral,"en")}</div>
+							<div className="w-96" data-id={"wf_createdAt"}>{format(date(workflow.createdAt), timeFormatGeneral,"en")}</div>
 						</div>
 						<div className="flex my-3">
 							<div className="w-48 font-bold">Updated at:</div>
-							<div className="w-96">{format(date(workflow.updatedAt), timeFormatGeneral,"en")}</div>
+							<div className="w-96" data-id={"wf_updatedAt"}>{format(date(workflow.updatedAt), timeFormatGeneral,"en")}</div>
 						</div>
 					</CardContent>
 				</Card>}
@@ -103,7 +103,7 @@ export default function WorkflowDelete() {
 					        variant="outline"
 					        onClick={() => { router.back() }}
 					>Cancel</Button>
-					<Button type="button" onClick={handleDelete} className="bg-red-500">Confirm deletion</Button>
+					<Button type="button" onClick={handleDelete} className="bg-red-500" data-id={"btn-confirm"}>Confirm deletion</Button>
 				</div>
 				<DialogSave
 					isOpen={modalOpen}

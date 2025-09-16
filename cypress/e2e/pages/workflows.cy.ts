@@ -80,7 +80,7 @@ describe('Workflow management and functionalities', () => {
 				.should('exist')
 				.type(workflow.name+"_jsonEditor")
 				.should('have.value', workflow.name+"_jsonEditor");
-			for (let i = 0; i < 4; i++) {
+			for (let i = 0; i < 10; i++) {
 				cy.get('.ace_content')
 					.should('exist')
 					.click()
@@ -134,20 +134,19 @@ describe('Workflow management and functionalities', () => {
 		});
 	});
 
-	describe('Edit workflow',()=>{
-		const nameTemp = 'test_workflow_1757668439130_jsonEditor';
+	describe('Edit workflow',()=> {
 		const editJson = `{"functions": [{"name": "funcEdit","class_specification_id": "test","class_specification_version": "0.2","output_mapping": {"test-out1": "func2"},"annotations": {}},`+
 			`{"name": "func2Edit","class_specification_id": "test","class_specification_version": "0.2","output_mapping": {"test-out1": "res_out"},"annotations": {}}],`+
 			`"resources": [{"name": "res1","class_type": "http-ingress","output_mapping": {"output_func1": "func1"},"configurations": {}},{"name": "res_out","class_type": "http-egress","output_mapping": {},"configurations": {}}],`+
 			`"annotations": {}}`;
 
 		it('Edit a workflow', () => {
-			cy.contains(`[data-id="workflow-row"]`, nameTemp)
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_jsonEditor")
 				.should('exist')
 				.find(`[data-id="btn-edit"]`)
 				.click();
 
-			for (let i = 0; i < 4; i++) {
+			for (let i = 0; i < 10; i++) {
 				cy.get('.ace_content')
 					.should('exist')
 					.click()
@@ -168,5 +167,72 @@ describe('Workflow management and functionalities', () => {
 		})
 	})
 
+	describe('Delete workflow',()=> {
+		it('Delete a workflow blank', () => {
+			cy.contains(`[data-id="workflow-row"]`, workflow.name)
+				.should('exist')
+				.find(`[data-id="btn-delete"]`)
+				.click();
+
+			cy.wait(1000);
+
+			cy.get('[data-id="wf_name"]')
+				.should('exist')
+				.should('contain.text', workflow.name);
+
+			cy.get('[data-id="wf_createdAt"]')
+				.should('exist')
+				.invoke('text').should('match', /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
+
+			cy.get('[data-id="wf_updatedAt"]')
+				.should('exist')
+				.invoke('text').should('match', /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
+
+			cy.get('[data-id="btn-confirm"]')
+				.should('exist')
+				.click();
+
+			cy.get('[data-id="modal-description"]')
+				.should('exist')
+				.should('contain.text', 'The workflow has been deleted successfully');
+
+			cy.get('[data-id="btn-modal-close"]').click();
+			cy.contains(`[data-id="workflow-row"]`, workflow.name)
+				.should('not.exist');
+		});
+
+		it('Delete a workflow jsonEditor', () => {
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_jsonEditor")
+				.should('exist')
+				.find(`[data-id="btn-delete"]`)
+				.click();
+
+			cy.wait(1000);
+
+			cy.get('[data-id="wf_name"]')
+				.should('exist')
+				.should('contain.text', workflow.name+"_jsonEditor");
+
+			cy.get('[data-id="wf_createdAt"]')
+				.should('exist')
+				.invoke('text').should('match', /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
+
+			cy.get('[data-id="wf_updatedAt"]')
+				.should('exist')
+				.invoke('text').should('match', /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
+
+			cy.get('[data-id="btn-confirm"]')
+				.should('exist')
+				.click();
+
+			cy.get('[data-id="modal-description"]')
+				.should('exist')
+				.should('contain.text', 'The workflow has been deleted successfully');
+
+			cy.get('[data-id="btn-modal-close"]').click();
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_jsonEditor")
+				.should('not.exist');
+		});
+	})
 
 })
