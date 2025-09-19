@@ -281,7 +281,20 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
 	const handleDeleteNode = () => {
 		isLoadPanel(false);
 		isEditNode(false);
-		if (selNode != null) deleteNodeData(selNode.name);
+
+		if (selNode != null) {
+			deleteNodeData(selNode.name);
+			value.functions.forEach(f => {
+				for (let key in f.output_mapping)
+					if (f.output_mapping[key] === selNode.name)
+						delete f.output_mapping[key];
+			});
+			value.resources.forEach(r => {
+				for (let key in r.output_mapping)
+					if (r.output_mapping[key] === selNode.name)
+						delete r.output_mapping[key];
+			});
+		}
 	};
 
 	const handleEditJSON = (value: object) => {
