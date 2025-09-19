@@ -133,6 +133,7 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
 						<label><b>NAME</b></label>
 						<div className="mt-1 mx-1">
 							<Input type="text" value={name}
+							       data-id={'name-create-node'}
 							       onChange={e => handleSetName(e.target.value)}/>
 						</div>
 					</div>
@@ -143,12 +144,14 @@ const CreatePanel:React.FC<CUPanelProps> = ({isResource, value, onChange, onClos
 					}
 					<div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
 						<Button
+							data-id={'btn-cancel-create-node'}
 							type="button"
 							className="py-2 px-4 rounded"
 							variant="outline"
 							onClick={onClose}>Cancel
 						</Button>
 						<Button
+							data-id={'btn-confirm-create-node'}
 							type="button"
 							className={((name !== "" && isComplete) ? "bg-edgeless-primary-color hover:bg-edgeless-secondary-color" : "bg-indigo-100") + " text-white py-2 px-4 rounded"}
 							onClick={handleSave} disabled={(name === "" || !isComplete)}>Confirm

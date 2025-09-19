@@ -70,8 +70,8 @@ export default function DialogInput ({isOpen, title, description, isLoading, opt
 
 				</DialogHeader>
 				{!isLoading && <DialogFooter className="flex justify-end">
-					<Button type={"button"} variant="outline" onClick={onClose}>Close</Button>
-					<Button type={"button"} className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" variant={value?"default":"ghost"} disabled={!value} onClick={handleClose}>Confirm</Button>
+					<Button type={"button"} data-id={'btn-dialog-close'} variant="outline" onClick={onClose}>Close</Button>
+					<Button type={"button"} data-id={'btn-dialog-confirm'} className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color" variant={value?"default":"ghost"} disabled={!value} onClick={handleClose}>Confirm</Button>
 				</DialogFooter>}
 			</DialogContent>
 		</Dialog>

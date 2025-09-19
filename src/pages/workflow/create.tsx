@@ -174,10 +174,10 @@ export default function WorkflowCreate() {
 						</CardHeader>
 						<CardContent>
 							{tabIdx==="visual-builder" && <div className="float-right">
-								<Button type="button" className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 mr-4 rounded" onClick={createNodeFunction}>
+								<Button type="button" data-id={'btn-add-function'} className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 mr-4 rounded" onClick={createNodeFunction}>
 									Add Function
 								</Button>
-								<Button type="button" className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-6 rounded" onClick={createNodeResource}>
+								<Button type="button" data-id={'btn-add-resource'} className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-6 rounded" onClick={createNodeResource}>
 									Add Resource
 								</Button>
 							</div>}

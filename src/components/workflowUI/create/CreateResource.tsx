@@ -33,7 +33,7 @@ const CreateResource:React.FC<props> = ({setIsCorrect, setResourceJson}) => {
 			<label><b>Class Type</b></label>
 			<div className="mx-1 mt-2">
 				<Select onValueChange={v => handleSelectType(v)}>
-					<SelectTrigger>
+					<SelectTrigger data-id={'select-id-create-resource'}>
 						<SelectValue placeholder="Select a type" />
 					</SelectTrigger>
 					<SelectContent>

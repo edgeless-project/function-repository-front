@@ -114,7 +114,7 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
 				<CardContent className="h-80">
 					<div className="flex flex-col w-80 h-full mt-4 overflow-y-auto">
 						<div className="mx-1">
-							<label><b>NAME</b></label><Input value={name}
+							<label><b>NAME</b></label><Input value={name} data-id={'name-update-node'}
 							                                 onChange={e => setName(e.target.value)}/>
 							{!isResource &&
 								<UpdateFunction funType={funType} setClassFunType={setClassFunType} classIdV={classIdV}
@@ -123,12 +123,14 @@ const UpdatePanel:React.FC<UpdatePanelProps> = ({node, value, onChange, onClose}
 						</div>
 						<div className="h-full grid grid-cols-2 gap-2 content-end justify-center">
 							<Button
+								data-id={'btn-cancel-update-node'}
 								type="button"
 								className="py-2 px-4 rounded"
 								variant="outline"
 								onClick={onClose}>Cancel
 							</Button>
 							<Button
+								data-id={'btn-confirm-update-node'}
 								type="button"
 								className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 px-4 rounded"
 								onClick={handleSave}>Save

@@ -35,3 +35,18 @@
 //     }
 //   }
 // }
+
+// @ts-ignore
+Cypress.Commands.add('dragTo', { prevSubject: 'element' }, (subject, target) => {
+  cy.wrap(subject).trigger('mousedown', { button: 0 });
+  cy.get(target).trigger('mousemove').trigger('mouseup', { force: true });
+});
+// @ts-ignore
+declare global {
+  namespace Cypress {
+    interface Chainable {
+	    // @ts-ignore
+	    dragTo(target: string): Chainable<Element>;
+    }
+  }
+}

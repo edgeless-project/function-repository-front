@@ -72,12 +72,13 @@ const CreateFunction:React.FC<Props> = ({setIsCorrect, setFunctionJson}) => {
 			<b>Class Specification Id</b>
 			<div className="relative">
 				<Input value={classSpecificationId} className="mt-1 mb-4"
+				       data-id={'type-id-create-function'}
 				       onChange={e => {
 					       setClassSpecificationId(e.target.value);
 				       }}/>
 				<div className="absolute top-0 right-0">
 					<Select onValueChange={v => handleSelectID(v)}>
-						<SelectTrigger>
+						<SelectTrigger data-id={'select-id-create-function'}>
 							<SelectValue placeholder="Select an ID" />
 						</SelectTrigger>
 						<SelectContent>

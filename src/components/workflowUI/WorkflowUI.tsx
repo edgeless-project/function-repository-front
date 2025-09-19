@@ -489,11 +489,13 @@ const Flow: React.FC<WorkFlowComponentProps> = ({value, readOnly, onChange, relo
 									<div className="flex justify-center">
 										{!readOnly && <div className="grid grid-cols-1">
 											<Button
+												data-id={'btn-edit-node'}
 												type="button"
 												className="bg-edgeless-primary-color hover:bg-edgeless-secondary-color text-white py-2 w-72 rounded"
 												onClick={handleEdit}>Edit
 											</Button>
 											<Button
+												data-id={'btn-delete-node'}
 												type="button"
 												className="bg-red-600 hover:bg-red-500 text-white mt-1 py-2 w-72 rounded"
 												onClick={handleDeleteNode}>Delete
