@@ -190,7 +190,7 @@ describe('Workflow management and functionalities', () => {
 				.should('exist');
 
 			// Edit an existing node's name (func1 -> func1_edited)
-			cy.wait(5000);
+			cy.wait(1000);
 			cy.get('[data-id="funcEdit"]').should('exist').dblclick().click();
 			cy.get('[data-id="btn-edit-node"]').should('exist').click();
 

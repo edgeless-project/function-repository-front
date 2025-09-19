@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-	  "cypress:open": "cypress open"
+	  "cypress:open": "cypress open",
+	  "cypress:run:pages": "cypress run --spec \"cypress/e2e/pages/**/*\""
   },
   "dependencies": {
     "@formkit/tempo": "^0.1.1",

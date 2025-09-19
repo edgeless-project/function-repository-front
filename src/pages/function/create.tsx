@@ -37,6 +37,7 @@ import { FunctionTypes } from "@/types/functions";
 import {useSelector} from "react-redux";
 import {selectRole} from "@/features/account/accountSlice";
 import {selectSessionAccessToken} from "@/features/account/sessionSlice";
+import {wait} from "next/dist/lib/wait";
 
 const functionTypesOptions = Object.keys(FunctionTypes).filter((item) => {
 	return isNaN(Number(item));
@@ -165,6 +166,7 @@ export default function FunctionCreate() {
 				setIsSaving(false);
 			}
 		}
+		wait(1000);
 
 		// Create the function in the API
 		try {
