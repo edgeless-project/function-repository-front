@@ -62,7 +62,7 @@ describe('Workflow management and functionalities', () => {
 				.should('exist')
 				.should('contain.text', 'The workflow has been created successfully');
 		});
-		it('Workflow listed on the index page', () => {
+		it('Workflow listed on the list page', () => {
 			cy.get('[data-id="name"]').should('contain.text', workflow.name);
 			cy.contains(`[data-id="workflow-row"]`, workflow.name)
 				.should('exist')
@@ -90,15 +90,13 @@ describe('Workflow management and functionalities', () => {
 
 			cy.get('[name="name"]')
 				.should('exist')
-				.type(workflow.name+"_jsonEditor")
-				.should('have.value', workflow.name+"_jsonEditor");
+				.type(workflow.name+"_JSON-Editor")
+				.should('have.value', workflow.name+"_JSON-Editor");
 
-			for (let i = 0; i < 10; i++) {
-				cy.get('.ace_content')
-					.should('exist')
-					.click()
-					.type(`{selectAll}{backspace}`, {parseSpecialCharSequences: true});
-			}
+						cy.get('.ace_content')
+				.should('exist')
+				.click()
+				.type(`{pageDown}{pageDown}{pageDown}{shift}{pageUp}{pageUp}{pageUp}{backspace}`, {parseSpecialCharSequences: true});
 
 			cy.wait(1000);
 			cy.get('.ace_content')
@@ -114,7 +112,7 @@ describe('Workflow management and functionalities', () => {
 			cy.get('[data-id="btn-modal-close"]').click();
 
 			cy.wait(1000);
-			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_jsonEditor")
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_JSON-Editor")
 				.should('exist');
 		});
 		it('Error handling when creating a workflow with invalid name', () => {
@@ -133,12 +131,10 @@ describe('Workflow management and functionalities', () => {
 				.clear()
 				.type(workflow.name+"_invalidJson");
 
-			for (let i = 0; i < 10; i++) {
-				cy.get('.ace_content')
-					.should('exist')
-					.click()
-					.type(`{selectAll}{backspace}`, {parseSpecialCharSequences: true});
-			}
+						cy.get('.ace_content')
+				.should('exist')
+				.click()
+				.type(`{pageDown}{pageDown}{pageDown}{shift}{pageUp}{pageUp}{pageUp}{backspace}`, {parseSpecialCharSequences: true});
 
 			cy.get('[data-id="btn-save"]').click();
 			cy.get('[data-id="modal-description"]')
@@ -154,17 +150,15 @@ describe('Workflow management and functionalities', () => {
 			`"annotations": {}}`;
 
 		it('Change the json editor content to edit the workflow', () => {
-			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_jsonEditor")
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_JSON-Editor")
 				.should('exist')
 				.find(`[data-id="btn-edit"]`)
 				.click();
 
-			for (let i = 0; i < 10; i++) {
-				cy.get('.ace_content')
-					.should('exist')
-					.click()
-					.type(`{selectAll}{backspace}`, {parseSpecialCharSequences: true});
-			}
+			cy.get('.ace_content')
+				.should('exist')
+				.click()
+				.type(`{pageDown}{pageDown}{pageDown}{shift}{pageUp}{pageUp}{pageUp}{backspace}`, {parseSpecialCharSequences: true});
 
 			cy.wait(1000);
 			cy.get('.ace_content')
@@ -179,7 +173,7 @@ describe('Workflow management and functionalities', () => {
 
 		})
 		it('Add a node, edit its name using the manel and delete one other', () => {
-			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_jsonEditor")
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_JSON-Editor")
 				.should('exist')
 				.find(`[data-id="btn-edit"]`)
 				.click();
@@ -233,7 +227,7 @@ describe('Workflow management and functionalities', () => {
 		});
 	})
 
-	describe('Workflow visual builder basic functionality', () => {
+	describe('Workflow UI basic functionality', () => {
 		beforeEach(() => {
 			cy.get('[data-id="btn-create"]').click();
 			cy.get('[id*="-trigger-visual-builder"]').click();
@@ -304,7 +298,7 @@ describe('Workflow management and functionalities', () => {
 			cy.get('[data-testid="rf__node-testResource1"]')
 				.should('exist');
 		});
-		it('Create a workflow connecting different nodes', () => {
+		it('Create a workflow from scratch and connect the different nodes', () => {
 			cy.get('[id*="-trigger-visual-builder"]')
 				.should('exist')
 				.click();
@@ -470,15 +464,15 @@ describe('Workflow management and functionalities', () => {
 			//Set name and create the workflow
 			cy.get('[name="name"]')
 				.should('exist')
-				.type(workflow.name+"_visualEditor")
-				.should('have.value', workflow.name+"_visualEditor");
+				.type(workflow.name+"_workflowUI")
+				.should('have.value', workflow.name+"_workflowUI");
 
 			cy.get('[data-id="btn-save"]').click();
 		});
 	});
 
 	describe('Delete workflow',()=> {
-		it('Delete a workflow blank', () => {
+		it('Delete a blank workflow', () => {
 			cy.contains(`[data-id="workflow-row"]`, workflow.name)
 				.should('exist')
 				.find(`[data-id="btn-delete"]`)
@@ -510,8 +504,8 @@ describe('Workflow management and functionalities', () => {
 			cy.contains(`[data-id="workflow-row"]`, workflow.name)
 				.should('not.exist');
 		});
-		it('Delete a workflow jsonEditor', () => {
-			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_jsonEditor")
+		it('Delete a workflow created with JSON Editor', () => {
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_JSON-Editor")
 				.should('exist')
 				.find(`[data-id="btn-delete"]`)
 				.click();
@@ -520,7 +514,7 @@ describe('Workflow management and functionalities', () => {
 
 			cy.get('[data-id="wf_name"]')
 				.should('exist')
-				.should('contain.text', workflow.name+"_jsonEditor");
+				.should('contain.text', workflow.name+"_JSON-Editor");
 
 			cy.get('[data-id="wf_createdAt"]')
 				.should('exist')
@@ -539,11 +533,11 @@ describe('Workflow management and functionalities', () => {
 				.should('contain.text', 'The workflow has been deleted successfully');
 
 			cy.get('[data-id="btn-modal-close"]').click();
-			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_jsonEditor")
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_JSON-Editor")
 				.should('not.exist');
 		});
-		it('Delete a workflow visualEditor', () => {
-			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_visualEditor")
+		it('Delete a workflow created with Workflow UI', () => {
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_workflowUI")
 				.should('exist')
 				.find(`[data-id="btn-delete"]`)
 				.click();
@@ -552,7 +546,7 @@ describe('Workflow management and functionalities', () => {
 
 			cy.get('[data-id="wf_name"]')
 				.should('exist')
-				.should('contain.text', workflow.name+"_visualEditor");
+				.should('contain.text', workflow.name+"_workflowUI");
 
 			cy.get('[data-id="wf_createdAt"]')
 				.should('exist')
@@ -571,7 +565,7 @@ describe('Workflow management and functionalities', () => {
 				.should('contain.text', 'The workflow has been deleted successfully');
 
 			cy.get('[data-id="btn-modal-close"]').click();
-			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_visualEditor")
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_workflowUI")
 				.should('not.exist');
 		});
 	})
