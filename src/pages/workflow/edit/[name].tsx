@@ -132,7 +132,7 @@ export default function WorkflowEdit() {
 					<CardContent className="max-w-5xl">
 						<div className="flex my-3">
 							<div className="w-48 font-bold">Name:</div>
-							<div className="w-96">{workflow.name}</div>
+							<div className="w-96" data-id={`name`}>{workflow.name}</div>
 						</div>
 						<div className="flex my-3">
 							<div className="w-48 font-bold">Created at:</div>

@@ -1,3 +1,5 @@
+import {wait} from "next/dist/lib/wait";
+
 describe('Workflow management and functionalities', () => {
 	const credentials = {
 		default:{
@@ -172,7 +174,7 @@ describe('Workflow management and functionalities', () => {
 				.should('contain.text', 'The workflow has been updated successfully');
 
 		})
-		it('Add a node, edit its name using the manel and delete one other', () => {
+		it('Add a node, edit its name using the panel and delete one other', () => {
 			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_JSON-Editor")
 				.should('exist')
 				.find(`[data-id="btn-edit"]`)
@@ -225,7 +227,46 @@ describe('Workflow management and functionalities', () => {
 				.should('exist')
 				.should('contain.text', 'The workflow has been updated successfully');
 		});
-	})
+	});
+
+	describe('View workflow',()=>{
+		const nodesShouldExist = ["funcEdited", "res1", "res_out"];
+
+		it('Displays correctly formatted workflow data', () => {
+			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_JSON-Editor")
+				.should('exist')
+				.find(`[data-id="btn-view"]`)
+				.click();
+
+			cy.get(`[data-id="name"]`)
+				.should('contain.text',  workflow.name+"_JSON-Editor");
+
+			cy.get(`[data-id="createdAt"]`)
+				.invoke('text')
+				.should('match', /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
+
+			cy.get(`[data-id="updatedAt"]`)
+				.invoke('text')
+				.should('match', /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
+
+			cy.get('[id*="-trigger-json-editor"]')
+				.should('exist')
+				.click();
+			cy.get('.jsoneditor')
+				.should('exist')
+
+			cy.get('[id*="-trigger-visual-builder"]')
+				.should('exist')
+				.click();
+
+			cy.get('[id*="-content-visual-builder"] > .rounded-lg')
+				.should('exist')
+
+			nodesShouldExist.forEach((node) => {
+				cy.get(`[data-id="${node}"]`).should('exist');
+			})
+		});
+	});
 
 	describe('Workflow UI basic functionality', () => {
 		beforeEach(() => {
@@ -568,6 +609,6 @@ describe('Workflow management and functionalities', () => {
 			cy.contains(`[data-id="workflow-row"]`, workflow.name+"_workflowUI")
 				.should('not.exist');
 		});
-	})
+	});
 
 })
