@@ -75,7 +75,6 @@ export default function CreateUser() {
 		//Create user
 		try {
 			const userData: UserDTO = {
-				id: '',
 				email: data.email,
 				password: data.password,
 				role: data.role
