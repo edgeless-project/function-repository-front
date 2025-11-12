@@ -6,7 +6,7 @@ import {useState} from "react";
 import {useSelector} from "react-redux";
 import {selectSessionAccessToken} from "@/features/account/sessionSlice";
 import {selectRole} from "@/features/account/accountSlice";
-import {router} from "next/client";
+import { useRouter } from 'next/router';
 import DialogSave from "@/components/utils/DialogSave";
 import {createAPIKey} from "@/services/apikeyServices";
 
@@ -14,6 +14,7 @@ const roleAllowed = ["APP_DEVELOPER", "CLUSTER_ADMIN", "FUNC_DEVELOPER"];
 
 
 export default function CreateAPIKey() {
+	const router = useRouter();
 
 	const tokenValue = useSelector(selectSessionAccessToken);
 	const role = useSelector(selectRole);

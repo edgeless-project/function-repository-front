@@ -12,7 +12,7 @@ import {z} from "zod";
 import {hasMiddleSpaces} from "@/utils/general";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {router} from "next/client";
+import { useRouter } from 'next/router';
 import DialogSave from "@/components/utils/DialogSave";
 import {createUser} from "@/services/userServices";
 import {UserDTO} from "@/types/users";
@@ -41,6 +41,7 @@ const formSchema = z.object({
 
 
 export default function CreateUser() {
+	const router = useRouter();
 
 	const tokenValue = useSelector(selectSessionAccessToken);
 	const role = useSelector(selectRole);
